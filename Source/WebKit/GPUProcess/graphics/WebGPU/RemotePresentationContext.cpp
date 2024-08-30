@@ -76,14 +76,14 @@ void RemotePresentationContext::unconfigure()
     m_backing->unconfigure();
 }
 
-void RemotePresentationContext::present()
+void RemotePresentationContext::present(uint32_t frameIndex)
 {
-    m_backing->present();
+    m_backing->present(frameIndex);
 }
 
-void RemotePresentationContext::getCurrentTexture(WebGPUIdentifier identifier)
+void RemotePresentationContext::getCurrentTexture(WebGPUIdentifier identifier, uint32_t frameIndex)
 {
-    auto texture = m_backing->getCurrentTexture();
+    auto texture = m_backing->getCurrentTexture(frameIndex);
     ASSERT(texture);
     auto connection = m_gpuConnectionToWebProcess.get();
     if (!texture || !connection)

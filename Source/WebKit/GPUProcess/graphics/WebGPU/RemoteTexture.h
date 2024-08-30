@@ -86,6 +86,7 @@ private:
     void createView(const std::optional<WebGPU::TextureViewDescriptor>&, WebGPUIdentifier);
 
     void destroy();
+    void undestroy();
     void destruct();
 
     void setLabel(String&&);

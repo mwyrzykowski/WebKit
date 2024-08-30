@@ -91,6 +91,11 @@ void RemoteTexture::destroy()
     m_backing->destroy();
 }
 
+void RemoteTexture::undestroy()
+{
+    m_backing->undestroy();
+}
+
 void RemoteTexture::destruct()
 {
     m_objectHeap->removeObject(m_identifier);

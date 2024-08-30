@@ -88,7 +88,7 @@ private:
 
     CanvasType htmlOrOffscreenCanvas() const;
     ExceptionOr<void> configure(GPUCanvasConfiguration&&, bool);
-    void present();
+    void present(uint32_t frameIndex);
 
     struct Configuration {
         Ref<GPUDevice> device;

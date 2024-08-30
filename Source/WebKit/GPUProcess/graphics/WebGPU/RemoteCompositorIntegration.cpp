@@ -92,9 +92,9 @@ void RemoteCompositorIntegration::recreateRenderBuffers(int width, int height, W
 }
 #endif
 
-void RemoteCompositorIntegration::prepareForDisplay(CompletionHandler<void(bool)>&& completionHandler)
+void RemoteCompositorIntegration::prepareForDisplay(uint32_t frameIndex, CompletionHandler<void(bool)>&& completionHandler)
 {
-    m_backing->prepareForDisplay([completionHandler = WTFMove(completionHandler)]() mutable {
+    m_backing->prepareForDisplay(frameIndex, [completionHandler = WTFMove(completionHandler)]() mutable {
         completionHandler(true);
     });
 }
