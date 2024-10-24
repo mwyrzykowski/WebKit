@@ -334,6 +334,9 @@ bool RenderBundleEncoder::executePreDrawCommands(bool passWasSplit, uint32_t fir
     if (!icbCommand)
         return true;
 
+    if (!m_currentPipelineState)
+        return false;
+
 #if CPU(X86_64)
     if (m_renderPassEncoder && passWasSplit) {
         id<MTLRenderCommandEncoder> commandEncoder = m_renderPassEncoder->renderCommandEncoder();
