@@ -874,7 +874,20 @@ void RenderBundleEncoder::endCurrentICB()
 {
     auto commandCount = m_currentCommandIndex;
     m_currentCommandIndex = 0;
-    RELEASE_ASSERT(!commandCount || !!m_icbDescriptor.commandTypes);
+    RELEASE_ASSERT(!commandCount || !!m_icbDescriptor);
+    auto cleanup = [&] {
+        m_indirectCommandBuffer = nil;
+        m_currentCommand = nil;
+        m_currentPipelineState = nil;
+        m_dynamicOffsetsFragmentBuffer = nil;
+        m_dynamicOffsetsVertexBuffer = nil;
+        m_resources = [NSMapTable strongToStrongObjectsMapTable];
+    };
+    if (!m_icbDescriptor.commandTypes) {
+        m_recordedCommands.clear();
+        cleanup();
+        return;
+    }
 
     m_icbDescriptor.maxVertexBufferBindCount = m_device->maxBuffersPlusVertexBuffersForVertexStage() + 1;
     m_icbDescriptor.maxFragmentBufferBindCount = m_device->maxBuffersForFragmentStage() + 1;
@@ -932,12 +945,7 @@ void RenderBundleEncoder::endCurrentICB()
 
     m_currentCommandIndex = commandCount - completedDraws;
     [m_icbArray addObject:makeRenderBundleICBWithResources(m_indirectCommandBuffer, m_resources, m_currentPipelineState, m_depthStencilState, m_cullMode, m_frontFace, m_depthClipMode, m_depthBias, m_depthBiasSlopeScale, m_depthBiasClamp, m_dynamicOffsetsFragmentBuffer, m_pipeline.get(), m_device, m_minVertexCountForDrawCommand)];
-    m_indirectCommandBuffer = nil;
-    m_currentCommand = nil;
-    m_currentPipelineState = nil;
-    m_dynamicOffsetsFragmentBuffer = nil;
-    m_dynamicOffsetsVertexBuffer = nil;
-    m_resources = [NSMapTable strongToStrongObjectsMapTable];
+    cleanup();
 }
 
 bool RenderBundleEncoder::validToEncodeCommand() const
