@@ -51,17 +51,103 @@ beforeAllSubcases((t) => {
 fn((t) => {
   const type = kValuesTypes[t.params.type];
 
-  // We expect to fail if low == high as it results in a DBZ
-  const expectedResult = t.params.value1 !== t.params.value2;
+  // We expect to fail if low >= high.
+  const expectedResult = t.params.value1 < t.params.value2;
 
   validateConstOrOverrideBuiltinEval(
     t,
     builtin,
     expectedResult,
     [type.create(t.params.value1), type.create(t.params.value2), type.create(0)],
-    t.params.stage,
-    /* returnType */concreteTypeOf(type, [Type.f32])
+    t.params.stage
   );
+});
+
+const kStages = [...kConstantAndOverrideStages, 'runtime'];
+
+g.test('partial_eval_errors').
+desc('Validates that low < high').
+params((u) =>
+u.
+combine('lowStage', kStages).
+combine('highStage', kStages).
+combine('type', keysOf(kValuesTypes)).
+filter((t) => {
+  const type = kValuesTypes[t.type];
+  const scalarTy = scalarTypeOf(type);
+  return scalarTy !== Type.abstractInt && scalarTy !== Type.abstractFloat;
+}).
+beginSubcases().
+expand('low', (u) => [0, 10]).
+expand('high', (u) => [0, 10])
+// in_shader: Is the function call statically accessed by the entry point?
+.combine('in_shader', [false, true])
+).
+beforeAllSubcases((t) => {
+  if (scalarTypeOf(kValuesTypes[t.params.type]) === Type.f16) {
+    t.selectDeviceOrSkipTestCase('shader-f16');
+  }
+}).
+fn((t) => {
+  const type = kValuesTypes[t.params.type];
+  const scalarTy = scalarTypeOf(type);
+  const enable = `${type.requiresF16() ? 'enable f16;' : ''}`;
+  let lowArg = '';
+  let highArg = '';
+  switch (t.params.lowStage) {
+    case 'constant':
+      lowArg = `${type.create(t.params.low).wgsl()}`;
+      break;
+    case 'override':
+      lowArg = `${type.toString()}(o_low)`;
+      break;
+    case 'runtime':
+      lowArg = `v_low`;
+      break;
+  }
+  switch (t.params.highStage) {
+    case 'constant':
+      highArg = `${type.create(t.params.high).wgsl()}`;
+      break;
+    case 'override':
+      highArg = `${type.toString()}(o_high)`;
+      break;
+    case 'runtime':
+      highArg = `v_high`;
+      break;
+  }
+  const wgsl = `
+${enable}
+override o_low : ${scalarTy.toString()};
+override o_high : ${scalarTy.toString()};
+fn foo() {
+  var x : ${type.toString()};
+  var v_low : ${type.toString()};
+  var v_high : ${type.toString()};
+  let tmp = smoothstep(${lowArg}, ${highArg}, x);
+}`;
+
+  const error = t.params.low >= t.params.high;
+  const shader_error =
+  error && t.params.lowStage === 'constant' && t.params.highStage === 'constant';
+  const pipeline_error =
+  t.params.in_shader &&
+  error &&
+  t.params.lowStage !== 'runtime' &&
+  t.params.highStage !== 'runtime';
+  t.expectCompileResult(!shader_error, wgsl);
+  if (!shader_error) {
+    const constants = {};
+    constants['o_low'] = t.params.low;
+    constants['o_high'] = t.params.high;
+    t.expectPipelineResult({
+      expectedResult: !pipeline_error,
+      code: wgsl,
+      constants,
+      reference: ['o_low', 'o_high'],
+      statements: t.params.in_shader ? ['foo();'] : []
+    });
+  }
 });
 
 g.test('argument_types').
@@ -78,10 +164,11 @@ beforeAllSubcases((t) => {
 }).
 fn((t) => {
   const type = kArgumentTypes[t.params.type];
+  const expectedResult = isConvertibleToFloatType(elementTypeOf(type));
   validateConstOrOverrideBuiltinEval(
     t,
     builtin,
-    /* expectedResult */isConvertibleToFloatType(elementTypeOf(type)),
+    expectedResult,
     [type.create(0), type.create(1), type.create(2)],
     'constant',
     /* returnType */concreteTypeOf(type, [Type.f32])
@@ -263,7 +350,7 @@ fn((t) => {
     t,
     builtin,
     /* expectedResult */t.params.low < t.params.high,
-    [f32(0), f32(t.params.low), f32(t.params.high)],
+    [f32(t.params.low), f32(t.params.high), f32(0)],
     t.params.stage
   );
 });

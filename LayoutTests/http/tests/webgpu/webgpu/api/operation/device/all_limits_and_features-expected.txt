@@ -1,0 +1,7 @@
+
+FAIL :everything: assert_unreached:
+  - EXCEPTION: Error: WebGPU device failed to initialize with OperationError "The operation failed for an operation-specific reason."; not retrying
+    assert@http://127.0.0.1:8000/webgpu/common/util/util.js:37:20
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:53:11
+ Reached unreachable code
+

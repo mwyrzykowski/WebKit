@@ -9,7 +9,47 @@ PASS :buffer:member_types=["i32","f16","vec4i","mat3x2f"];inputSource="uniform"
 PASS :buffer:member_types=["i32","f16","vec4i","mat3x2f"];inputSource="storage"
 PASS :buffer:member_types=["i32","u32","f32","f16","vec3f","vec4i"];inputSource="uniform"
 PASS :buffer:member_types=["i32","u32","f32","f16","vec3f","vec4i"];inputSource="storage"
-PASS :buffer_align:
+FAIL :buffer_align: assert_unreached:
+  - EXCEPTION: GPUPipelineError
+    _
+  - EXCEPTION: GPUPipelineError
+    _
+  - EXCEPTION: GPUPipelineError
+      at (elided: only 2 shown)
+  - INFO: subcase: member_index=0;alignments=[1,1,1]
+    OK
+  - INFO: subcase: member_index=1;alignments=[1,1,1]
+    OK
+  - INFO: subcase: member_index=2;alignments=[1,1,1]
+    OK
+  - INFO: subcase: member_index=0;alignments=[4,4,4]
+    OK
+  - INFO: subcase: member_index=0;alignments=[4,8,16]
+    OK
+  - INFO: subcase: member_index=0;alignments=[8,4,16]
+    OK
+  - INFO: subcase: member_index=0;alignments=[8,16,4]
+    OK
+  - INFO: subcase: member_index=1;alignments=[4,4,4]
+    OK
+  - INFO: subcase: member_index=1;alignments=[4,8,16]
+    OK
+  - INFO: subcase: member_index=1;alignments=[8,4,16]
+    OK
+  - INFO: subcase: member_index=1;alignments=[8,16,4]
+    OK
+  - INFO: subcase: member_index=2;alignments=[4,4,4]
+    OK
+  - INFO: subcase: member_index=2;alignments=[4,8,16]
+    OK
+  - INFO: subcase: member_index=2;alignments=[8,4,16]
+    OK
+  - INFO: subcase: member_index=2;alignments=[8,16,4]
+    OK
+  - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
+    7:2: @align attribute 1 of struct member is not a multiple of the type's alignment 4
+      at (elided: only 2 shown)
+ Reached unreachable code
 PASS :buffer_size:
 PASS :buffer_pointer:member_types=["u32"];inputSource="uniform"
 PASS :buffer_pointer:member_types=["u32"];inputSource="storage"

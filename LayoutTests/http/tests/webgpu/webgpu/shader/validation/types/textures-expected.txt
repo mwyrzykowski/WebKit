@@ -57,7 +57,7 @@ FAIL :storage_texture_types:access="read";format="bgra8unorm";comma="" assert_un
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :storage_texture_types:access="read";format="bgra8unorm";comma="," assert_unreached:
   - VALIDATION FAILED: Unexpected compilationInfo 'error' message.
@@ -71,7 +71,7 @@ FAIL :storage_texture_types:access="read";format="bgra8unorm";comma="," assert_u
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :storage_texture_types:access="read";format="bgra8unorm-srgb";comma=""
 PASS :storage_texture_types:access="read";format="bgra8unorm-srgb";comma=","
@@ -273,7 +273,7 @@ FAIL :storage_texture_types:access="write";format="bgra8unorm";comma="" assert_u
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :storage_texture_types:access="write";format="bgra8unorm";comma="," assert_unreached:
   - VALIDATION FAILED: Unexpected compilationInfo 'error' message.
@@ -287,7 +287,7 @@ FAIL :storage_texture_types:access="write";format="bgra8unorm";comma="," assert_
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :storage_texture_types:access="write";format="bgra8unorm-srgb";comma=""
 PASS :storage_texture_types:access="write";format="bgra8unorm-srgb";comma=","
@@ -489,7 +489,7 @@ FAIL :storage_texture_types:access="read_write";format="bgra8unorm";comma="" ass
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :storage_texture_types:access="read_write";format="bgra8unorm";comma="," assert_unreached:
   - VALIDATION FAILED: Unexpected compilationInfo 'error' message.
@@ -503,7 +503,7 @@ FAIL :storage_texture_types:access="read_write";format="bgra8unorm";comma="," as
     1:50: unresolved identifier 'bgra8unorm'
     1:22: module-scope 'var' declarations that are not of texture or sampler types must provide an address space
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :storage_texture_types:access="read_write";format="bgra8unorm-srgb";comma=""
 PASS :storage_texture_types:access="read_write";format="bgra8unorm-srgb";comma=","

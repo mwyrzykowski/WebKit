@@ -4,6 +4,7 @@
 Texture Usages Validation Tests on All Kinds of WebGPU Subresource Usage Scopes.
 `;import { makeTestGroup } from '../../../../../common/framework/test_group.js';
 import { unreachable } from '../../../../../common/util/util.js';
+import { kTextureUsages } from '../../../../capability_info.js';
 import { ValidationTest } from '../../validation_test.js';
 import {
 
@@ -15,7 +16,7 @@ class F extends ValidationTest {
   createBindGroupLayoutForTest(
   textureUsage,
   sampleType,
-  visibility = GPUShaderStage['FRAGMENT'])
+  visibility = GPUShaderStage.FRAGMENT)
   {
     const bindGroupLayoutEntry = {
       binding: 0,
@@ -60,7 +61,7 @@ class F extends ValidationTest {
   textureView,
   textureUsage,
   sampleType,
-  visibility = GPUShaderStage['FRAGMENT'])
+  visibility = GPUShaderStage.FRAGMENT)
   {
     return this.device.createBindGroup({
       layout: this.createBindGroupLayoutForTest(textureUsage, sampleType, visibility),
@@ -88,10 +89,16 @@ combine('baseLayer2', [0, 1]).
 combine('view1Binding', kTextureBindingTypes).
 combine('view2Binding', kTextureBindingTypes)
 ).
+beforeAllSubcases((t) => {
+  t.skipIf(
+    t.isCompatibility,
+    'texture views used in bindgroups must consist of the entire array in compatibility mode. textureView0 does not fit.'
+  );
+}).
 fn((t) => {
   const { useDifferentTextureAsTexture2, baseLayer2, view1Binding, view2Binding } = t.params;
 
-  const texture0 = t.device.createTexture({
+  const texture0 = t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING,
     size: [kTextureSize, kTextureSize, kTextureLayers]
@@ -106,7 +113,7 @@ fn((t) => {
   const bindGroup1 = t.createBindGroupForTest(textureView0, view2Binding, 'unfilterable-float');
 
   const texture2 = useDifferentTextureAsTexture2 ?
-  t.device.createTexture({
+  t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING,
     size: [kTextureSize, kTextureSize, kTextureLayers]
@@ -124,7 +131,7 @@ fn((t) => {
     'unfilterable-float'
   );
 
-  const unusedColorTexture = t.device.createTexture({
+  const unusedColorTexture = t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.RENDER_ATTACHMENT,
     size: [kTextureSize, kTextureSize, 1]
@@ -166,7 +173,7 @@ combine('depthStencilReadOnly', [true, false])
 ).
 fn((t) => {
   const { bindAspect, depthStencilReadOnly } = t.params;
-  const depthStencilTexture = t.device.createTexture({
+  const depthStencilTexture = t.createTextureTracked({
     format: 'depth24plus-stencil8',
     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT,
     size: [kTextureSize, kTextureSize, 1],
@@ -184,7 +191,7 @@ fn((t) => {
     bindAspect === 'depth-only' ? 'depth' : 'uint'
   );
 
-  const colorTexture = t.device.createTexture({
+  const colorTexture = t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING,
     size: [kTextureSize, kTextureSize, 1],
@@ -231,6 +238,12 @@ combine('inRenderPass', [true, false]).
 combine('textureUsage0', kTextureBindingTypes).
 combine('textureUsage1', kTextureBindingTypes)
 ).
+beforeAllSubcases((t) => {
+  t.skipIf(
+    t.isCompatibility,
+    'texture views used in bindgroups must consist of the entire array in compatibility mode. textureView0 does not fit.'
+  );
+}).
 fn((t) => {
   const { inRenderPass, textureUsage0, textureUsage1 } = t.params;
 
@@ -241,7 +254,7 @@ fn((t) => {
     t.skipIfLanguageFeatureNotSupported('readonly_and_readwrite_storage_textures');
   }
 
-  const texture0 = t.device.createTexture({
+  const texture0 = t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING,
     size: [kTextureSize, kTextureSize, kTextureLayers]
@@ -268,7 +281,7 @@ fn((t) => {
   );
 
   const encoder = t.device.createCommandEncoder();
-  const colorTexture = t.device.createTexture({
+  const colorTexture = t.createTextureTracked({
     format: 'r32float',
     usage: GPUTextureUsage.RENDER_ATTACHMENT,
     size: [kTextureSize, kTextureSize, 1]
@@ -415,7 +428,7 @@ fn((t) => {
       }
     });
 
-    const writableStorageTexture = t.device.createTexture({
+    const writableStorageTexture = t.createTextureTracked({
       format: 'r32float',
       usage: GPUTextureUsage.STORAGE_BINDING,
       size: [kTextureSize, kTextureSize, 1]
@@ -494,7 +507,7 @@ filter(
 fn((t) => {
   const { usage0, usage1 } = t.params;
 
-  const texture = t.device.createTexture({
+  const texture = t.createTextureTracked({
     format: 'r32float',
     usage:
     GPUTextureUsage.COPY_SRC |
@@ -541,7 +554,7 @@ fn((t) => {
       case 'readonly-storage-texture':
       case 'writeonly-storage-texture':
       case 'readwrite-storage-texture':{
-          const colorTexture = t.device.createTexture({
+          const colorTexture = t.createTextureTracked({
             format: 'r32float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
             size: [kTextureSize, kTextureSize, 1]
@@ -570,4 +583,80 @@ fn((t) => {
   t.expectValidationError(() => {
     encoder.finish();
   }, false);
+});
+
+g.test('subresources,texture_view_usages').
+desc(
+  `
+  Test that the usages of the texture view are used to validate compatibility in command encoding
+  instead of the usages of the base texture.`
+).
+params((u) =>
+u.
+combine('bindingType', ['color-attachment', ...kTextureBindingTypes]).
+combine('viewUsage', [0, ...kTextureUsages])
+).
+fn((t) => {
+  const { bindingType, viewUsage } = t.params;
+
+  const texture = t.createTextureTracked({
+    format: 'r32float',
+    usage:
+    GPUTextureUsage.COPY_SRC |
+    GPUTextureUsage.COPY_DST |
+    GPUTextureUsage.TEXTURE_BINDING |
+    GPUTextureUsage.STORAGE_BINDING |
+    GPUTextureUsage.RENDER_ATTACHMENT,
+    size: [kTextureSize, kTextureSize, 1],
+    ...(t.isCompatibility && {
+      textureBindingViewDimension: '2d-array'
+    })
+  });
+
+  switch (bindingType) {
+    case 'color-attachment':{
+        const encoder = t.device.createCommandEncoder();
+        const renderPassEncoder = encoder.beginRenderPass({
+          colorAttachments: [
+          { view: texture.createView({ usage: viewUsage }), loadOp: 'load', storeOp: 'store' }]
+
+        });
+        renderPassEncoder.end();
+
+        const success = viewUsage === 0 || (viewUsage & GPUTextureUsage.RENDER_ATTACHMENT) !== 0;
+
+        t.expectValidationError(() => {
+          encoder.finish();
+        }, !success);
+        break;
+      }
+    case 'sampled-texture':
+    case 'readonly-storage-texture':
+    case 'writeonly-storage-texture':
+    case 'readwrite-storage-texture':
+      {
+        let success = true;
+        if (viewUsage !== 0) {
+          if (bindingType === 'sampled-texture') {
+            if ((viewUsage & GPUTextureUsage.TEXTURE_BINDING) === 0) success = false;
+          } else {
+            if ((viewUsage & GPUTextureUsage.STORAGE_BINDING) === 0) success = false;
+          }
+        }
+
+        t.expectValidationError(() => {
+          t.createBindGroupForTest(
+            texture.createView({
+              dimension: '2d-array',
+              usage: viewUsage
+            }),
+            bindingType,
+            'unfilterable-float'
+          );
+        }, !success);
+      }
+      break;
+    default:
+      unreachable();
+  }
 });

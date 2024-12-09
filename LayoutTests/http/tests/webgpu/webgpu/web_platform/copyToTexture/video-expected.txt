@@ -13,7 +13,7 @@ FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -29,7 +29,7 @@ FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -45,7 +45,7 @@ FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -61,7 +61,7 @@ FAIL :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp8-bt601.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -81,7 +81,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -97,7 +97,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -113,7 +113,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -129,7 +129,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -149,7 +149,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -165,7 +165,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -181,7 +181,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -197,7 +197,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -217,7 +217,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -233,7 +233,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -249,7 +249,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -265,7 +265,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoEl
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt709.webm";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -285,7 +285,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -301,7 +301,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -317,7 +317,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -333,7 +333,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-90.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -353,7 +353,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -369,7 +369,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -385,7 +385,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -401,7 +401,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-180.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -421,7 +421,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -437,7 +437,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -453,7 +453,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -469,7 +469,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceTy
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601-rotate-270.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -489,7 +489,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -505,7 +505,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -521,7 +521,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -537,7 +537,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-90.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -557,7 +557,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -573,7 +573,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -589,7 +589,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -605,7 +605,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-180.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -625,7 +625,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -641,7 +641,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -657,7 +657,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -673,7 +673,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceTyp
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-rotate-270.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -693,7 +693,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -709,7 +709,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -725,7 +725,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -741,7 +741,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601-hflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -761,7 +761,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -777,7 +777,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -793,7 +793,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -809,7 +809,7 @@ FAIL :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="V
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-h264-bt601-vflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -829,7 +829,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -845,7 +845,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -861,7 +861,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -877,7 +877,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-hflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"
@@ -897,7 +897,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=true;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -913,7 +913,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="display-p3" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -929,7 +929,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="VideoElement";srcDoFlipYDuringCopy=false;dstColorSpace="srgb" assert_unreached:
   - EXPECTATION FAILED: Texture level had unexpected contents:
@@ -945,7 +945,7 @@ FAIL :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="Vi
       at (elided: below max severity)
   - EXCEPTION: Error: Unexpected validation error occurred: GPUQueue.writeTexture: validateLinearTextureData failed
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="display-p3"
 PASS :copy_from_video:videoName="four-colors-vp9-bt601-vflip.mp4";sourceType="VideoFrame";srcDoFlipYDuringCopy=true;dstColorSpace="srgb"

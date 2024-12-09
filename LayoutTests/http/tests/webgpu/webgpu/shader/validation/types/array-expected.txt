@@ -43,7 +43,7 @@ FAIL :valid:case="same_override" assert_unreached:
   - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
     6:19: type in function call does not match parameter type: expected 'ptr<workgroup, array<u32, x>, read_write>', found 'ptr<workgroup, array<u32, x>, read_write>'
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :valid:case="same_rta"
 PASS :valid:case="shadow"
@@ -57,7 +57,7 @@ FAIL :valid:case="trailing_comma1" assert_unreached:
   - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
     1:15: Expected a >, but got a ,
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 FAIL :valid:case="trailing_comma2" assert_unreached:
   - VALIDATION FAILED: Unexpected compilationInfo 'error' message.
@@ -69,7 +69,7 @@ FAIL :valid:case="trailing_comma2" assert_unreached:
   - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
     1:20: Expected one of '(', a literal, or an identifier
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :valid:case="alias_element"
 FAIL :invalid:case="f16_without_enable" assert_unreached:

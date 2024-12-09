@@ -139,7 +139,7 @@ FAIL :parse:test="in_for_init" assert_unreached:
   - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
     4:2: Invalid for-loop initialization clause
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :parse:test="in_for_init_semi"
 FAIL :parse:test="in_for_update" assert_unreached:
@@ -156,7 +156,7 @@ FAIL :parse:test="in_for_update" assert_unreached:
   - EXCEPTION: Error: Unexpected validation error occurred: 1 error generated while compiling the shader:
     4:2: Invalid for-loop update clause
     TestFailedButDeviceReusable@
-    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:409:44
+    @http://127.0.0.1:8000/webgpu/webgpu/util/device_pool.js:424:44
  Reached unreachable code
 PASS :parse:test="in_for_update_semi"
 PASS :parse:test="in_block"
@@ -173,4 +173,5 @@ PASS :parse:test="compound"
 PASS :parse:test="equality"
 PASS :parse:test="block"
 PASS :parse:test="return"
+PASS :module_scope:
 

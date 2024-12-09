@@ -23,7 +23,7 @@ export const listing = [
       "api",
       "operation",
       "adapter",
-      "requestAdapter"
+      "info"
     ]
   },
   {
@@ -31,7 +31,7 @@ export const listing = [
       "api",
       "operation",
       "adapter",
-      "requestAdapterInfo"
+      "requestAdapter"
     ]
   },
   {
@@ -205,6 +205,14 @@ export const listing = [
       "operation",
       "compute_pipeline",
       "overrides"
+    ]
+  },
+  {
+    "file": [
+      "api",
+      "operation",
+      "device",
+      "all_limits_and_features"
     ]
   },
   {
@@ -508,6 +516,14 @@ export const listing = [
     "file": [
       "api",
       "operation",
+      "sampling",
+      "sampler_texture"
+    ]
+  },
+  {
+    "file": [
+      "api",
+      "operation",
       "shader_module",
       "compilation_info"
     ]
@@ -637,6 +653,15 @@ export const listing = [
       "features"
     ],
     "readme": "Test every method or option that shouldn't be allowed without a feature enabled.\nIf the feature is not enabled, any use of an enum value added by a feature must be an\n*exception*, per <https://github.com/gpuweb/gpuweb/blob/main/design/ErrorConventions.md>.\n\n- x= that feature {enabled, disabled}\n\nGenerally one file for each feature name, but some may be grouped (e.g. one file for all optional\nquery types, one file for all optional texture formats).\n\nTODO: implement"
+  },
+  {
+    "file": [
+      "api",
+      "validation",
+      "capability_checks",
+      "features",
+      "clip_distances"
+    ]
   },
   {
     "file": [
@@ -789,15 +814,6 @@ export const listing = [
       "capability_checks",
       "limits",
       "maxDynamicUniformBuffersPerPipelineLayout"
-    ]
-  },
-  {
-    "file": [
-      "api",
-      "validation",
-      "capability_checks",
-      "limits",
-      "maxInterStageShaderComponents"
     ]
   },
   {
@@ -1116,6 +1132,16 @@ export const listing = [
       "encoding",
       "cmds",
       "render",
+      "indirect_multi_draw"
+    ]
+  },
+  {
+    "file": [
+      "api",
+      "validation",
+      "encoding",
+      "cmds",
+      "render",
       "setIndexBuffer"
     ]
   },
@@ -1307,6 +1333,13 @@ export const listing = [
     "file": [
       "api",
       "validation",
+      "non_filterable_texture"
+    ]
+  },
+  {
+    "file": [
+      "api",
+      "validation",
       "query_set",
       "create"
     ]
@@ -1433,6 +1466,14 @@ export const listing = [
       "validation",
       "render_pipeline",
       "depth_stencil_state"
+    ]
+  },
+  {
+    "file": [
+      "api",
+      "validation",
+      "render_pipeline",
+      "float32_blendable"
     ]
   },
   {
@@ -1678,6 +1719,14 @@ export const listing = [
       "compat",
       "api",
       "validation",
+      "pipeline_creation"
+    ]
+  },
+  {
+    "file": [
+      "compat",
+      "api",
+      "validation",
       "render_pipeline",
       "depth_stencil_state"
     ]
@@ -1697,7 +1746,7 @@ export const listing = [
       "api",
       "validation",
       "render_pipeline",
-      "shader_module"
+      "unsupported_wgsl"
     ]
   },
   {
@@ -2985,6 +3034,26 @@ export const listing = [
       "expression",
       "call",
       "builtin",
+      "quadBroadcast"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "quadSwap"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
       "quantizeToF16"
     ]
   },
@@ -3135,6 +3204,86 @@ export const listing = [
       "expression",
       "call",
       "builtin",
+      "subgroupAdd"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupAll"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupAny"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBallot"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBitwise"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBroadcast"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupMul"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupShuffle"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
       "tan"
     ]
   },
@@ -3235,6 +3384,16 @@ export const listing = [
       "expression",
       "call",
       "builtin",
+      "textureSampleBaseClampToEdge"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
       "textureSampleBias"
     ]
   },
@@ -3286,6 +3445,16 @@ export const listing = [
       "call",
       "builtin",
       "textureStore"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "expression",
+      "call",
+      "builtin",
+      "texture_utils"
     ]
   },
   {
@@ -3794,6 +3963,14 @@ export const listing = [
       "shader",
       "execution",
       "shader_io",
+      "vertex_builtins"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "shader_io",
       "workgroup_size"
     ]
   },
@@ -3833,6 +4010,14 @@ export const listing = [
       "execution",
       "statement",
       "increment_decrement"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "execution",
+      "statement",
+      "phony"
     ]
   },
   {
@@ -4007,6 +4192,15 @@ export const listing = [
       "expression",
       "binary",
       "parse"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "binary",
+      "short_circuiting_and_or"
     ]
   },
   {
@@ -4616,6 +4810,26 @@ export const listing = [
       "expression",
       "call",
       "builtin",
+      "quadBroadcast"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "quadSwap"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
       "quantizeToF16"
     ]
   },
@@ -4747,6 +4961,106 @@ export const listing = [
       "call",
       "builtin",
       "step"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupAdd"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupAnyAll"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBallot"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBitwise"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBroadcast"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupBroadcastFirst"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupElect"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupMinMax"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupMul"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
+      "call",
+      "builtin",
+      "subgroupShuffle"
     ]
   },
   {
@@ -5034,6 +5348,14 @@ export const listing = [
       "shader",
       "validation",
       "expression",
+      "early_evaluation"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "expression",
       "matrix",
       "add_sub"
     ]
@@ -5133,6 +5455,22 @@ export const listing = [
       "expression",
       "unary",
       "logical_negation"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "extension",
+      "clip_distances"
+    ]
+  },
+  {
+    "file": [
+      "shader",
+      "validation",
+      "extension",
+      "dual_source_blending"
     ]
   },
   {

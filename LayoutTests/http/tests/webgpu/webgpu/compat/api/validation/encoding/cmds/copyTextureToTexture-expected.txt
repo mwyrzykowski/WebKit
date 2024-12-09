@@ -51,4 +51,5 @@ PASS :compressed:format="astc-12x10-unorm"
 PASS :compressed:format="astc-12x10-unorm-srgb"
 PASS :compressed:format="astc-12x12-unorm"
 PASS :compressed:format="astc-12x12-unorm-srgb"
+PASS :multisample:
 

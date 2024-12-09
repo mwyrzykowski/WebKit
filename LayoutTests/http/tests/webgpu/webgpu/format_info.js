@@ -1773,6 +1773,43 @@ export function isCompressedTextureFormat(format) {
   return format in kCompressedTextureFormatInfo;
 }
 
+export function isDepthTextureFormat(format) {
+  return !!kTextureFormatInfo[format].depth;
+}
+
+export function isStencilTextureFormat(format) {
+  return !!kTextureFormatInfo[format].stencil;
+}
+
+export function isDepthOrStencilTextureFormat(format) {
+  return isDepthTextureFormat(format) || isStencilTextureFormat(format);
+}
+
+export function isEncodableTextureFormat(format) {
+  return kEncodableTextureFormats.includes(format);
+}
+
+export function canUseAsRenderTarget(format) {
+  return kTextureFormatInfo[format].colorRender || isDepthOrStencilTextureFormat(format);
+}
+
+export function is32Float(format) {
+  return format === 'r32float' || format === 'rg32float' || format === 'rgba32float';
+}
+
+/**
+ * Returns true if texture is filterable as `texture_xxx<f32>`
+ *
+ * examples:
+ * * 'rgba8unorm' -> true
+ * * 'depth16unorm' -> false
+ * * 'rgba32float' -> true (you need to enable feature 'float32-filterable')
+ */
+export function isFilterableAsTextureF32(format) {
+  const info = kTextureFormatInfo[format];
+  return info.color?.type === 'float' || is32Float(format);
+}
+
 export const kCompatModeUnsupportedStorageTextureFormats = [
 'rg32float',
 'rg32sint',
@@ -1788,11 +1825,35 @@ isCompatibilityMode)
       return false;
     }
   }
-  return !!kTextureFormatInfo[format].color?.storage;
+  const info = kTextureFormatInfo[format];
+  return !!(info.color?.storage || info.depth?.storage || info.stencil?.storage);
 }
 
 export function isRegularTextureFormat(format) {
   return format in kRegularTextureFormatInfo;
+}
+
+/**
+ * Returns true if format is both compressed and a float format, for example 'bc6h-rgb-ufloat'.
+ */
+export function isCompressedFloatTextureFormat(format) {
+  return isCompressedTextureFormat(format) && format.includes('float');
+}
+
+/**
+ * Returns true if format is sint or uint
+ */
+export function isSintOrUintFormat(format) {
+  const info = kTextureFormatInfo[format];
+  const type = info.color?.type ?? info.depth?.type ?? info.stencil?.type;
+  return type === 'sint' || type === 'uint';
+}
+
+/**
+ * Returns true of format can be multisampled.
+ */
+export function isMultisampledTextureFormat(format) {
+  return kAllTextureFormatInfo[format].multisample;
 }
 
 export const kFeaturesForFormats = getFeaturesForFormats(kAllTextureFormats);
