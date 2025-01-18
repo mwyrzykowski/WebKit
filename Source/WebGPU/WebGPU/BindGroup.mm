@@ -921,7 +921,7 @@ Ref<BindGroup> Device::createBindGroup(const WGPUBindGroupDescriptor& descriptor
 #define INTERNAL_ERROR_STRING(x) [NSString stringWithFormat:@"GPUDevice.createBindGroup: %@", x]
 #define VALIDATION_ERROR(...) generateAValidationError(INTERNAL_ERROR_STRING((__VA_ARGS__)))
     if (descriptor.nextInChain || !descriptor.layout || !isValid())
-        return BindGroup::createInvalid(*this);
+        return BindGroup::createInvalid(*this, @"descriptor is not valid");
 
     constexpr ShaderStage stagesPlusUndefined[] = { ShaderStage::Vertex, ShaderStage::Fragment, ShaderStage::Compute, ShaderStage::Undefined };
     constexpr size_t stageCount = std::size(stages);
@@ -971,7 +971,7 @@ Ref<BindGroup> Device::createBindGroup(const WGPUBindGroupDescriptor& descriptor
         bool textureViewIsPresent = WebGPU::textureViewIsPresent(entry);
         bool externalTextureIsPresent = static_cast<bool>(wgpuExternalTexture);
         if (bufferIsPresent + samplerIsPresent + textureViewIsPresent + externalTextureIsPresent != 1)
-            return BindGroup::createInvalid(*this);
+            return BindGroup::createInvalid(*this, @"descriptor has multiple resources");
 
         bool bindingContainedInStage = false;
         bool appendedBufferToDynamicBuffers = false;
@@ -1205,7 +1205,7 @@ Ref<BindGroup> Device::createBindGroup(const WGPUBindGroupDescriptor& descriptor
 
     for (auto& indices : argumentIndices) {
         if (indices.size())
-            return BindGroup::createInvalid(*this);
+            return BindGroup::createInvalid(*this, @"Bind group did not populate all bindings from the layout");
     }
 
     Vector<BindableResources> resources;

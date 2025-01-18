@@ -48,8 +48,9 @@ public:
     {
         return adoptRef(*new CommandBuffer(commandBuffer, device, sharedEvent, sharedEventSignalValue, commandEncoder));
     }
-    static Ref<CommandBuffer> createInvalid(Device& device)
+    static Ref<CommandBuffer> createInvalid(Device& device, NSString* error = nil)
     {
+        WGPU_REPORT_INVALID_OBJECT(error);
         return adoptRef(*new CommandBuffer(device));
     }
 

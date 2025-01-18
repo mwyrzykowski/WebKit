@@ -68,8 +68,9 @@ public:
     {
         return adoptRef(*new CommandEncoder(commandBuffer, device));
     }
-    static Ref<CommandEncoder> createInvalid(Device& device)
+    static Ref<CommandEncoder> createInvalid(Device& device, NSString* error)
     {
+        WGPU_REPORT_INVALID_OBJECT(error);
         return adoptRef(*new CommandEncoder(device));
     }
 

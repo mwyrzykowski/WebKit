@@ -917,7 +917,7 @@ Ref<PipelineLayout> Device::generatePipelineLayout(const Vector<Vector<WGPUBindG
         bindGroupLayoutDescriptor.entries = entries.size() ? &entries[0] : nullptr;
         auto bindGroupLayout = createBindGroupLayout(bindGroupLayoutDescriptor, true);
         if (!bindGroupLayout->isValid())
-            return PipelineLayout::createInvalid(*this);
+            return PipelineLayout::createInvalid(*this, @"bind group layout is invalid");
         bindGroupLayoutsRefs.append(WTFMove(bindGroupLayout));
         bindGroupLayouts.append(&bindGroupLayoutsRefs[bindGroupLayoutsRefs.size() - 1].get());
     }
@@ -936,7 +936,7 @@ static std::pair<Ref<RenderPipeline>, NSString*> returnInvalidRenderPipeline(Web
 {
     if (!isAsync)
         object.generateAValidationError(error);
-    return std::make_pair(RenderPipeline::createInvalid(object), error);
+    return std::make_pair(RenderPipeline::createInvalid(object, error), error);
 }
 
 static std::pair<Ref<RenderPipeline>, NSString*> returnInvalidRenderPipeline(WebGPU::Device &object, bool isAsync, String&& error)
@@ -1649,7 +1649,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 RenderPipeline::RenderPipeline(Device& device)
     : m_device(device)
-    , m_pipelineLayout(PipelineLayout::createInvalid(device))
+    , m_pipelineLayout(PipelineLayout::createInvalid(device, @"invalid render pipeline"))
     , m_minimumBufferSizes({ })
 {
 }

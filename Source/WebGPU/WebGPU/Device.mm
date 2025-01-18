@@ -232,7 +232,7 @@ Ref<Device> Device::create(id<MTLDevice> device, String&& deviceLabel, HardwareC
 {
     id<MTLCommandQueue> commandQueue = [device newCommandQueueWithMaxCommandBufferCount:4096];
     if (!commandQueue)
-        return Device::createInvalid(adapter);
+        return Device::createInvalid(adapter, @"invalid device object");
 
     // See the comment in Device::setLabel() about why we're not setting the label on the MTLDevice here.
 
@@ -334,7 +334,7 @@ Device::Device(id<MTLDevice> device, id<MTLCommandQueue> defaultQueue, HardwareC
 }
 
 Device::Device(Adapter& adapter)
-    : m_defaultQueue(Queue::createInvalid(adapter, *this))
+    : m_defaultQueue(Queue::createInvalid(adapter, *this, @"invalid device object"))
     , m_adapter(adapter)
     , m_instance(adapter.weakInstance())
 {
@@ -463,6 +463,9 @@ void Device::generateAValidationError(String&& message)
     if (m_supressAllErrors)
         return;
 
+#ifndef NDEBUG
+    WTFLogAlways("%s failed: error %s", __PRETTY_FUNCTION__, message.utf8().data()); // NOLINT
+#endif
     // https://gpuweb.github.io/gpuweb/#abstract-opdef-generate-a-validation-error
     auto* scope = currentErrorScope(WGPUErrorFilter_Validation);
     if (scope) {
@@ -483,7 +486,9 @@ void Device::generateAnOutOfMemoryError(String&& message)
         return;
 
     // https://gpuweb.github.io/gpuweb/#abstract-opdef-generate-an-out-of-memory-error
-
+#ifndef NDEBUG
+    WTFLogAlways("%s failed: error %s", __PRETTY_FUNCTION__, message.utf8().data()); // NOLINT
+#endif
     auto* scope = currentErrorScope(WGPUErrorFilter_OutOfMemory);
 
     if (scope) {
@@ -504,7 +509,9 @@ void Device::generateAnInternalError(String&& message)
         return;
 
     // https://gpuweb.github.io/gpuweb/#abstract-opdef-generate-an-internal-error
-
+#ifndef NDEBUG
+    WTFLogAlways("%s failed: error %s", __PRETTY_FUNCTION__, message.utf8().data()); // NOLINT
+#endif
     auto* scope = currentErrorScope(WGPUErrorFilter_Internal);
 
     if (scope) {

@@ -2563,7 +2563,7 @@ static MTLStorageMode storageMode(bool deviceHasUnifiedMemory, bool supportsNonP
 Ref<Texture> Device::createTexture(const WGPUTextureDescriptor& descriptor)
 {
     if (descriptor.nextInChain || !isValid())
-        return Texture::createInvalid(*this);
+        return Texture::createInvalid(*this, @"descriptor or device is not valid");
 
     // https://gpuweb.github.io/gpuweb/#dom-gpudevice-createtexture
 
@@ -2594,7 +2594,7 @@ Ref<Texture> Device::createTexture(const WGPUTextureDescriptor& descriptor)
             textureDescriptor.arrayLength = descriptor.size.depthOrArrayLayers;
             if (descriptor.sampleCount > 1) {
 #if PLATFORM(WATCHOS) || PLATFORM(APPLETV)
-                return Texture::createInvalid(*this);
+                return Texture::createInvalid(*this, @"multisampling is not supported on watchOS or tvOS");
 #else
                 textureDescriptor.textureType = MTLTextureType2DMultisampleArray;
 #endif
@@ -2615,7 +2615,7 @@ Ref<Texture> Device::createTexture(const WGPUTextureDescriptor& descriptor)
         break;
     case WGPUTextureDimension_Force32:
         ASSERT_NOT_REACHED();
-        return Texture::createInvalid(*this);
+        return Texture::createInvalid(*this, @"invalid texture type");
     }
 
     textureDescriptor.pixelFormat = Texture::pixelFormat(descriptor.format);
@@ -2901,7 +2901,7 @@ Ref<TextureView> Texture::createView(const WGPUTextureViewDescriptor& inputDescr
     auto device = m_device;
 
     if (inputDescriptor.nextInChain || m_destroyed)
-        return TextureView::createInvalid(*this, device.get());
+        return TextureView::createInvalid(*this, device.get(), @"texture was destroyed or descriptor is invalid");
 
     // https://gpuweb.github.io/gpuweb/#dom-gputexture-createview
 
@@ -2926,7 +2926,7 @@ Ref<TextureView> Texture::createView(const WGPUTextureViewDescriptor& inputDescr
     switch (descriptor->dimension) {
     case WGPUTextureViewDimension_Undefined:
         ASSERT_NOT_REACHED();
-        return TextureView::createInvalid(*this, device.get());
+        return TextureView::createInvalid(*this, device.get(), @"texture view descriptor has invalid dimension");
     case WGPUTextureViewDimension_1D:
         if (descriptor->arrayLayerCount == 1)
             textureType = MTLTextureType1D;
@@ -2942,7 +2942,7 @@ Ref<TextureView> Texture::createView(const WGPUTextureViewDescriptor& inputDescr
     case WGPUTextureViewDimension_2DArray:
         if (m_sampleCount > 1) {
 #if PLATFORM(WATCHOS) || PLATFORM(APPLETV)
-            return TextureView::createInvalid(*this, device.get());
+            return TextureView::createInvalid(*this, device.get(), @"multisampling is not supported on watchOS or tvOS");
 #else
             textureType = MTLTextureType2DMultisampleArray;
 #endif
@@ -2960,7 +2960,7 @@ Ref<TextureView> Texture::createView(const WGPUTextureViewDescriptor& inputDescr
         break;
     case WGPUTextureViewDimension_Force32:
         ASSERT_NOT_REACHED();
-        return TextureView::createInvalid(*this, device.get());
+        return TextureView::createInvalid(*this, device.get(), @"descriptor has invalid texture dimension");
     }
 
     auto levels = NSMakeRange(descriptor->baseMipLevel, descriptor->mipLevelCount);
@@ -2969,7 +2969,7 @@ Ref<TextureView> Texture::createView(const WGPUTextureViewDescriptor& inputDescr
 
     id<MTLTexture> texture = [m_texture newTextureViewWithPixelFormat:resolvedPixelFormat(pixelFormat, m_texture.pixelFormat) textureType:textureType levels:levels slices:slices];
     if (!texture)
-        return TextureView::createInvalid(*this, device.get());
+        return TextureView::createInvalid(*this, device.get(), @"texture failed to create");
 
     texture.label = fromAPI(descriptor->label);
     if (!texture.label.length)

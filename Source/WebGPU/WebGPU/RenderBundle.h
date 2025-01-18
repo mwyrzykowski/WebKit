@@ -69,6 +69,7 @@ public:
     }
     static Ref<RenderBundle> createInvalid(Device& device, NSString* errorString)
     {
+        WGPU_REPORT_INVALID_OBJECT(errorString);
         return adoptRef(*new RenderBundle(device, errorString));
     }
 

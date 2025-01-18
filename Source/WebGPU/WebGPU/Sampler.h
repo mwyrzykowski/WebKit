@@ -54,8 +54,9 @@ public:
     {
         return adoptRef(*new Sampler(samplerIdentifier, descriptor, device));
     }
-    static Ref<Sampler> createInvalid(Device& device)
+    static Ref<Sampler> createInvalid(Device& device, NSString* error = nil)
     {
+        WGPU_REPORT_INVALID_OBJECT(error);
         return adoptRef(*new Sampler(device));
     }
 
