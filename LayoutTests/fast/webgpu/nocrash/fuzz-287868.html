@@ -121,8 +121,12 @@ function toBlobUrl(payload) {
   return URL.createObjectURL(blob);
 }
 </script>
+Pass
+
 <script>
+globalThis.testRunner?.dumpAsText();
 globalThis.testRunner?.waitUntilDone();
+
 
 async function window0() {
 let promise0 = navigator.gpu.requestAdapter({});
@@ -17262,3 +17266,5 @@ new Worker(toBlobUrl(`${sharedScript}; log('hello from worker1'); ${worker1}; wo
   globalThis.testRunner?.notifyDone();
 };
 </script>
+Pass
+

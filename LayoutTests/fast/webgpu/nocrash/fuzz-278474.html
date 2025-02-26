@@ -12,6 +12,10 @@ async function run() {
     await device.queue.onSubmittedWorkDone();
     globalThis.testRunner?.notifyDone();
 }
+testRunner?.dumpAsText();
 testRunner?.waitUntilDone();
+
 run();
 </script>
+Pass
+

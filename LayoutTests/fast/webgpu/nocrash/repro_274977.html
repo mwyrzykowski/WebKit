@@ -1,6 +1,8 @@
 <!-- webkit-test-runner [ enableMetalShaderValidation=true ] -->
 <script>
+  globalThis.testRunner?.dumpAsText();
   globalThis.testRunner?.waitUntilDone();
+
   const log = console.debug;
 
   const format = 'bgra8unorm';
@@ -79,3 +81,5 @@ fn f() -> @location(0) vec4f {
     globalThis.testRunner?.notifyDone();
   };
 </script>
+Pass
+

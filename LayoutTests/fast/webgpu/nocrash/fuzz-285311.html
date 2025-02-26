@@ -122,8 +122,12 @@ function toBlobUrl(payload) {
   return URL.createObjectURL(blob);
 }
 </script>
+Pass
+
 <script>
+globalThis.testRunner?.dumpAsText();
 globalThis.testRunner?.waitUntilDone();
+
 
 async function window0() {
 let adapter0 = await navigator.gpu.requestAdapter({});
@@ -19127,3 +19131,5 @@ onload = async () => {
   globalThis.testRunner?.notifyDone();
 };
 </script>
+Pass
+
