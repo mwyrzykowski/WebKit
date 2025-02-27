@@ -56,8 +56,14 @@ static id<MTLComputePipelineState> createComputePipelineState(id<MTLDevice> devi
     // FIXME: Run the asynchronous version of this
     id<MTLComputePipelineState> computePipelineState = [device newComputePipelineStateWithDescriptor:computePipelineDescriptor options:MTLPipelineOptionNone reflection:nil error:&error];
 
-    if (error)
+    if (error) {
         WTFLogAlways("Pipeline state creation error: %@", error);
+        return nil;
+    }
+
+    if (computePipelineState.staticThreadgroupMemoryLength > device.maxThreadgroupMemoryLength)
+        return nil;
+
     return computePipelineState;
 }
 
@@ -132,10 +138,14 @@ std::pair<Ref<ComputePipeline>, NSString*> Device::createComputePipeline(const W
         if (!generatedPipelineLayout->isValid())
             return returnInvalidComputePipeline(*this, isAsync);
         auto computePipelineState = createComputePipelineState(m_device, function, generatedPipelineLayout, size, label, shaderValidationState());
+        if (!computePipelineState)
+            return returnInvalidComputePipeline(*this, isAsync, @"Failed to create compute pipeline");
         return std::make_pair(ComputePipeline::create(computePipelineState, WTFMove(generatedPipelineLayout), size, WTFMove(minimumBufferSizes), *this), nil);
     }
 
     auto computePipelineState = createComputePipelineState(m_device, function, pipelineLayout, size, label, shaderValidationState());
+    if (!computePipelineState)
+        return returnInvalidComputePipeline(*this, isAsync, @"Failed to create compute pipeline");
     return std::make_pair(ComputePipeline::create(computePipelineState, WTFMove(pipelineLayout), size, WTFMove(minimumBufferSizes), *this), nil);
 }
 
