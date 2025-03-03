@@ -689,7 +689,7 @@ id<MTLRenderPipelineState> Device::copyIndexIndirectArgsPipeline(NSUInteger rast
     using namespace metal;
     [[vertex]] void vsCopyIndexedIndirect(device MTLDrawIndexedPrimitivesIndirectArguments& indexedOutput [[buffer(0)]], constant const MTLDrawIndexedPrimitivesIndirectArguments& indirectArguments [[buffer(1)]], const constant uint* instanceCount [[buffer(2)]])
     {
-        bool condition = indirectArguments.baseInstance + indirectArguments.instanceCount > instanceCount[0] || indirectArguments.baseInstance >= instanceCount[0];
+        bool condition = addsat(indirectArguments.baseInstance, indirectArguments.instanceCount) > instanceCount[0] || indirectArguments.baseInstance >= instanceCount[0];
         indexedOutput.indexCount = metal::select(indirectArguments.indexCount, 0u, condition);
         indexedOutput.instanceCount = metal::select(indirectArguments.instanceCount, 0u, condition);
         indexedOutput.indexStart = indirectArguments.indexStart;
@@ -750,7 +750,7 @@ id<MTLRenderPipelineState> Device::indexBufferClampPipeline(MTLIndexType indexTy
         ushort indexBufferValue = indexBuffer[indexId];
         ushort vertexIndex = data[primitiveRestart] + indexBufferValue;
         bool negativeCondition = indexedOutput.baseVertex + data[primitiveRestart] < indexedOutput.baseVertex;
-        if (negativeCondition || (vertexIndex + indexedOutput.baseVertex >= data[vertexCount] + data[primitiveRestart])) {
+        if (negativeCondition || (addsat((uint)vertexIndex, indexedOutput.baseVertex) >= data[vertexCount] + data[primitiveRestart])) {
             indexedOutput.indexCount = 0u;
             *(&indexedOutput.baseInstance + 1) = 1;
         }
@@ -760,7 +760,7 @@ id<MTLRenderPipelineState> Device::indexBufferClampPipeline(MTLIndexType indexTy
         uint indexBufferValue = indexBuffer[indexId];
         uint vertexIndex = data[primitiveRestart] + indexBufferValue;
         bool negativeCondition = indexedOutput.baseVertex + data[primitiveRestart] < indexedOutput.baseVertex;
-        if (negativeCondition || (vertexIndex + indexedOutput.baseVertex >= data[vertexCount] + data[primitiveRestart])) {
+        if (negativeCondition || (addsat(vertexIndex, indexedOutput.baseVertex) >= data[vertexCount] + data[primitiveRestart])) {
             indexedOutput.indexCount = 0u;
             *(&indexedOutput.baseInstance + 1) = 1;
         }
@@ -820,11 +820,11 @@ id<MTLRenderPipelineState> Device::indexedIndirectBufferClampPipeline(NSUInteger
     using namespace metal;
     [[vertex]] void vsIndexedIndirect(device const MTLDrawIndexedPrimitivesIndirectArguments& input [[buffer(0)]], device MTLDrawIndexedPrimitivesIndirectArguments& indexedOutput [[buffer(1)]], device MTLDrawPrimitivesIndirectArguments& output [[buffer(2)]], const constant uint* indexBufferCount [[buffer(3)]])
     {
-        bool lostCondition = input.indexCount > %u || input.instanceCount > %u || input.indexCount * input.instanceCount > %u;
+        bool lostCondition = input.indexCount > %u || input.instanceCount > %u || madsat(input.indexCount, input.instanceCount, 0u) > %u;
         bool condition = lostCondition
-            || input.indexCount + input.indexStart > indexBufferCount[0]
+            || addsat(input.indexCount, input.indexStart) > indexBufferCount[0]
             || input.indexStart >= indexBufferCount[0]
-            || input.instanceCount + input.baseInstance > indexBufferCount[1]
+            || addsat(input.instanceCount, input.baseInstance) > indexBufferCount[1]
             || input.baseInstance >= indexBufferCount[1];
 
         indexedOutput.indexCount = metal::select(input.indexCount, 0u, condition);
@@ -887,11 +887,11 @@ id<MTLRenderPipelineState> Device::indirectBufferClampPipeline(NSUInteger raster
     using namespace metal;
     [[vertex]] void vsIndirect(device const MTLDrawPrimitivesIndirectArguments& input [[buffer(0)]], device MTLDrawPrimitivesIndirectArguments& output [[buffer(1)]], const constant uint* minCounts [[buffer(2)]])
     {
-        bool lostCondition = input.vertexCount > %u || input.instanceCount > %u || input.vertexCount * input.instanceCount > %u;
+        bool lostCondition = input.vertexCount > %u || input.instanceCount > %u || madsat(input.vertexCount, input.instanceCount, 0u) > %u;
         bool vertexCondition = lostCondition
-            || input.vertexCount + input.vertexStart > minCounts[0]
+            || addsat(input.vertexCount, input.vertexStart) > minCounts[0]
             || input.vertexStart >= minCounts[0];
-        bool instanceCondition = input.baseInstance + input.instanceCount > minCounts[1] || input.baseInstance >= minCounts[1];
+        bool instanceCondition = addsat(input.baseInstance, input.instanceCount) > minCounts[1] || input.baseInstance >= minCounts[1];
         auto minVertexCountMinusVertexStart = minCounts[0] > input.vertexStart ? (minCounts[0] - input.vertexStart) : 0u;
         output.vertexCount = metal::select(input.vertexCount, minVertexCountMinusVertexStart, vertexCondition);
         auto minInstanceCountMinusInstanceStart = minCounts[1] > input.baseInstance ? (minCounts[1] - input.baseInstance) : 0u;
@@ -1020,10 +1020,10 @@ id<MTLFunction> Device::icbCommandClampFunction(MTLIndexType indexType)
     {
         device const IndexDataUint& data = *indexData;
         uint32_t k = (data.primitiveType == primitive_type::triangle_strip || data.primitiveType == primitive_type::line_strip) ? 1 : 0;
-        uint32_t indexBufferValue = data.indexBuffer[indexId + data.firstIndex];
+        uint32_t indexBufferValue = data.indexBuffer[min(data.indexCount - 1, addsat(indexId, data.firstIndex))];
         uint32_t vertexIndex = indexBufferValue + k;
         bool negativeCondition = data.baseVertex + k < data.baseVertex;
-        if (negativeCondition || (data.baseVertex + vertexIndex >= data.minVertexCount + k)) {
+        if (negativeCondition || (addsat((uint)data.baseVertex, vertexIndex) >= data.minVertexCount + k)) {
             *icb_container->outOfBoundsRead = 1;
             render_command cmd(icb_container->commandBuffer, data.renderCommand);
             cmd.draw_indexed_primitives(data.primitiveType,
@@ -1041,10 +1041,10 @@ id<MTLFunction> Device::icbCommandClampFunction(MTLIndexType indexType)
     {
         device const IndexDataUshort& data = *indexData;
         uint32_t k = (data.primitiveType == primitive_type::triangle_strip || data.primitiveType == primitive_type::line_strip) ? 1 : 0;
-        ushort indexBufferValue = data.indexBuffer[indexId + data.firstIndex];
+        ushort indexBufferValue = data.indexBuffer[min(data.indexCount - 1, addsat(indexId, data.firstIndex))];
         ushort vertexIndex = indexBufferValue + k;
         bool negativeCondition = data.baseVertex + k < data.baseVertex;
-        if (negativeCondition || (data.baseVertex + vertexIndex >= data.minVertexCount + k)) {
+        if (negativeCondition || (addsat((uint)data.baseVertex, (uint)vertexIndex) >= data.minVertexCount + k)) {
             *icb_container->outOfBoundsRead = 1;
             render_command cmd(icb_container->commandBuffer, data.renderCommand);
             cmd.draw_indexed_primitives(data.primitiveType,
