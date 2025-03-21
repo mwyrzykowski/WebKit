@@ -25,6 +25,7 @@
 
 #pragma once
 
+#import "BindableResource.h"
 #import "Instance.h"
 #import "SwiftCXXThunk.h"
 #import "WebGPU.h"
@@ -62,7 +63,7 @@ public:
         size_t endOffset; // Exclusive
     };
 
-    static Ref<Buffer> create(id<MTLBuffer> buffer, uint64_t initialSize, WGPUBufferUsageFlags usage, State initialState, MappingRange initialMappingRange, Device& device)
+    static Ref<Buffer> create(BufferWithUniqueId buffer, uint64_t initialSize, WGPUBufferUsageFlags usage, State initialState, MappingRange initialMappingRange, Device& device)
     {
         return adoptRef(*new Buffer(buffer, initialSize, usage, initialState, initialMappingRange, device));
     }
@@ -126,9 +127,12 @@ public:
 #if ENABLE(WEBGPU_SWIFT)
     void copyFrom(const std::span<const uint8_t>, const size_t offset) HAS_SWIFTCXX_THUNK;
 #endif
+    uint64_t uniqueId() const { return m_buffer; }
+    uint64_t indirectIndexedBufferUniqueId() const { return m_indirectIndexedBuffer; }
+    uint64_t indirectBufferUniqueId() const { return m_indirectBuffer; }
 
 private:
-    Buffer(id<MTLBuffer>, uint64_t initialSize, WGPUBufferUsageFlags, State initialState, MappingRange initialMappingRange, Device&);
+    Buffer(BufferWithUniqueId, uint64_t initialSize, WGPUBufferUsageFlags, State initialState, MappingRange initialMappingRange, Device&);
     Buffer(Device&);
 
 
@@ -147,10 +151,10 @@ private:
     void takeSlowIndirectValidationPath(CommandBuffer&, uint64_t indirectOffset, uint32_t minVertexCount, uint32_t minInstanceCount);
 
 private PUBLIC_IN_WEBGPU_SWIFT:
-    id<MTLBuffer> m_buffer { nil };
+    BufferWithUniqueId m_buffer { nil };
 private:
-    id<MTLBuffer> m_indirectBuffer { nil };
-    id<MTLBuffer> m_indirectIndexedBuffer { nil };
+    BufferWithUniqueId m_indirectBuffer { nil };
+    BufferWithUniqueId m_indirectIndexedBuffer { nil };
 
     // https://gpuweb.github.io/gpuweb/#buffer-interface
 

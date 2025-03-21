@@ -1398,8 +1398,7 @@ bool CommandEncoder::waitForCommandBufferCompletion()
 
 bool CommandEncoder::encoderIsCurrent(id<MTLCommandEncoder> commandEncoder) const
 {
-    id<MTLCommandEncoder> existingEncoder = m_device->protectedQueue()->encoderForBuffer(m_commandBuffer);
-    return existingEncoder == commandEncoder;
+    return m_device->isValid() && m_existingCommandEncoder == commandEncoder;
 }
 
 void CommandEncoder::makeInvalid(NSString* errorString)

@@ -82,7 +82,7 @@ public:
     void insertDebugMarker(String&& markerLabel);
     void popDebugGroup();
     void pushDebugGroup(String&& groupLabel);
-    void setBindGroup(uint32_t groupIndex, const BindGroup&, std::span<const uint32_t>);
+    void setBindGroup(uint32_t groupIndex, const BindGroup&, std::optional<Vector<uint32_t>>&&);
     void setBlendConstant(const WGPUColor&);
     void setIndexBuffer(Buffer&, WGPUIndexFormat, uint64_t offset, uint64_t size);
     void setPipeline(const RenderPipeline&);
@@ -139,7 +139,8 @@ private:
     std::pair<id<MTLBuffer>, uint64_t> clampIndirectIndexBufferToValidValues(Buffer&, MTLIndexType, NSUInteger indexBufferOffsetInBytes, uint64_t indirectOffset, uint32_t minVertexCount, uint32_t minInstanceCount, bool& splitEncoder);
     std::pair<id<MTLBuffer>, uint64_t> clampIndirectBufferToValidValues(Buffer&, uint64_t indirectOffset, uint32_t minVertexCount, uint32_t minInstanceCount, bool& splitEncoder);
     void setCachedRenderPassState(id<MTLRenderCommandEncoder>);
-
+    void setVertexBuffer(id<MTLRenderCommandEncoder>, id<MTLBuffer>, uint64_t bufferIdentifier, uint32_t offset, uint32_t bufferIndex);
+    void setFragmentBuffer(id<MTLRenderCommandEncoder>, id<MTLBuffer>, uint64_t bufferIdentifier, uint32_t offset, uint32_t bufferIndex);
     id<MTLRenderCommandEncoder> m_renderCommandEncoder { nil };
 
     uint64_t m_debugGroupStackSize { 0 };
@@ -167,8 +168,6 @@ private:
     using EntryMap = HashMap<uint64_t, EntryUsage, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>>;
     HashMap<const void*, EntryMap> m_usagesForTexture;
     HashMap<const void*, EntryUsage> m_usagesForBuffer;
-    float m_minDepth { 0.f };
-    float m_maxDepth { 1.f };
     HashSet<uint64_t, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_queryBufferIndicesToClear;
     HashSet<uint64_t, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_queryBufferUtilizedIndices;
     id<MTLBuffer> m_visibilityResultBuffer { nil };
@@ -186,9 +185,16 @@ private:
         id<MTLBuffer> buffer { nil };
         uint64_t offset { 0 };
         uint64_t size { 0 };
+        uint64_t uniqueId { 0 };
     };
-    HashMap<uint32_t, BufferAndOffset, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_vertexBuffers;
+    static constexpr uint32_t maxBufferSlots = 31;
+    std::array<BufferAndOffset, maxBufferSlots> m_vertexBuffers;
+    using ExistingBufferKey = std::pair<uint64_t, uint32_t>;
+    std::array<ExistingBufferKey, maxBufferSlots> m_existingVertexBuffers;
+    std::array<ExistingBufferKey, maxBufferSlots> m_existingFragmentBuffers;
+    std::array<uint64_t, maxBufferSlots> m_vertexBuffersValidatedForPipeline;
     HashMap<uint32_t, RefPtr<const BindGroup>, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_bindGroups;
+    std::array<uint32_t, 32> m_maxDynamicOffsetAtIndex;
     NSString* m_lastErrorString { nil };
 #if CPU(X86_64)
     MTLRenderPassDescriptor* m_metalDescriptor { nil };
@@ -200,10 +206,7 @@ private:
     uint64_t m_drawCount { 0 };
     const uint64_t m_maxDrawCount { 0 };
     uint32_t m_stencilClearValue { 0 };
-    float m_viewportX { 0 };
-    float m_viewportY { 0 };
-    float m_viewportWidth { 0 };
-    float m_viewportHeight { 0 };
+    std::optional<MTLViewport> m_viewport;
     bool m_clearDepthAttachment { false };
     bool m_clearStencilAttachment { false };
     bool m_occlusionQueryActive { false };

@@ -94,4 +94,11 @@ struct IndexBufferAndIndexData {
     IndexData indexData;
 };
 
+struct BufferWithUniqueId {
+    id<MTLBuffer> buffer { nil };
+    uint64_t uniqueId { 0 };
+    operator id<MTLBuffer>() const { return buffer; }
+    operator uint64_t() const { return uniqueId; }
+};
+
 } // namespace WebGPU

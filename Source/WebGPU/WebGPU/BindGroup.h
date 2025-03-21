@@ -68,9 +68,9 @@ public:
 
     static constexpr MTLRenderStages MTLRenderStageCompute = static_cast<MTLRenderStages>(0);
     static constexpr MTLRenderStages MTLRenderStageUndefined = static_cast<MTLRenderStages>(MTLRenderStageFragment + 1);
-    static Ref<BindGroup> create(id<MTLBuffer> vertexArgumentBuffer, id<MTLBuffer> fragmentArgumentBuffer, id<MTLBuffer> computeArgumentBuffer, Vector<BindableResources>&& resources, const BindGroupLayout& bindGroupLayout, DynamicBuffersContainer&& dynamicBuffers, SamplersContainer&& samplers, ShaderStageArray<ExternalTextureIndices>&& externalTextureIndices, Device& device)
+    static Ref<BindGroup> create(BufferWithUniqueId vertexArgumentBuffer, BufferWithUniqueId fragmentArgumentBuffer, BufferWithUniqueId computeArgumentBuffer, Vector<BindableResources>&& resources, const BindGroupLayout& bindGroupLayout, DynamicBuffersContainer&& dynamicBuffers, SamplersContainer&& samplers, ShaderStageArray<ExternalTextureIndices>&& externalTextureIndices, uint32_t uniqueIdentifier, Device& device)
     {
-        return adoptRef(*new BindGroup(vertexArgumentBuffer, fragmentArgumentBuffer, computeArgumentBuffer, WTFMove(resources), bindGroupLayout, WTFMove(dynamicBuffers), WTFMove(samplers), WTFMove(externalTextureIndices), device));
+        return adoptRef(*new BindGroup(vertexArgumentBuffer, fragmentArgumentBuffer, computeArgumentBuffer, WTFMove(resources), bindGroupLayout, WTFMove(dynamicBuffers), WTFMove(samplers), WTFMove(externalTextureIndices), uniqueIdentifier, device));
     }
     static Ref<BindGroup> createInvalid(Device& device)
     {
@@ -86,6 +86,10 @@ public:
     id<MTLBuffer> vertexArgumentBuffer() const { return m_vertexArgumentBuffer; }
     id<MTLBuffer> fragmentArgumentBuffer() const { return m_fragmentArgumentBuffer; }
     id<MTLBuffer> computeArgumentBuffer() const { return m_computeArgumentBuffer; }
+
+    uint32_t vertexArgumentBufferUniqueId() const { return m_vertexArgumentBuffer; }
+    uint32_t fragmentArgumentBufferUniqueId() const { return m_fragmentArgumentBuffer; }
+    uint32_t computeArgumentBufferUniqueId() const { return m_computeArgumentBuffer; }
 
     const Vector<BindableResources>& resources() const { return m_resources; }
 
@@ -104,22 +108,27 @@ public:
     bool updateExternalTextures(ExternalTexture&);
     bool makeSubmitInvalid(ShaderStage, const BindGroupLayout*) const;
     const SamplersContainer& samplers() const { return m_samplers; }
+    uint32_t uniqueId() const { return m_uniqueIdentifier; }
+    void validatedSuccessfully(uint32_t groupIndex, uint64_t pipelineIndex, uint32_t maxOffset) const;
+    bool previouslyValidatedBindGroup(uint32_t groupIndex, uint64_t pipelineIndex, uint32_t maxOffset) const;
 
 private:
-    BindGroup(id<MTLBuffer> vertexArgumentBuffer, id<MTLBuffer> fragmentArgumentBuffer, id<MTLBuffer> computeArgumentBuffer, Vector<BindableResources>&&, const BindGroupLayout&, DynamicBuffersContainer&&, SamplersContainer&&, ShaderStageArray<ExternalTextureIndices>&&, Device&);
+    BindGroup(BufferWithUniqueId vertexArgumentBuffer, BufferWithUniqueId fragmentArgumentBuffer, BufferWithUniqueId computeArgumentBuffer, Vector<BindableResources>&&, const BindGroupLayout&, DynamicBuffersContainer&&, SamplersContainer&&, ShaderStageArray<ExternalTextureIndices>&&, uint32_t uniqueIdentifier, Device&);
     BindGroup(Device&);
 
-    const id<MTLBuffer> m_vertexArgumentBuffer { nil };
-    const id<MTLBuffer> m_fragmentArgumentBuffer { nil };
-    const id<MTLBuffer> m_computeArgumentBuffer { nil };
+    const BufferWithUniqueId m_vertexArgumentBuffer;
+    const BufferWithUniqueId m_fragmentArgumentBuffer;
+    const BufferWithUniqueId m_computeArgumentBuffer;
 
     const Ref<Device> m_device;
     Vector<BindableResources> m_resources;
     RefPtr<const BindGroupLayout> m_bindGroupLayout;
     DynamicBuffersContainer m_dynamicBuffers;
     HashMap<uint32_t, uint32_t, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_dynamicOffsetsIndices;
+    mutable HashMap<uint64_t, uint32_t, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_validatedBindGroup;
     SamplersContainer m_samplers;
     ShaderStageArray<ExternalTextureIndices> m_externalTextureIndices;
+    uint32_t m_uniqueIdentifier { 0 };
 };
 
 } // namespace WebGPU

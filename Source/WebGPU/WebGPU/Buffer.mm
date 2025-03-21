@@ -120,16 +120,16 @@ static MTLStorageMode storageMode(bool deviceHasUnifiedMemory, WGPUBufferUsageFl
     return MTLStorageModePrivate;
 }
 
-id<MTLBuffer> Device::safeCreateBuffer(NSUInteger length, MTLStorageMode storageMode, bool skipAttribution, MTLCPUCacheMode cpuCacheMode, MTLHazardTrackingMode hazardTrackingMode) const
+BufferWithUniqueId Device::safeCreateBuffer(NSUInteger length, MTLStorageMode storageMode, bool skipAttribution, MTLCPUCacheMode cpuCacheMode, MTLHazardTrackingMode hazardTrackingMode) const
 {
     MTLResourceOptions resourceOptions = (cpuCacheMode << MTLResourceCPUCacheModeShift) | (storageMode << MTLResourceStorageModeShift) | (hazardTrackingMode << MTLResourceHazardTrackingModeShift);
     id<MTLBuffer> buffer = [m_device newBufferWithLength:std::max<NSUInteger>(1, length) options:resourceOptions];
     if (!skipAttribution)
         setOwnerWithIdentity(buffer);
-    return buffer;
+    return { buffer, ++m_uniqueBufferId };
 }
 
-id<MTLBuffer> Device::safeCreateBuffer(NSUInteger length, bool skipAttribution) const
+BufferWithUniqueId Device::safeCreateBuffer(NSUInteger length, bool skipAttribution) const
 {
     return safeCreateBuffer(length, MTLStorageModeShared, skipAttribution);
 }
@@ -157,7 +157,7 @@ Ref<Buffer> Device::createBuffer(const WGPUBufferDescriptor& descriptor)
         return Buffer::createInvalid(*this);
     }
 
-    buffer.label = fromAPI(descriptor.label);
+    buffer.buffer.label = fromAPI(descriptor.label);
 
     if (descriptor.mappedAtCreation)
         return Buffer::create(buffer, descriptor.size, descriptor.usage, Buffer::State::MappedAtCreation, { static_cast<size_t>(0), static_cast<size_t>(descriptor.size) }, *this);
@@ -167,7 +167,7 @@ Ref<Buffer> Device::createBuffer(const WGPUBufferDescriptor& descriptor)
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(Buffer);
 
-Buffer::Buffer(id<MTLBuffer> buffer, uint64_t initialSize, WGPUBufferUsageFlags usage, State initialState, MappingRange initialMappingRange, Device& device)
+Buffer::Buffer(BufferWithUniqueId buffer, uint64_t initialSize, WGPUBufferUsageFlags usage, State initialState, MappingRange initialMappingRange, Device& device)
     : m_buffer(buffer)
     , m_initialSize(initialSize)
     , m_usage(usage)
@@ -238,7 +238,7 @@ void Buffer::destroy()
     }
 
     m_commandEncoders.clear();
-    m_buffer = protectedDevice()->placeholderBuffer();
+    m_buffer = { protectedDevice()->placeholderBuffer(), protectedDevice()->placeholderBufferUniqueId() };
 }
 
 bool Buffer::validateGetMappedRange(size_t offset, size_t rangeSize) const
@@ -293,7 +293,7 @@ std::span<uint8_t> Buffer::getMappedRange(size_t offset, size_t size)
     m_mappedRanges.add({ offset, offset + rangeSize });
     m_mappedRanges.compact();
 
-    if (!m_buffer.contents)
+    if (!m_buffer.buffer.contents)
         return { };
     return getBufferContents().subspan(offset);
 }
@@ -411,9 +411,9 @@ void Buffer::unmap()
     indirectBufferInvalidated();
 
 #if CPU(X86_64) && (PLATFORM(MAC) || PLATFORM(MACCATALYST))
-    if (m_buffer.storageMode == MTLStorageModeManaged) {
+    if (m_buffer.buffer.storageMode == MTLStorageModeManaged) {
         if (m_mappedAtCreation)
-            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
+            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.buffer.length)];
         else {
             for (const auto& mappedRange : m_mappedRanges)
                 [m_buffer didModifyRange:NSMakeRange(static_cast<NSUInteger>(mappedRange.begin()), static_cast<NSUInteger>(mappedRange.end() - mappedRange.begin()))];
@@ -427,7 +427,7 @@ void Buffer::unmap()
 
 void Buffer::setLabel(String&& label)
 {
-    m_buffer.label = label;
+    m_buffer.buffer.label = label;
 }
 
 uint64_t Buffer::initialSize() const
@@ -437,7 +437,7 @@ uint64_t Buffer::initialSize() const
 
 uint64_t Buffer::currentSize() const
 {
-    return m_buffer.length;
+    return m_buffer.buffer.length;
 }
 
 bool Buffer::isValid() const
@@ -525,8 +525,8 @@ void Buffer::takeSlowIndexValidationPath(CommandBuffer& commandBuffer, uint32_t 
         queue->clearBuffer(m_buffer);
         queue->finalizeBlitCommandEncoder();
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
-        if (m_buffer.storageMode == MTLStorageModeManaged)
-            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
+        if (m_buffer.buffer.storageMode == MTLStorageModeManaged)
+            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.buffer.length)];
 #endif
         commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];
@@ -542,7 +542,7 @@ void Buffer::takeSlowIndirectIndexValidationPath(CommandBuffer& commandBuffer, B
     auto queue = protectedDevice()->protectedQueue();
     queue->waitForAllCommitedWorkToComplete();
     queue->synchronizeResourceAndWait(m_buffer);
-    if (m_buffer.length < indexBufferOffsetInBytes + sizeof(MTLDrawIndexedPrimitivesIndirectArguments))
+    if (m_buffer.buffer.length < indexBufferOffsetInBytes + sizeof(MTLDrawIndexedPrimitivesIndirectArguments))
         return;
     auto bufferSubData = span<MTLDrawIndexedPrimitivesIndirectArguments>(m_buffer, indexBufferOffsetInBytes);
     if (!bufferSubData.data() || !bufferSubData.size())
@@ -562,8 +562,8 @@ void Buffer::takeSlowIndirectIndexValidationPath(CommandBuffer& commandBuffer, B
         queue->clearBuffer(m_buffer, indirectOffset, sizeof(MTLDrawPrimitivesIndirectArguments));
         queue->finalizeBlitCommandEncoder();
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
-        if (m_buffer.storageMode == MTLStorageModeManaged)
-            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
+        if (m_buffer.buffer.storageMode == MTLStorageModeManaged)
+            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.buffer.length)];
 #endif
         commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];
@@ -605,8 +605,8 @@ void Buffer::takeSlowIndirectValidationPath(CommandBuffer& commandBuffer, uint64
         queue->writeBuffer(m_buffer, indirectOffset, newDataSpan);
         queue->finalizeBlitCommandEncoder();
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
-        if (m_buffer.storageMode == MTLStorageModeManaged)
-            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
+        if (m_buffer.buffer.storageMode == MTLStorageModeManaged)
+            [m_buffer didModifyRange:NSMakeRange(0, m_buffer.buffer.length)];
 #endif
         commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];

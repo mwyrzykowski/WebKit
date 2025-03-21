@@ -27,6 +27,7 @@
 
 #import "API.h"
 #import "Adapter.h"
+#import "BindableResource.h"
 #import "HardwareCapabilities.h"
 #import "Queue.h"
 #import "WebGPU.h"
@@ -184,6 +185,7 @@ public:
     static bool isStencilOnlyFormat(MTLPixelFormat);
     bool shouldStopCaptureAfterSubmit();
     id<MTLBuffer> placeholderBuffer() const { return m_placeholderBuffer; }
+    uint32_t placeholderBufferUniqueId() const { return m_placeholderBuffer; }
 
     id<MTLTexture> placeholderTexture(WGPUTextureFormat) const;
     bool isDestroyed() const;
@@ -196,8 +198,8 @@ public:
     id<MTLRenderPipelineState> icbCommandClampPipeline(MTLIndexType, NSUInteger rasterSampleCount);
     id<MTLFunction> icbCommandClampFunction(MTLIndexType);
     id<MTLRenderPipelineState> copyIndexIndirectArgsPipeline(NSUInteger rasterSampleCount);
-    id<MTLBuffer> safeCreateBuffer(NSUInteger length, MTLStorageMode, bool skipMemoryAttribution = false, MTLCPUCacheMode = MTLCPUCacheModeDefaultCache, MTLHazardTrackingMode = MTLHazardTrackingModeDefault) const;
-    id<MTLBuffer> safeCreateBuffer(NSUInteger, bool skipMemoryAttribution = false) const;
+    BufferWithUniqueId safeCreateBuffer(NSUInteger length, MTLStorageMode, bool skipMemoryAttribution = false, MTLCPUCacheMode = MTLCPUCacheModeDefaultCache, MTLHazardTrackingMode = MTLHazardTrackingModeDefault) const;
+    BufferWithUniqueId safeCreateBuffer(NSUInteger, bool skipMemoryAttribution = false) const;
     template<typename T>
     id<MTLBuffer> safeCreateBufferWithData(const T& data) const
     {
@@ -243,6 +245,11 @@ public:
         m_commandEncoderMap.remove(identifier);
     }
     bool supportsResidencySets() { return m_capabilities.baseCapabilities.supportsResidencySets; }
+    bool isCachedCompatibile(const BindGroupLayout&, const BindGroupLayout&) const;
+    void setCachedCompatibile(const BindGroupLayout&, const BindGroupLayout&) const;
+    void removeCachedBindGroupLayout(const BindGroupLayout&) const;
+    static constexpr uint64_t maxPipelines = (1ull << (64 - 5));
+    static constexpr uint64_t maxBindGroups = (1ull << 5);
 private:
     Device(id<MTLDevice>, id<MTLCommandQueue> defaultQueue, HardwareCapabilities&&, Adapter&);
     Device(Adapter&);
@@ -288,7 +295,7 @@ private:
 
     HardwareCapabilities m_capabilities { };
 
-    id<MTLBuffer> m_placeholderBuffer { nil };
+    BufferWithUniqueId m_placeholderBuffer { };
     id<MTLTexture> m_placeholderTexture { nil };
     id<MTLTexture> m_placeholderDepthStencilTexture { nil };
     id<MTLBuffer> m_dispatchCallBuffer { nil };
@@ -319,7 +326,14 @@ private:
     NSMapTable<id<MTLCommandBuffer>, NSMutableArray<id<MTLBuffer>>*>* m_resolvedSampleCounterBuffers;
     id<MTLSharedEvent> m_resolveTimestampsSharedEvent { nil };
     HashMap<uint64_t, CommandEncoder*, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_commandEncoderMap;
+    mutable HashSet<uint64_t, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_bindGroupCompatibilityCache;
     uint64_t m_commandEncoderId { 0 };
+    uint64_t m_pipelineLayoutId { 0 };
+    uint64_t m_renderPipelineId { 0 };
+    uint64_t m_computePipelineId { 0 };
+    uint32_t m_bindGroupLayoutId { 0 };
+    uint32_t m_bindGroupId { 0 };
+    mutable uint64_t m_uniqueBufferId { 0 };
     bool m_supressAllErrors { false };
     const uint32_t m_maxVerticesPerDrawCall { 0 };
     bool m_shaderValidationEnabled { true };
