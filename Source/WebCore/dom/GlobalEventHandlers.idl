@@ -119,4 +119,5 @@ interface mixin GlobalEventHandlers {
     [NotEnumerable] attribute EventHandler onwebkitmouseforcedown;
     [NotEnumerable] attribute EventHandler onwebkitmouseforcewillbegin;
     [NotEnumerable] attribute EventHandler onwebkitmouseforceup;
+    [NotEnumerable] attribute EventHandler onuncapturederror;
 };
