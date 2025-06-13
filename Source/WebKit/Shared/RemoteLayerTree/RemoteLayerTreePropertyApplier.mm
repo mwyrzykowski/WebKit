@@ -555,9 +555,13 @@ void RemoteLayerTreePropertyApplier::applyPropertiesToLayer(CALayer *layer, Remo
             [layer setContentsFormat:formatString.get()];
 #if ENABLE(PIXEL_FORMAT_RGBA16F)
         if (contentsFormat == ContentsFormat::RGBA16F) {
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+            [layer setPreferredDynamicRange:CADynamicRangeHigh];
+#else
             ALLOW_DEPRECATED_DECLARATIONS_BEGIN
             [layer setWantsExtendedDynamicRangeContent:true];
             ALLOW_DEPRECATED_DECLARATIONS_END
+#endif
             [layer setToneMapMode:CAToneMapModeIfSupported];
         }
 #endif

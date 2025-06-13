@@ -1186,9 +1186,13 @@ void PlatformCALayerCocoa::updateContentsFormat()
             [m_layer setContentsFormat:formatString];
 #if ENABLE(PIXEL_FORMAT_RGBA16F)
         if (contentsFormat == ContentsFormat::RGBA16F) {
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+            [m_layer setPreferredDynamicRange:CADynamicRangeHigh];
+#else
             ALLOW_DEPRECATED_DECLARATIONS_BEGIN
             [m_layer setWantsExtendedDynamicRangeContent:true];
             ALLOW_DEPRECATED_DECLARATIONS_END
+#endif
             [m_layer setToneMapMode:CAToneMapModeIfSupported];
         }
 #endif

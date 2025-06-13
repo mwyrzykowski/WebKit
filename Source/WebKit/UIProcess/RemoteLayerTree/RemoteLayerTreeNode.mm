@@ -46,7 +46,6 @@
 
 namespace WebKit {
 
-static NSString *const WKRemoteLayerTreeNodePropertyKey = @"WKRemoteLayerTreeNode";
 #if ENABLE(GAZE_GLOW_FOR_INTERACTION_REGIONS)
 static NSString *const WKInteractionRegionContainerKey = @"WKInteractionRegionContainer";
 #endif

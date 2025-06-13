@@ -41,6 +41,7 @@
 #import <WebCore/DestinationColorSpace.h>
 #import <WebCore/GraphicsContextCG.h>
 #import <WebCore/IOSurface.h>
+#import <WebCore/PlatformDynamicRangeLimitCocoa.h>
 #import <WebCore/PlatformLayer.h>
 #import <WebCore/ShareableBitmap.h>
 #import <WebCore/WebCoreCALayerExtras.h>
@@ -63,6 +64,8 @@
 #import <pal/cocoa/QuartzCoreSoftLink.h>
 
 namespace WebKit {
+static NSString *const WKRemoteLayerDynamicRangePropertyKey = @"WKRemoteLayerDynamicRangePropertyKey";
+
 using namespace WebCore;
 
 #define REMOTE_LAYER_TREE_HOST_RELEASE_LOG(...) RELEASE_LOG(ViewState, __VA_ARGS__)
@@ -162,6 +165,61 @@ bool RemoteLayerTreeHost::updateBannerLayers(const RemoteLayerTreeTransaction& t
 }
 #endif
 
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+static void updateLayerHDRState(CALayer *layer, bool suppressHDR)
+{
+    if ([layer toneMapMode] == CAToneMapModeIfSupported && [layer valueForKey:WKRemoteLayerTreeNodePropertyKey]) {
+        PlatformDynamicRangeLimit platformDynamicRangeLimit = suppressHDR ? PlatformDynamicRangeLimit::defaultWhenSuppressingHDR() : PlatformDynamicRangeLimit::noLimit();
+        CADynamicRange initialRangeLimit = [layer valueForKey:WKRemoteLayerDynamicRangePropertyKey];
+        if (suppressHDR) {
+            if (!initialRangeLimit) {
+                CADynamicRange preferredDynamicRange = [layer preferredDynamicRange];
+                [layer setValue:preferredDynamicRange forKey:WKRemoteLayerDynamicRangePropertyKey];
+                initialRangeLimit = preferredDynamicRange;
+            }
+        } else
+            [layer setValue:nil forKey:WKRemoteLayerDynamicRangePropertyKey];
+
+        if (initialRangeLimit == CADynamicRangeStandard && platformDynamicRangeLimit.value() > PlatformDynamicRangeLimit::standard().value())
+            platformDynamicRangeLimit = PlatformDynamicRangeLimit::standard();
+        else if (initialRangeLimit == CADynamicRangeConstrainedHigh && platformDynamicRangeLimit.value() > PlatformDynamicRangeLimit::constrained().value())
+            platformDynamicRangeLimit = PlatformDynamicRangeLimit::constrained();
+
+        setLayerDynamicRangeLimit(layer, platformDynamicRangeLimit);
+    }
+}
+
+static void updateLayerHDRStateRecursive(CALayer *layer, bool suppressHDR)
+{
+    updateLayerHDRState(layer, suppressHDR);
+
+    for (CALayer *sublayer in [layer sublayers])
+        updateLayerHDRStateRecursive(sublayer, suppressHDR);
+}
+
+void RemoteLayerTreeHost::updateHDRStateForAllLayers() const
+{
+    RefPtr page = m_drawingArea->page();
+    if (!page || !m_rootNode)
+        return;
+
+    [CATransaction begin];
+    updateLayerHDRStateRecursive(rootLayer(), page->shouldSuppressHDR());
+    [CATransaction commit];
+}
+
+void RemoteLayerTreeHost::updateHDRStateForLayer(WebCore::PlatformLayerIdentifier layerID) const
+{
+    RefPtr page = m_drawingArea->page();
+    if (!page)
+        return;
+
+    [CATransaction begin];
+    updateLayerHDRState(layerForID(layerID), page->shouldSuppressHDR());
+    [CATransaction commit];
+}
+#endif
+
 bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, const RemoteLayerTreeTransaction& transaction, float indicatorScaleFactor)
 {
     if (!m_drawingArea)
@@ -243,6 +301,10 @@ bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, con
                 node->layer().borderWidth = properties.borderWidth / indicatorScaleFactor;
             node->layer().masksToBounds = false;
         }
+
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+        updateHDRStateForLayer(layerID);
+#endif
     }
     
     for (const auto& layerAndClone : clonesToUpdate)
@@ -432,6 +494,10 @@ void RemoteLayerTreeHost::createLayer(const RemoteLayerTreeTransaction::LayerCre
     }
 
     m_nodes.add(*properties.layerID, node.releaseNonNull());
+
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+    updateHDRStateForLayer(*properties.layerID);
+#endif
 }
 
 #if !PLATFORM(IOS_FAMILY)

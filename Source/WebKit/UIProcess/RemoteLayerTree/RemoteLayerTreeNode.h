@@ -45,6 +45,10 @@ OBJC_CLASS UIView;
 
 namespace WebKit {
 
+#ifdef __OBJC__
+static NSString *const WKRemoteLayerTreeNodePropertyKey = @"WKRemoteLayerTreeNode";
+#endif
+
 class RemoteLayerTreeHost;
 class RemoteLayerTreeScrollbars;
 

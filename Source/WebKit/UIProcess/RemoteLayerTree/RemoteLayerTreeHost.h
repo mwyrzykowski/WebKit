@@ -106,6 +106,10 @@ public:
 #endif
 
     void remotePageProcessDidTerminate(WebCore::ProcessIdentifier);
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+    void updateHDRStateForAllLayers() const;
+    void updateHDRStateForLayer(WebCore::PlatformLayerIdentifier) const;
+#endif
 
 private:
     Ref<RemoteLayerTreeDrawingAreaProxy> protectedDrawingArea() const;
