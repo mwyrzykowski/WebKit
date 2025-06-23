@@ -536,8 +536,7 @@ GPUCanvasContext* HTMLCanvasElement::createContextWebGPU(const String& type, GPU
     if (!document().settings().webGPUEnabled() || !gpu)
         return nullptr;
 
-    Ref document = this->document();
-    m_context = GPUCanvasContext::create(*this, *gpu, document.ptr());
+    m_context = GPUCanvasContext::create(*this, *gpu);
 
     if (m_context) {
         // Need to make sure a RenderLayer and compositing layer get created for the Canvas.

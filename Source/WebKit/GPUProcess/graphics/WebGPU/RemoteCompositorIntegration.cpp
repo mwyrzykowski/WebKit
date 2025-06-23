@@ -109,11 +109,6 @@ Ref<IPC::StreamServerConnection> RemoteCompositorIntegration::protectedStreamCon
     return m_streamConnection;
 }
 
-void RemoteCompositorIntegration::updateContentsHeadroom(float headroom)
-{
-    protectedBacking()->updateContentsHeadroom(headroom);
-}
-
 } // namespace WebKit
 
 #undef MESSAGE_CHECK

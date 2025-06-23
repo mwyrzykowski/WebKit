@@ -45,9 +45,4 @@ void GPUCompositorIntegration::paintCompositedResultsToCanvas(WebCore::ImageBuff
     m_backing->paintCompositedResultsToCanvas(imageBuffer, bufferIndex);
 }
 
-void GPUCompositorIntegration::updateContentsHeadroom(float headroom)
-{
-    m_backing->updateContentsHeadroom(headroom);
-}
-
 } // namespace WebCore
