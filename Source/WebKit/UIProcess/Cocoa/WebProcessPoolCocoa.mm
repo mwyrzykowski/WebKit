@@ -861,6 +861,7 @@ void WebProcessPool::registerNotificationObservers()
     m_didEndSuppressingHighDynamicRange = [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification object:NSApp queue:[NSOperationQueue currentQueue] usingBlock:^(NSNotification *notification) {
         m_suppressEDR = false;
         screenPropertiesChanged();
+        m_currentHeadroomOnSuspend = std::nullopt;
     }];
 #endif
 
@@ -1255,15 +1256,22 @@ void WebProcessPool::screenPropertiesChanged()
 {
     auto screenProperties = WebCore::collectScreenProperties();
 #if HAVE(SUPPORT_HDR_DISPLAY)
-    if (m_suppressEDR) {
-        for (auto& properties : screenProperties.screenDataMap.values()) {
+    bool saveHeadroom = !m_currentHeadroomOnSuspend;
+    if (saveHeadroom)
+        m_currentHeadroomOnSuspend = SavedHeadroomMap();
+
+    for (auto& [displayID, properties] : screenProperties.screenDataMap) {
+        if (m_suppressEDR) {
             constexpr auto maxStudioDisplayHeadroom = 2.f;
             constexpr auto threeQuartersStudioDisplayHeadroom = 1.5f;
             constexpr auto halfMaxHeadroomMultiplier = 0.5f;
             auto maxHeadroom = std::clamp(properties.maxEDRHeadroom * halfMaxHeadroomMultiplier, std::min(properties.maxEDRHeadroom, threeQuartersStudioDisplayHeadroom), maxStudioDisplayHeadroom);
             properties.currentEDRHeadroom = maxHeadroom;
             properties.maxEDRHeadroom = maxHeadroom;
-            properties.suppressEDR = m_suppressEDR;
+            properties.suppressEDR = true;
+        } else if (m_currentHeadroomOnSuspend) {
+            if (auto it = m_currentHeadroomOnSuspend->find(displayID); it != m_currentHeadroomOnSuspend->end())
+                properties.currentEDRHeadroom = it->value;
         }
     }
 #endif

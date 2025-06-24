@@ -1033,6 +1033,8 @@ private:
     const Ref<IPCTester> m_ipcTester;
 #endif
 
+    using SavedHeadroomMap = HashMap<uint32_t, float, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>>;
+    std::optional<SavedHeadroomMap> m_currentHeadroomOnSuspend;
     bool m_hasReceivedAXRequestInUIProcess { false };
     bool m_suppressEDR { false };
 };
