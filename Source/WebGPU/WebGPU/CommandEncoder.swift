@@ -395,6 +395,11 @@ extension WebGPU.CommandEncoder {
         return writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? 0 : writeIndex
     }
 
+    private func timestampWriteIndex(writeIndex: UInt32, defaultValue: Int, offset: UInt32) -> Int
+    {
+        writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? defaultValue : Int(writeIndex + offset)
+    }
+
     private func errorValidatingCopyBufferToBuffer(source: WebGPU.Buffer, sourceOffset: UInt64, destination: WebGPU.Buffer, destinationOffset: UInt64, size: UInt64) -> String? {
         func errorString(_ format: String) -> String {
             return "GPUCommandEncoder.copyBufferToBuffer: \(format)"
@@ -839,20 +844,22 @@ extension WebGPU.CommandEncoder {
 
         let mtlDescriptor = MTLRenderPassDescriptor()
         var counterSampleBuffer: MTLCounterSampleBuffer? = nil
+        var counterSampleBufferOffset: UInt32 = 0
         if let wgpuTimestampWrites = wgpuGetRenderPassDescriptorTimestampWrites(descriptorSpan)?[0] {
             let wgpuQuerySet = wgpuTimestampWrites.querySet
             let querySet = WebGPU.fromAPI(wgpuQuerySet)
             counterSampleBuffer = querySet.counterSampleBufferWithOffset().first
+            counterSampleBufferOffset = querySet.counterSampleBufferWithOffset().second
         }
 
         if m_device.ptr().enableEncoderTimestamps() || counterSampleBuffer != nil {
             if counterSampleBuffer != nil {
                 let timestampWrites = wgpuGetRenderPassDescriptorTimestampWrites(descriptorSpan)![0]
                 mtlDescriptor.sampleBufferAttachments[0].sampleBuffer = counterSampleBuffer;
-                mtlDescriptor.sampleBufferAttachments[0].startOfVertexSampleIndex = Int(timestampWrites.beginningOfPassWriteIndex)
-                mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex = Int(timestampWrites.endOfPassWriteIndex)
-                mtlDescriptor.sampleBufferAttachments[0].startOfFragmentSampleIndex = Int(timestampWrites.endOfPassWriteIndex)
-                mtlDescriptor.sampleBufferAttachments[0].endOfFragmentSampleIndex = Int(timestampWrites.endOfPassWriteIndex)
+                mtlDescriptor.sampleBufferAttachments[0].startOfVertexSampleIndex = timestampWriteIndex(writeIndex: timestampWrites.beginningOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
+                mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex = timestampWriteIndex(writeIndex: timestampWrites.endOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
+                mtlDescriptor.sampleBufferAttachments[0].startOfFragmentSampleIndex = mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex
+                mtlDescriptor.sampleBufferAttachments[0].endOfFragmentSampleIndex = mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex
                 m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
             } else {
                 mtlDescriptor.sampleBufferAttachments[0].sampleBuffer = counterSampleBuffer != nil ? counterSampleBuffer : m_device.ptr().timestampsBuffer(m_commandBuffer, 4)
@@ -2111,15 +2118,17 @@ extension WebGPU.CommandEncoder {
         let computePassDescriptor = MTLComputePassDescriptor()
         computePassDescriptor.dispatchType = MTLDispatchType.serial
         var counterSampleBuffer: MTLCounterSampleBuffer? = nil
+        var counterSampleBufferOffset: UInt32 = 0
         if let wgpuTimestampWrites = wgpuGetComputePassDescriptorTimestampWrites(collection.span)?[0] {
             counterSampleBuffer = WebGPU.fromAPI(wgpuTimestampWrites.querySet).counterSampleBufferWithOffset().first
+            counterSampleBufferOffset = WebGPU.fromAPI(wgpuTimestampWrites.querySet).counterSampleBufferWithOffset().second
         }
 
         if m_device.ptr().enableEncoderTimestamps() || counterSampleBuffer != nil {
             let timestampWrites = wgpuGetComputePassDescriptorTimestampWrites(collection.span)?[0]
             computePassDescriptor.sampleBufferAttachments[0].sampleBuffer = counterSampleBuffer != nil ? computePassDescriptor.sampleBufferAttachments[0].sampleBuffer : m_device.ptr().timestampsBuffer(m_commandBuffer, 2)
-            computePassDescriptor.sampleBufferAttachments[0].startOfEncoderSampleIndex = timestampWrites != nil ? Int(timestampWrites!.beginningOfPassWriteIndex) : 0
-            computePassDescriptor.sampleBufferAttachments[0].endOfEncoderSampleIndex = timestampWrites != nil ? Int(timestampWrites!.endOfPassWriteIndex) : 1
+            computePassDescriptor.sampleBufferAttachments[0].startOfEncoderSampleIndex = timestampWriteIndex(writeIndex: timestampWrites!.beginningOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
+            computePassDescriptor.sampleBufferAttachments[0].endOfEncoderSampleIndex = timestampWriteIndex(writeIndex: timestampWrites!.endOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
             if counterSampleBuffer != nil {
                 m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
             }
