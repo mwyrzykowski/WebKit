@@ -1266,6 +1266,11 @@ void Queue::clearTextureIfNeeded(Texture& parentTexture, uint32_t mipLevelCount,
     finalizeBlitCommandEncoder();
 }
 
+id<MTLDevice> Queue::metalDevice() const
+{
+    return device().device();
+}
+
 } // namespace WebGPU
 
 #pragma mark WGPU Stubs
