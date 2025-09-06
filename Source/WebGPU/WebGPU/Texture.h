@@ -37,9 +37,7 @@
 #import <wtf/WeakHashSet.h>
 #import <wtf/WeakPtr.h>
 
-// FIXME(rdar://155970441): this annotation should be in WebGPU.h, move it once we support
-// annotating incomplete types
-struct __attribute__((swift_attr("@safe"))) SWIFT_SHARED_REFERENCE(wgpuTextureReference, wgpuTextureRelease) WGPUTextureImpl {
+struct WGPUTextureImpl {
 };
 
 namespace WebGPU {
