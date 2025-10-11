@@ -570,6 +570,11 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
     WebKit::GPUProcessProxy::setEnableMetalShaderValidationInNewGPUProcessesForTesting(enable);
 }
 
++ (void)_setEnableMetalShaderCacheOverridenForTesting:(BOOL)enable
+{
+    WebKit::GPUProcessProxy::setEnableMetalShaderCacheOverriden(enable);
+}
+
 + (BOOL)_isMetalDebugDeviceEnabledInGPUProcessForTesting
 {
     if (RefPtr gpuProcess = WebKit::GPUProcessProxy::singletonIfCreated())
