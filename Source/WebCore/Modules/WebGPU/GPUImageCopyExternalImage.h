@@ -52,7 +52,7 @@ struct GPUImageCopyExternalImage {
     WebGPU::ImageCopyExternalImage convertToBacking() const
     {
         return {
-            // FIXME: Handle the canvas element.
+            source,
             origin ? std::optional { WebCore::convertToBacking(*origin) } : std::nullopt,
             flipY,
         };

@@ -162,12 +162,6 @@ private:
     const Ref<IPC::StreamServerConnection> m_streamConnection;
     WebGPUIdentifier m_identifier;
     const Ref<RemoteQueue> m_queue;
-#if ENABLE(VIDEO)
-    const Ref<RemoteVideoFrameObjectHeap> m_videoFrameObjectHeap;
-#if PLATFORM(COCOA)
-    SharedVideoFrameReader m_sharedVideoFrameReader;
-#endif
-#endif
     ThreadSafeWeakPtr<GPUConnectionToWebProcess> m_gpuConnectionToWebProcess;
     WeakRef<RemoteGPU> m_gpu;
 };

@@ -29,6 +29,7 @@
 #if ENABLE(GPU_PROCESS)
 
 #include "RemoteBufferProxy.h"
+#include "RemoteDeviceMessages.h"
 #include "RemoteQueueMessages.h"
 #include "WebGPUConvertToBackingContext.h"
 #include "WebProcess.h"
@@ -157,19 +158,36 @@ void RemoteQueueProxy::writeTexture(
 void RemoteQueueProxy::copyExternalImageToTexture(
     const WebCore::WebGPU::ImageCopyExternalImage& source,
     const WebCore::WebGPU::ImageCopyTextureTagged& destination,
-    const WebCore::WebGPU::Extent3D& copySize)
+    unsigned width,
+    unsigned height,
+    CompletionHandler<void(bool)>&& completionHandler,
+    RetainPtr<IOSurfaceRef>)
 {
     Ref convertToBackingContext = m_convertToBackingContext;
-    auto convertedSource = convertToBackingContext->convertToBacking(source);
-    ASSERT(convertedSource);
+    RefPtr<WebCore::VideoFrame> videoFrame;
+    auto convertedSource = convertToBackingContext->convertToBacking(source, videoFrame);
+    if (videoFrame && convertedSource) {
+        auto& sharedVideoFrameWriter = m_parent->sharedVideoFrameWriter();
+        convertedSource->source = sharedVideoFrameWriter.write(*videoFrame, [this, protectedThis = Ref { *this }](auto& semaphore) {
+            auto sendResult = send(Messages::RemoteDevice::SetSharedVideoFrameSemaphore { semaphore });
+            UNUSED_VARIABLE(sendResult);
+        }, [this, protectedThis = Ref { *this }](WebCore::SharedMemory::Handle&& handle) {
+            auto sendResult = send(Messages::RemoteDevice::SetSharedVideoFrameMemory { WTFMove(handle) });
+            UNUSED_VARIABLE(sendResult);
+        });
+    }
+    if (!convertedSource) {
+        completionHandler(false);
+        return;
+    }
     auto convertedDestination = convertToBackingContext->convertToBacking(destination);
     ASSERT(convertedDestination);
-    auto convertedCopySize = convertToBackingContext->convertToBacking(copySize);
-    ASSERT(convertedCopySize);
-    if (!convertedSource || !convertedDestination || !convertedCopySize)
+    if (!convertedSource || !convertedDestination)
         return;
 
-    auto sendResult = send(Messages::RemoteQueue::CopyExternalImageToTexture(*convertedSource, *convertedDestination, *convertedCopySize));
+    auto sendResult = sendWithAsyncReply(Messages::RemoteQueue::CopyExternalImageToTexture(WTFMove(*convertedSource), WTFMove(*convertedDestination), width, height), [completionHandler = WTFMove(completionHandler)](auto success) mutable {
+        completionHandler(success);
+    });
     UNUSED_VARIABLE(sendResult);
 }
 

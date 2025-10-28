@@ -79,7 +79,7 @@ public:
 
     virtual void setImageBufferAndMarkDirty(RefPtr<ImageBuffer>&&) { }
 
-    RefPtr<ImageBuffer> makeRenderingResultsAvailable(ShouldApplyPostProcessingToDirtyRect = ShouldApplyPostProcessingToDirtyRect::Yes);
+    WEBCORE_EXPORT RefPtr<ImageBuffer> makeRenderingResultsAvailable(ShouldApplyPostProcessingToDirtyRect = ShouldApplyPostProcessingToDirtyRect::Yes);
 
     size_t memoryCost() const;
 #if ENABLE(RESOURCE_USAGE)

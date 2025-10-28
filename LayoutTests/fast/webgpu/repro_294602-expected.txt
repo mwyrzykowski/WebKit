@@ -1,0 +1,11 @@
+CONSOLE MESSAGE: Blocked access to external URL https://webgpufundamentals.org/webgpu/resources/webgpu-lesson.css
+CONSOLE MESSAGE: Blocked access to external URL https://webgpufundamentals.org/3rdparty/wgpu-matrix.module.js
+CONSOLE MESSAGE: Blocked access to external URL https://webgpufundamentals.org/3rdparty/muigui-0.x.module.js
+layer at (0,0) size 800x600
+  RenderView at (0,0) size 800x600
+layer at (0,0) size 800x600
+  RenderBlock {HTML} at (0,0) size 800x600
+    RenderBody {BODY} at (0,0) size 800x600
+      RenderHTMLCanvas {CANVAS} at (0,0) size 800x600
+layer at (0,0) size 13x13
+  RenderBlock (positioned) {PRE} at (0,0) size 13x13 [color=#FFFFFF] [bgcolor=#000000]

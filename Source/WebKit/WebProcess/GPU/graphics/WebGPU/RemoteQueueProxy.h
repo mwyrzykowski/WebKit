@@ -107,7 +107,10 @@ private:
     void copyExternalImageToTexture(
         const WebCore::WebGPU::ImageCopyExternalImage& source,
         const WebCore::WebGPU::ImageCopyTextureTagged& destination,
-        const WebCore::WebGPU::Extent3D& copySize) final;
+        unsigned width,
+        unsigned height,
+        CompletionHandler<void(bool)>&&,
+        RetainPtr<IOSurfaceRef>) final;
 
     void setLabelInternal(const String&) final;
 #if ENABLE(VIDEO)

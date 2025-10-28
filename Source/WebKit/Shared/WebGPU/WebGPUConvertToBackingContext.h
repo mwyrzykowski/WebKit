@@ -35,6 +35,7 @@
 #include "WebGPUOrigin2D.h"
 #include "WebGPUOrigin3D.h"
 #include "WebGPURenderPassTimestampWrites.h"
+#include <WebCore/VideoFrame.h>
 #include <WebCore/WebGPUColor.h>
 #include <WebCore/WebGPUComputePassTimestampWrites.h>
 #include <WebCore/WebGPUError.h>
@@ -236,7 +237,7 @@ public:
     std::optional<FragmentState> convertToBacking(const WebCore::WebGPU::FragmentState&);
     std::optional<Identifier> convertToBacking(const WebCore::WebGPU::Identifier&);
     std::optional<ImageCopyBuffer> convertToBacking(const WebCore::WebGPU::ImageCopyBuffer&);
-    std::optional<ImageCopyExternalImage> convertToBacking(const WebCore::WebGPU::ImageCopyExternalImage&);
+    std::optional<ImageCopyExternalImage> convertToBacking(const WebCore::WebGPU::ImageCopyExternalImage&, RefPtr<WebCore::VideoFrame>&);
     std::optional<ImageCopyTexture> convertToBacking(const WebCore::WebGPU::ImageCopyTexture&);
     std::optional<ImageCopyTextureTagged> convertToBacking(const WebCore::WebGPU::ImageCopyTextureTagged&);
     std::optional<ImageDataLayout> convertToBacking(const WebCore::WebGPU::ImageDataLayout&);

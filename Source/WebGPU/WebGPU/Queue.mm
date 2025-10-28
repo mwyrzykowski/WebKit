@@ -732,6 +732,139 @@ bool Queue::writeWillCompletelyClear(WGPUTextureDimension textureDimension, uint
     return false;
 }
 
+id<MTLRenderPipelineState> Queue::copyPSO(id<MTLTexture> texture)
+{
+    if (!m_copyPSO)
+        m_copyPSO = [NSMutableDictionary dictionary];
+
+    if (id<MTLRenderPipelineState> pso = [m_copyPSO objectForKey:@(texture.pixelFormat)])
+        return pso;
+
+    auto device = m_device.get();
+    if (!device)
+        return nil;
+
+    id<MTLDevice> mtlDevice = device->device();
+    static std::once_flag onceFlag;
+    static id<MTLFunction> functionVS;
+    static id<MTLFunction> functionFS;
+    NSError* error;
+    std::call_once(onceFlag, [&] {
+        MTLCompileOptions* options = [MTLCompileOptions new];
+        options.mathMode = MTLMathModeFast;
+        options.mathFloatingPointFunctions = MTLMathFloatingPointFunctionsPrecise;
+
+        /* NOLINT */ id<MTLLibrary> library = [mtlDevice newLibraryWithSource:@R"(
+    using namespace metal;
+    struct VertexOutput {
+        float4 position [[position]];
+        float2 uv;
+    };
+    [[vertex]] VertexOutput bigTriangle(uint vertexId [[vertex_id]], constant float2* uvs [[buffer(0)]])
+    {
+        VertexOutput out;
+        float2 uv = uvs[vertexId + 1];
+        out.uv = uv + uvs[0];
+        out.position = float4(2.f * uv.x - 1.f, -2.f * uv.y + 1.f, .5f, 1.f);
+        return out;
+    }
+
+    [[fragment]] float4 copy(VertexOutput input [[stage_in]], texture2d<float> inTexture [[texture(0)]])
+    {
+        constexpr sampler s = sampler(coord::normalized, address::clamp_to_zero, filter::linear);
+        return inTexture.sample(s, input.uv);
+    })" /* NOLINT */ options:options error:&error];
+
+        if (error) {
+            WTFLogAlways("Could not compile copy shaders, error: %@", error); // NOLINT
+            return;
+        }
+
+        functionVS = [library newFunctionWithName:@"bigTriangle"];
+        functionFS = [library newFunctionWithName:@"copy"];
+    });
+
+    MTLRenderPipelineDescriptor* descriptor = [MTLRenderPipelineDescriptor new];
+    descriptor.colorAttachments[0].pixelFormat = texture.pixelFormat;
+    descriptor.vertexFunction = functionVS;
+    descriptor.fragmentFunction = functionFS;
+    descriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
+
+    id<MTLRenderPipelineState> pso = [mtlDevice newRenderPipelineStateWithDescriptor:descriptor error:&error];
+    [m_copyPSO setObject:pso forKey:@(texture.pixelFormat)];
+    return pso;
+}
+
+void Queue::copyExternalImageToTexture(unsigned originX, unsigned originY, bool flipY, RetainPtr<IOSurfaceRef> retainedSourceIOSurface, const WGPUImageCopyTextureTagged& destination, unsigned width, unsigned height)
+{
+    auto device = m_device.get();
+    if (!device)
+        return;
+
+    IOSurfaceRef sourceIOSurface = retainedSourceIOSurface.get();
+    if (!sourceIOSurface)
+        return;
+
+    MTLTextureDescriptor* sourceTextureDescriptor = [MTLTextureDescriptor new];
+    sourceTextureDescriptor.width = IOSurfaceGetWidth(sourceIOSurface);
+    sourceTextureDescriptor.height = IOSurfaceGetHeight(sourceIOSurface);
+    sourceTextureDescriptor.usage = MTLTextureUsageShaderRead;
+    sourceTextureDescriptor.textureType = MTLTextureType2D;
+    sourceTextureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+
+    Ref destinationTexture = fromAPI(destination.texture);
+    id<MTLTexture> destinationMTLTexture = destinationTexture->texture();
+    destinationTexture->setPreviouslyCleared();
+
+    float destinationWidth = static_cast<float>(destinationMTLTexture.width);
+    float destinationHeight = static_cast<float>(destinationMTLTexture.height);
+
+    float xOffset = destination.origin.x / destinationWidth;
+    float yOffset = destination.origin.y / destinationHeight;
+    float xSize = width / destinationWidth;
+    float ySize = height / destinationHeight;
+
+    RELEASE_ASSERT(!flipY);
+    RELEASE_ASSERT(xSize + xOffset <= 1.f);
+    RELEASE_ASSERT(ySize + yOffset <= 1.f);
+    float uvs[] = {
+        originX / static_cast<float>(sourceTextureDescriptor.width), originY / static_cast<float>(sourceTextureDescriptor.height),
+        0.f   + xOffset,    0.f   + yOffset,
+        xSize + xOffset,    0.f   + yOffset,
+        0.f   + xOffset,    ySize + yOffset,
+
+        xSize + xOffset,    0.f   + yOffset,
+        xSize + xOffset,    ySize + yOffset,
+        0.f   + xOffset,    ySize + yOffset
+    };
+    id<MTLTexture> sourceTexture = device->newTextureWithDescriptor(sourceTextureDescriptor, sourceIOSurface);
+
+    id<MTLRenderPipelineState> pso = copyPSO(destinationMTLTexture);
+    if (!pso)
+        return;
+
+    Ref deviceQueue = device->getQueue();
+
+    MTLRenderPassDescriptor* renderPassDescriptor = [MTLRenderPassDescriptor new];
+    renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+    renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionDontCare;
+    renderPassDescriptor.colorAttachments[0].texture = destinationMTLTexture;
+    renderPassDescriptor.colorAttachments[0].slice = destination.origin.z;
+
+    MTLCommandBufferDescriptor *descriptor = [MTLCommandBufferDescriptor new];
+    id<MTLCommandBuffer> commandBuffer = deviceQueue->commandBufferWithDescriptor(descriptor);
+
+    id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+    deviceQueue->setEncoderForBuffer(commandBuffer, renderEncoder);
+    [renderEncoder setRenderPipelineState:pso];
+
+    [renderEncoder setVertexBytes:uvs length:sizeof(uvs) atIndex:0];
+    [renderEncoder setFragmentTexture:sourceTexture atIndex:0];
+    [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:6];
+    deviceQueue->endEncoding(renderEncoder, commandBuffer);
+    deviceQueue->commitMTLCommandBuffer(commandBuffer);
+}
+
 void Queue::writeTexture(const WGPUImageCopyTexture& destination, std::span<uint8_t> data, const WGPUTextureDataLayout& dataLayout, const WGPUExtent3D& size, bool skipValidation)
 {
     auto device = m_device.get();
@@ -1315,6 +1448,11 @@ void wgpuQueueSubmit(WGPUQueue queue, size_t commandCount, const WGPUCommandBuff
 void wgpuQueueWriteBuffer(WGPUQueue queue, WGPUBuffer buffer, uint64_t bufferOffset, std::span<uint8_t> data)
 {
     WebGPU::protectedFromAPI(queue)->writeBuffer(WebGPU::protectedFromAPI(buffer), bufferOffset, data);
+}
+
+void wgpuCopyExternalImageToTexture(WGPUQueue queue, unsigned originX, unsigned originY, WGPUBool flipY, IOSurfaceRef sourceIOSurface, const WGPUImageCopyTextureTagged* backingDestination, unsigned width, unsigned height)
+{
+    WebGPU::protectedFromAPI(queue)->copyExternalImageToTexture(originX, originY, flipY, sourceIOSurface, *backingDestination, width, height);
 }
 
 void wgpuQueueWriteTexture(WGPUQueue queue, const WGPUImageCopyTexture* destination, std::span<uint8_t> data, const WGPUTextureDataLayout* dataLayout, const WGPUExtent3D* writeSize)

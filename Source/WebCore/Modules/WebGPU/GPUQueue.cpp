@@ -56,6 +56,8 @@
 #include "CoreVideoSoftLink.h"
 #endif
 
+#define WEBGPU_USE_GPU_ACCELERATED_IMPORT_PATH 1
+
 namespace WebCore {
 
 GPUQueue::GPUQueue(Ref<WebGPU::Queue>&& backing, WebGPU::Device& device)
@@ -811,8 +813,6 @@ static bool isStateValid(const auto& source, const std::optional<GPUOrigin2D>& o
     );
 }
 
-// FIXME: https://bugs.webkit.org/show_bug.cgi?id=263692 - this code should be removed, it is to unblock
-// compiler <-> pipeline dependencies
 #if PLATFORM(COCOA)
 static uint32_t convertRGBA8888ToRGB10A2(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
@@ -1143,53 +1143,60 @@ ExceptionOr<void> GPUQueue::copyExternalImageToTexture(ScriptExecutionContext& c
     if (!isOriginClean(source.source, context))
         return Exception { ExceptionCode::SecurityError, "GPUQueue.copyExternalImageToTexture: Cross origin external images are not allowed in WebGPU"_s };
 
-    bool callbackScopeIsSafe { true };
-    bool needsYFlip = source.flipY;
-    bool needsPremultipliedAlpha = destination.premultipliedAlpha;
-    auto backingCopySize = convertToBacking(copySize);
-    imageBytesForSource(m_backing.get(), source, destination, needsYFlip, needsPremultipliedAlpha, backingCopySize, [&](std::span<const uint8_t> imageBytes, size_t columns, size_t rows) {
-        RELEASE_ASSERT(callbackScopeIsSafe);
-        auto destinationTexture = destination.texture;
-        auto sizeInBytes = imageBytes.size();
-        if (!imageBytes.data() || !sizeInBytes || !destinationTexture || (imageBytes.size() % 4))
-            return;
+    Ref protectedThis = Ref { *this };
+#if WEBGPU_USE_GPU_ACCELERATED_IMPORT_PATH
+    auto copySizeWidth = dimension(copySize, 0);
+    auto copySizeHeight = dimension(copySize, 1);
+    m_backing->copyExternalImageToTexture(source.convertToBacking(), destination.convertToBacking(), copySizeWidth, copySizeHeight, [protectedThis, source, destination, copySize](bool success) {
+        if (!success) {
+#endif
+            bool callbackScopeIsSafe { true };
+            bool needsYFlip = source.flipY;
+            bool needsPremultipliedAlpha = destination.premultipliedAlpha;
+            auto backingCopySize = convertToBacking(copySize);
+            imageBytesForSource(protectedThis->m_backing.get(), source, destination, needsYFlip, needsPremultipliedAlpha, backingCopySize, [&](std::span<const uint8_t> imageBytes, size_t columns, size_t rows) {
+                RELEASE_ASSERT(callbackScopeIsSafe);
+                auto destinationTexture = destination.texture;
+                auto sizeInBytes = imageBytes.size();
+                if (!imageBytes.data() || !sizeInBytes || !destinationTexture || (imageBytes.size() % 4))
+                    return;
 
-        bool supportedFormat;
-        auto newImageBytes = copyToDestinationFormat(imageBytes, destination.texture->format(), supportedFormat, rows, needsYFlip, needsPremultipliedAlpha, source.origin);
-        uint32_t sourceX = 0, sourceY = 0;
-        auto widthInBytes = (newImageBytes ? newImageBytes.sizeInBytes() : sizeInBytes) / rows;
-        auto channels = widthInBytes / columns;
-        GPUImageDataLayout dataLayout { 0, widthInBytes, rows };
+                bool supportedFormat;
+                auto newImageBytes = copyToDestinationFormat(imageBytes, destination.texture->format(), supportedFormat, rows, needsYFlip, needsPremultipliedAlpha, source.origin);
+                uint32_t sourceX = 0, sourceY = 0;
+                auto widthInBytes = (newImageBytes ? newImageBytes.sizeInBytes() : sizeInBytes) / rows;
+                auto channels = widthInBytes / columns;
+                GPUImageDataLayout dataLayout { 0, widthInBytes, rows };
 
-        if (source.origin && supportedFormat) {
-            populdateXYFromOrigin(*source.origin, sourceX, sourceY);
+                if (source.origin && supportedFormat) {
+                    populdateXYFromOrigin(*source.origin, sourceX, sourceY);
 
-            if (sourceX || sourceY) {
-                RELEASE_ASSERT(newImageBytes);
-                auto copySizeWidth = dimension(copySize, 0);
-                auto copySizeHeight = dimension(copySize, 1);
-                for (size_t y = 0; y < copySizeHeight; ++y) {
-                    auto targetY = !needsYFlip ? (sourceY + y) : (sourceY + (copySizeHeight - 1 - y));
-                    for (size_t x = sourceX, x0 = 0; x0 < copySizeWidth; ++x, ++x0) {
-                        for (size_t c = 0; c < channels; ++c)
-                            newImageBytes[y * widthInBytes + x0 * channels + c] = newImageBytes[targetY * widthInBytes + x * channels + c];
+                    if (sourceX || sourceY) {
+                        RELEASE_ASSERT(newImageBytes);
+                        auto copySizeWidth = dimension(copySize, 0);
+                        auto copySizeHeight = dimension(copySize, 1);
+                        for (size_t y = 0; y < copySizeHeight; ++y) {
+                            auto targetY = !needsYFlip ? (sourceY + y) : (sourceY + (copySizeHeight - 1 - y));
+                            for (size_t x = sourceX, x0 = 0; x0 < copySizeWidth; ++x, ++x0) {
+                                for (size_t c = 0; c < channels; ++c)
+                                    newImageBytes[y * widthInBytes + x0 * channels + c] = newImageBytes[targetY * widthInBytes + x * channels + c];
+                            }
+                        }
+                        needsYFlip = false;
                     }
                 }
-                needsYFlip = false;
-            }
+
+                auto copyDestination = destination.convertToBacking();
+                if (!supportedFormat || !(destinationTexture->usage() & GPUTextureUsage::RENDER_ATTACHMENT))
+                    copyDestination.mipLevel = INT_MAX;
+
+                protectedThis->m_backing->writeTexture(copyDestination, newImageBytes ? newImageBytes.span() : imageBytes, dataLayout.convertToBacking(), backingCopySize);
+            });
+            callbackScopeIsSafe = false;
+#if WEBGPU_USE_GPU_ACCELERATED_IMPORT_PATH
         }
-
-        auto copyDestination = destination.convertToBacking();
-
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=263692 - this code should be removed once copyExternalImageToTexture
-        // is implemented in the GPU process
-        if (!supportedFormat || !(destinationTexture->usage() & GPUTextureUsage::RENDER_ATTACHMENT))
-            copyDestination.mipLevel = INT_MAX;
-
-        m_backing->writeTexture(copyDestination, newImageBytes ? newImageBytes.span() : imageBytes, dataLayout.convertToBacking(), backingCopySize);
     });
-    callbackScopeIsSafe = false;
-
+#endif
     return { };
 }
 

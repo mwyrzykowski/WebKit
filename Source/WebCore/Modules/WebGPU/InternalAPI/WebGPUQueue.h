@@ -96,7 +96,10 @@ public:
     virtual void copyExternalImageToTexture(
         const ImageCopyExternalImage& source,
         const ImageCopyTextureTagged& destination,
-        const Extent3D& copySize) = 0;
+        unsigned width,
+        unsigned height,
+        CompletionHandler<void(bool)>&&,
+        RetainPtr<IOSurfaceRef> = nullptr) = 0;
 
     virtual RefPtr<WebCore::NativeImage> getNativeImage(WebCore::VideoFrame&) = 0;
     virtual bool isRemoteQueueProxy() const { return false; }

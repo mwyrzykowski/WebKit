@@ -124,9 +124,9 @@ public:
     static Ref<ImageBitmap> create(ScriptExecutionContext&, DetachedImageBitmap);
     static Ref<ImageBitmap> create(Ref<ImageBuffer>, bool originClean, bool premultiplyAlpha = false, bool forciblyPremultiplyAlpha = false);
 
-    ~ImageBitmap();
+    WEBCORE_EXPORT ~ImageBitmap();
 
-    ImageBuffer* buffer() const;
+    WEBCORE_EXPORT ImageBuffer* buffer() const;
 
     RefPtr<ImageBuffer> takeImageBuffer();
 

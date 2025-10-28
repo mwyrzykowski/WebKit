@@ -27,13 +27,23 @@
 
 #if ENABLE(GPU_PROCESS)
 
+#include "SharedVideoFrame.h"
 #include "WebGPUOrigin2D.h"
+#include <WebCore/MediaPlayerIdentifier.h>
+#include <WebCore/RenderingResourceIdentifier.h>
 #include <optional>
+#include <wtf/MachSendRight.h>
 
 namespace WebKit::WebGPU {
 
+using SourceType = Variant<std::optional<WebCore::RenderingResourceIdentifier>,
+#if ENABLE(VIDEO) && ENABLE(WEB_CODECS)
+std::optional<WebCore::MediaPlayerIdentifier>, std::optional<WebKit::SharedVideoFrame>,
+#endif
+std::optional<MachSendRight>>;
+
 struct ImageCopyExternalImage {
-    // FIXME: Handle the source.
+    SourceType source;
     std::optional<Origin2D> origin;
     bool flipY { false };
 };

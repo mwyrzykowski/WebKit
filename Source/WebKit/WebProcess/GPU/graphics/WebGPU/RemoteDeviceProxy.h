@@ -130,9 +130,6 @@ private:
     const Ref<ConvertToBackingContext> m_convertToBackingContext;
     const Ref<RemoteAdapterProxy> m_parent;
     const Ref<RemoteQueueProxy> m_queue;
-#if PLATFORM(COCOA) && ENABLE(VIDEO)
-    WebKit::SharedVideoFrameWriter m_sharedVideoFrameWriter;
-#endif
     const Ref<WebCore::WebGPU::CommandEncoder> m_invalidCommandEncoder;
     const Ref<WebCore::WebGPU::RenderPassEncoder> m_invalidRenderPassEncoder;
     const Ref<WebCore::WebGPU::ComputePassEncoder> m_invalidComputePassEncoder;

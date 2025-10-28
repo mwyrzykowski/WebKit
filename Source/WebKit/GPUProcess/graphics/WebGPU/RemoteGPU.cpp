@@ -70,6 +70,12 @@ RemoteGPU::RemoteGPU(WebGPUIdentifier identifier, GPUConnectionToWebProcess& gpu
     , m_modelObjectHeap(DDModel::ObjectHeap::create())
     , m_identifier(identifier)
     , m_renderingBackend(renderingBackend)
+#if ENABLE(VIDEO)
+    , m_videoFrameObjectHeap(gpuConnectionToWebProcess.videoFrameObjectHeap())
+#if PLATFORM(COCOA)
+    , m_sharedVideoFrameReader(m_videoFrameObjectHeap.ptr(), gpuConnectionToWebProcess.webProcessIdentity())
+#endif
+#endif
 {
     weakPtrFactory().prepareForUseOnlyOnNonMainThread();
 }
@@ -262,6 +268,22 @@ void RemoteGPU::paintNativeImageToImageBuffer(WebCore::NativeImage& nativeImage,
         semaphore.signal();
     });
     semaphore.wait();
+}
+
+RefPtr<WebCore::ImageBuffer> RemoteGPU::imageBuffer(WebCore::RenderingResourceIdentifier imageBufferIdentifier)
+{
+    assertIsCurrent(workQueue());
+    BinarySemaphore semaphore;
+
+    RefPtr<WebCore::ImageBuffer> result;
+    Ref renderingBackend = m_renderingBackend;
+    renderingBackend->dispatch([&]() mutable {
+        result = renderingBackend->imageBuffer(imageBufferIdentifier);
+        semaphore.signal();
+    });
+
+    semaphore.wait();
+    return result;
 }
 
 void RemoteGPU::createModelBacking(unsigned width, unsigned height, DDModelIdentifier identifier, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)

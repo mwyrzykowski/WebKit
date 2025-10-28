@@ -44,6 +44,7 @@
 #include <array>
 #include <optional>
 #include <wtf/Forward.h>
+#include <wtf/RetainPtr.h>
 #include <wtf/StdLibExtras.h>
 
 #if defined(WGPU_SHARED_LIBRARY)
@@ -1230,6 +1231,15 @@ typedef struct WGPUImageCopyTexture {
     WGPUTextureAspect aspect;
 } WGPUImageCopyTexture WGPU_STRUCTURE_ATTRIBUTE;
 
+typedef struct WGPUImageCopyTextureTagged {
+    WGPUTexture texture;
+    uint32_t mipLevel;
+    WGPUOrigin3D origin;
+    WGPUTextureAspect aspect;
+    WGPUColorSpace colorSpace;
+    WGPUBool premultipliedAlpha;
+} WGPUImageCopyTextureTagged WGPU_STRUCTURE_ATTRIBUTE;
+
 typedef struct WGPUProgrammableStageDescriptor {
     WGPUShaderModule module;
     char const * entryPoint;
@@ -1746,6 +1756,7 @@ WGPU_EXPORT void wgpuQueueWriteBuffer(WGPUQueue queue, WGPUBuffer buffer, uint64
 WGPU_EXPORT void wgpuQueueWriteTexture(WGPUQueue queue, WGPUImageCopyTexture const * destination, std::span<uint8_t> data, WGPUTextureDataLayout const * dataLayout, WGPUExtent3D const * writeSize) WGPU_FUNCTION_ATTRIBUTE;
 WGPU_EXPORT void wgpuQueueReference(WGPUQueue queue) WGPU_FUNCTION_ATTRIBUTE;
 WGPU_EXPORT void wgpuQueueRelease(WGPUQueue queue) WGPU_FUNCTION_ATTRIBUTE;
+WGPU_EXPORT void wgpuCopyExternalImageToTexture(WGPUQueue queue, unsigned originX, unsigned originY, WGPUBool flipY, IOSurfaceRef sourceIOSurface, const WGPUImageCopyTextureTagged* backingDestination, unsigned width, unsigned height) WGPU_FUNCTION_ATTRIBUTE;
 
 // Methods of RenderBundle
 WGPU_EXPORT void wgpuRenderBundleSetLabel(WGPURenderBundle renderBundle, char const * label) WGPU_FUNCTION_ATTRIBUTE;

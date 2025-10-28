@@ -36,7 +36,9 @@ messages -> RemoteQueue Stream {
     void WriteBuffer(WebKit::WebGPUIdentifier identifier, WebCore::WebGPU::Size64 bufferOffset, std::optional<WebCore::SharedMemory::Handle> data) -> (bool success) NotStreamEncodable
     void WriteTexture(WebKit::WebGPU::ImageCopyTexture destination, std::optional<WebCore::SharedMemory::Handle> dataHandle, WebKit::WebGPU::ImageDataLayout imageDataLayout, WebKit::WebGPU::Extent3D size) -> (bool success) NotStreamEncodable
     void WriteTextureWithCopy(WebKit::WebGPU::ImageCopyTexture destination, Vector<uint8_t> data, WebKit::WebGPU::ImageDataLayout imageDataLayout, WebKit::WebGPU::Extent3D size)
-    void CopyExternalImageToTexture(WebKit::WebGPU::ImageCopyExternalImage source, WebKit::WebGPU::ImageCopyTextureTagged destination, WebKit::WebGPU::Extent3D copySize)
+#if ENABLE(VIDEO) && ENABLE(WEB_CODECS)
+    void CopyExternalImageToTexture(WebKit::WebGPU::ImageCopyExternalImage source, WebKit::WebGPU::ImageCopyTextureTagged destination, WebCore::WebGPU::IntegerCoordinate width, WebCore::WebGPU::IntegerCoordinate height) -> (bool success) NotStreamEncodable
+#endif
     void SetLabel(String label)
 }
 

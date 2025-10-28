@@ -105,6 +105,7 @@ public:
     void synchronizeResourceAndWait(id<MTLBuffer>);
     id<MTLIndirectCommandBuffer> trimICB(id<MTLIndirectCommandBuffer> dest, id<MTLIndirectCommandBuffer> src, NSUInteger newSize);
     id<MTLDevice> _Nullable metalDevice() const;
+    void copyExternalImageToTexture(unsigned originX, unsigned originY, bool flipY, RetainPtr<IOSurfaceRef>, const WGPUImageCopyTextureTagged&, unsigned width, unsigned height);
 
 private:
     Queue(id<MTLCommandQueue>, Adapter&, Device&);
@@ -118,6 +119,7 @@ private:
     bool isSchedulingIdle() const { return m_submittedCommandBufferCount == m_scheduledCommandBufferCount; }
     void removeMTLCommandBufferInternal(id<MTLCommandBuffer>);
     void clearTextureIfNeeded(Texture&, uint32_t mipLevelCount, uint32_t arrayLayerCount, uint32_t baseMipLevel, uint32_t baseArrayLayer);
+    id<MTLRenderPipelineState> copyPSO(id<MTLTexture>);
 
     NSString * _Nullable errorValidatingWriteTexture(const WGPUImageCopyTexture&, const WGPUTextureDataLayout&, const WGPUExtent3D&, size_t, const Texture&) const;
 
@@ -141,6 +143,7 @@ private:
     NSMapTable<id<MTLCommandBuffer>, id<MTLCommandEncoder>> * _Nullable m_openCommandEncoders;
     const ThreadSafeWeakPtr<Instance> m_instance;
     id<MTLBuffer> _Nullable m_temporaryBuffer;
+    NSMutableDictionary<NSNumber*, id<MTLRenderPipelineState>>* m_copyPSO { nil };
     uint64_t m_temporaryBufferOffset;
 } SWIFT_SHARED_REFERENCE(refQueue, derefQueue) SWIFT_PRIVATE_FILEID("WebGPU/Queue.swift");
 

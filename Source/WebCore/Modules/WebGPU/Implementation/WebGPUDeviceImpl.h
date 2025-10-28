@@ -108,6 +108,8 @@ private:
     const Ref<QueueImpl> m_queue;
 };
 
+WGPUColorSpace convertToWGPUColorSpace(const PredefinedColorSpace&);
+
 } // namespace WebCore::WebGPU
 
 #endif // HAVE(WEBGPU_IMPLEMENTATION)

@@ -92,7 +92,10 @@ private:
     void copyExternalImageToTexture(
         const ImageCopyExternalImage& source,
         const ImageCopyTextureTagged& destination,
-        const Extent3D& copySize) final;
+        unsigned width,
+        unsigned height,
+        CompletionHandler<void(bool)>&&,
+        RetainPtr<IOSurfaceRef>) final;
 
     void setLabelInternal(const String&) final;
     RefPtr<WebCore::NativeImage> getNativeImage(WebCore::VideoFrame&) final;

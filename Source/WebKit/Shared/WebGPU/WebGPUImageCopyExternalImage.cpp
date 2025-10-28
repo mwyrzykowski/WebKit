@@ -28,13 +28,63 @@
 
 #if ENABLE(GPU_PROCESS)
 
+#include "SharedVideoFrame.h"
 #include "WebGPUConvertFromBackingContext.h"
 #include "WebGPUConvertToBackingContext.h"
+#include <WebCore/BitmapImage.h>
+#include <WebCore/CachedImage.h>
+#include <WebCore/NativeImage.h>
+#include <WebCore/SVGImage.h>
 #include <WebCore/WebGPUImageCopyExternalImage.h>
 
 namespace WebKit::WebGPU {
 
-std::optional<ImageCopyExternalImage> ConvertToBackingContext::convertToBacking(const WebCore::WebGPU::ImageCopyExternalImage& imageCopyExternalImage)
+static std::optional<SourceType> convertSourceTypeToBacking(const WebCore::WebGPU::SourceType& sourceType, RefPtr<WebCore::VideoFrame>& videoFrame)
+{
+    return WTF::switchOn(sourceType, [&] (const RefPtr<WebCore::ImageBitmap>& imageBitmap) -> std::optional<SourceType> {
+        return imageBitmap->buffer()->renderingResourceIdentifier();
+#if ENABLE(VIDEO) && ENABLE(WEB_CODECS)
+    }, [&] (const RefPtr<WebCore::ImageData>&) -> std::optional<SourceType> {
+        return std::nullopt;
+    }, [&] (const RefPtr<WebCore::HTMLImageElement>& imageElement) -> std::optional<SourceType> {
+        auto* cachedImage = imageElement->cachedImage();
+        if (!cachedImage)
+            return std::nullopt;
+
+        RefPtr image = dynamicDowncast<WebCore::BitmapImage>(cachedImage->image());
+        RefPtr<WebCore::NativeImage> nativeImage;
+        if (image)
+            nativeImage = image->nativeImage();
+        else {
+            RefPtr svgImage = dynamicDowncast<WebCore::SVGImage>(cachedImage->image());
+            nativeImage = svgImage->nativeImage(svgImage->size());
+        }
+        if (!nativeImage)
+            return std::nullopt;
+
+        return nativeImage->renderingResourceIdentifier();
+    }, [&] (const RefPtr<WebCore::HTMLVideoElement>& videoElement) -> std::optional<SourceType> {
+        if (auto playerIdentifier = videoElement->playerIdentifier())
+            return playerIdentifier;
+        if (videoElement->player())
+            videoFrame = videoElement->protectedPlayer()->videoFrameForCurrentTime();
+
+        return std::nullopt;
+    }, [&] (const RefPtr<WebCore::WebCodecsVideoFrame>& webCodecsVideoFrame) -> std::optional<SourceType> {
+        videoFrame = webCodecsVideoFrame->internalFrame();
+
+        return std::nullopt;
+#endif
+#if ENABLE(OFFSCREEN_CANVAS)
+    }, [&] (const RefPtr<WebCore::OffscreenCanvas>& canvasElement) -> std::optional<SourceType> {
+        return canvasElement->makeRenderingResultsAvailable(WebCore::ShouldApplyPostProcessingToDirtyRect::No)->renderingResourceIdentifier();
+#endif
+    }, [&] (const RefPtr<WebCore::HTMLCanvasElement>& canvasElement) -> std::optional<SourceType> {
+        return canvasElement->makeRenderingResultsAvailable(WebCore::ShouldApplyPostProcessingToDirtyRect::No)->renderingResourceIdentifier();
+    });
+}
+
+std::optional<ImageCopyExternalImage> ConvertToBackingContext::convertToBacking(const WebCore::WebGPU::ImageCopyExternalImage& imageCopyExternalImage, RefPtr<WebCore::VideoFrame>& videoFrame)
 {
     std::optional<Origin2D> origin;
     if (imageCopyExternalImage.origin) {
@@ -43,7 +93,17 @@ std::optional<ImageCopyExternalImage> ConvertToBackingContext::convertToBacking(
             return std::nullopt;
     }
 
-    return { { WTFMove(origin), imageCopyExternalImage.flipY } };
+    auto sourceType = convertSourceTypeToBacking(imageCopyExternalImage.source, videoFrame);
+    if (!sourceType)
+        return std::nullopt;
+
+    return { { *sourceType, WTFMove(origin), imageCopyExternalImage.flipY } };
+}
+
+static WebCore::WebGPU::SourceType convertSourceTypeFromBacking(const SourceType& sourceType)
+{
+    RefPtr<WebCore::ImageBitmap> nullBitmap;
+    return nullBitmap;
 }
 
 std::optional<WebCore::WebGPU::ImageCopyExternalImage> ConvertFromBackingContext::convertFromBacking(const ImageCopyExternalImage& imageCopyExternalImage)
@@ -55,7 +115,7 @@ std::optional<WebCore::WebGPU::ImageCopyExternalImage> ConvertFromBackingContext
             return std::nullopt;
     }
 
-    return { { WTFMove(origin), imageCopyExternalImage.flipY } };
+    return { { convertSourceTypeFromBacking(imageCopyExternalImage.source), WTFMove(origin), imageCopyExternalImage.flipY } };
 }
 
 } // namespace WebKit

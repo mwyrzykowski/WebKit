@@ -76,7 +76,7 @@ public:
     Page* internalPage() { return m_page.get(); }
     WEBCORE_EXPORT RefPtr<SVGSVGElement> rootElement() const;
 
-    RefPtr<NativeImage> nativeImage(const FloatSize&, const DestinationColorSpace& = DestinationColorSpace::SRGB());
+    WEBCORE_EXPORT RefPtr<NativeImage> nativeImage(const FloatSize&, const DestinationColorSpace& = DestinationColorSpace::SRGB());
 
 private:
     friend class SVGImageChromeClient;

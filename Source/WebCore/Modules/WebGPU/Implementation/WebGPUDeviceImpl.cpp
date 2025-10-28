@@ -167,7 +167,7 @@ RefPtr<Sampler> DeviceImpl::createSampler(const SamplerDescriptor& descriptor)
     return SamplerImpl::create(adoptWebGPU(wgpuDeviceCreateSampler(m_backing.get(), &backingDescriptor)), convertToBackingContext);
 }
 
-static WGPUColorSpace convertToWGPUColorSpace(const PredefinedColorSpace& colorSpace)
+WGPUColorSpace convertToWGPUColorSpace(const PredefinedColorSpace& colorSpace)
 {
     switch (colorSpace) {
     case PredefinedColorSpace::SRGB:

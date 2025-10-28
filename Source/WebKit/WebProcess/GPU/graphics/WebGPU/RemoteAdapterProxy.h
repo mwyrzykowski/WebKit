@@ -28,6 +28,7 @@
 #if ENABLE(GPU_PROCESS)
 
 #include "RemoteGPUProxy.h"
+#include "SharedVideoFrame.h"
 #include "WebGPUIdentifier.h"
 #include <WebCore/WebGPUAdapter.h>
 #include <wtf/TZoneMalloc.h>
@@ -52,7 +53,7 @@ public:
 
     RemoteGPUProxy& parent() const { return m_parent; }
     RemoteGPUProxy& root() { return m_parent->root(); }
-
+    WebKit::SharedVideoFrameWriter& sharedVideoFrameWriter() { return m_sharedVideoFrameWriter; }
 private:
     friend class DowncastConvertToBackingContext;
 
@@ -82,6 +83,9 @@ private:
     void requestDevice(const WebCore::WebGPU::DeviceDescriptor&, CompletionHandler<void(RefPtr<WebCore::WebGPU::Device>&&)>&&) final;
 
     WebGPUIdentifier m_backing;
+#if PLATFORM(COCOA) && ENABLE(VIDEO)
+    WebKit::SharedVideoFrameWriter m_sharedVideoFrameWriter;
+#endif
     const Ref<ConvertToBackingContext> m_convertToBackingContext;
     const Ref<RemoteGPUProxy> m_parent;
     bool m_xrCompatible { false };

@@ -28,9 +28,11 @@
 
 #if ENABLE(GPU_PROCESS)
 
+#include "GPUConnectionToWebProcess.h"
 #include "RemoteQueueMessages.h"
 #include "StreamServerConnection.h"
 #include "WebGPUObjectHeap.h"
+#include <WebCore/CoreVideoSoftLink.h>
 #include <WebCore/SharedMemory.h>
 #include <WebCore/WebGPUBuffer.h>
 #include <WebCore/WebGPUQueue.h>
@@ -40,11 +42,12 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteQueue);
 
-RemoteQueue::RemoteQueue(WebCore::WebGPU::Queue& queue, WebGPU::ObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, RemoteGPU& gpu, WebGPUIdentifier identifier)
+RemoteQueue::RemoteQueue(GPUConnectionToWebProcess& gpuConnectionToWebProcess, WebCore::WebGPU::Queue& queue, WebGPU::ObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, RemoteGPU& gpu, WebGPUIdentifier identifier)
     : m_backing(queue)
     , m_objectHeap(objectHeap)
     , m_streamConnection(WTFMove(streamConnection))
     , m_gpu(gpu)
+    , m_gpuConnectionToWebProcess(gpuConnectionToWebProcess)
     , m_identifier(identifier)
 {
     Ref { m_streamConnection }->startReceivingMessages(*this, Messages::RemoteQueue::messageReceiverName(), m_identifier.toUInt64());
@@ -161,19 +164,46 @@ void RemoteQueue::writeTextureWithCopy(
 void RemoteQueue::copyExternalImageToTexture(
     const WebGPU::ImageCopyExternalImage& source,
     const WebGPU::ImageCopyTextureTagged& destination,
-    const WebGPU::Extent3D& copySize)
+    WebCore::WebGPU::IntegerCoordinate width,
+    WebCore::WebGPU::IntegerCoordinate height,
+    CompletionHandler<void(bool)>&& completionHandler)
 {
     Ref objectHeap = m_objectHeap.get();
     auto convertedSource = objectHeap->convertFromBacking(source);
     ASSERT(convertedSource);
     auto convertedDestination = objectHeap->convertFromBacking(destination);
     ASSERT(convertedDestination);
-    auto convertedCopySize = objectHeap->convertFromBacking(copySize);
-    ASSERT(convertedCopySize);
-    if (!convertedDestination || !convertedDestination || !convertedCopySize)
+    if (!convertedDestination || !convertedDestination)
         return;
 
-    protectedBacking()->copyExternalImageToTexture(*convertedSource, *convertedDestination, *convertedCopySize);
+    RetainPtr<IOSurfaceRef> ioSurface;
+    WTF::switchOn(source.source, [&] (const std::optional<WebCore::RenderingResourceIdentifier>& identifier) {
+        if (identifier) {
+            if (auto imageBuffer = m_gpu->imageBuffer(*identifier)) {
+                if (auto webIOSurface = imageBuffer->surface())
+                    ioSurface = webIOSurface->surface();
+            }
+        }
+        UNUSED_PARAM(identifier);
+    }, [&] (const std::optional<WebCore::MediaPlayerIdentifier>& mediaIdentifier) {
+        if (auto connection = m_gpuConnectionToWebProcess.get(); connection && mediaIdentifier) {
+            connection->performWithMediaPlayerOnMainThread(*mediaIdentifier, [&] (auto& player) mutable {
+                auto videoFrame = player.videoFrameForCurrentTime();
+                if (videoFrame)
+                    ioSurface = WebCore::CVPixelBufferGetIOSurface(videoFrame->pixelBuffer());
+            });
+        }
+    }, [&] (std::optional<WebKit::SharedVideoFrame> sharedVideoFrame) {
+        if (auto videoFrame = m_gpu->sharedVideoFrameReader().read(WTFMove(*sharedVideoFrame)))
+            ioSurface = WebCore::CVPixelBufferGetIOSurface(videoFrame->pixelBuffer());
+    }, [&] (const std::optional<MachSendRight>& sendRight) {
+        ioSurface = IOSurfaceLookupFromMachPort(sendRight->sendRight());
+    });
+
+    if (ioSurface.get())
+        protectedBacking()->copyExternalImageToTexture(*convertedSource, *convertedDestination, width, height, WTFMove(completionHandler), ioSurface);
+    else
+        completionHandler(false);
 }
 
 void RemoteQueue::setLabel(String&& label)

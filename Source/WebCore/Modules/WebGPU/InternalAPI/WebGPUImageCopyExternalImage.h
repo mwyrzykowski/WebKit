@@ -25,13 +25,29 @@
 
 #pragma once
 
+#include <WebCore/HTMLCanvasElement.h>
+#include <WebCore/HTMLImageElement.h>
+#include <WebCore/HTMLVideoElement.h>
+#include <WebCore/ImageBitmap.h>
+#include <WebCore/ImageData.h>
+#include <WebCore/OffscreenCanvas.h>
+#include <WebCore/WebCodecsVideoFrame.h>
 #include <WebCore/WebGPUOrigin2D.h>
 #include <optional>
 
 namespace WebCore::WebGPU {
 
+using SourceType = Variant<RefPtr<WebCore::ImageBitmap>,
+#if ENABLE(VIDEO) && ENABLE(WEB_CODECS)
+RefPtr<WebCore::ImageData>, RefPtr<WebCore::HTMLImageElement>, RefPtr<WebCore::HTMLVideoElement>, RefPtr<WebCore::WebCodecsVideoFrame>,
+#endif
+#if ENABLE(OFFSCREEN_CANVAS)
+RefPtr<WebCore::OffscreenCanvas>,
+#endif
+RefPtr<WebCore::HTMLCanvasElement>>;
+
 struct ImageCopyExternalImage {
-    // FIXME: Handle the source.
+    SourceType source;
     std::optional<Origin2D> origin;
     bool flipY { false };
 };

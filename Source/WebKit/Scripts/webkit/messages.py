@@ -138,6 +138,8 @@ def types_that_must_be_moved():
         'MachSendRight',
         'std::optional<WebKit::SharedVideoFrame>',
         'Vector<WebCore::SharedMemory::Handle>',
+        'WebKit::WebGPU::ImageCopyExternalImage',
+        'WebKit::WebGPU::ImageCopyTextureTagged',
         'WebKit::WebGPU::ExternalTextureDescriptor',
         'WebCore::GraphicsContextGL::ExternalImageSource',
         'WebCore::GraphicsContextGL::ExternalSyncSource',

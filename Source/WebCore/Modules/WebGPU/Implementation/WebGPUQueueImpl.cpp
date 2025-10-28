@@ -31,6 +31,7 @@
 #include "WebGPUBufferImpl.h"
 #include "WebGPUCommandBufferImpl.h"
 #include "WebGPUConvertToBackingContext.h"
+#include "WebGPUDeviceImpl.h"
 #include "WebGPUTextureImpl.h"
 #include <WebGPU/WebGPUExt.h>
 #include <wtf/BlockPtr.h>
@@ -130,11 +131,33 @@ void QueueImpl::writeTexture(
 void QueueImpl::copyExternalImageToTexture(
     const ImageCopyExternalImage& source,
     const ImageCopyTextureTagged& destination,
-    const Extent3D& copySize)
+    unsigned width,
+    unsigned height,
+    CompletionHandler<void(bool)>&& completionHandler,
+    RetainPtr<IOSurfaceRef> ioSurface)
 {
+    Ref convertToBackingContext = m_convertToBackingContext;
     UNUSED_PARAM(source);
     UNUSED_PARAM(destination);
-    UNUSED_PARAM(copySize);
+
+    WGPUImageCopyTextureTagged backingDestination {
+        .texture = convertToBackingContext->convertToBacking(destination.protectedTexture().get()),
+        .mipLevel = destination.mipLevel,
+        .origin = destination.origin ? convertToBackingContext->convertToBacking(*destination.origin) : WGPUOrigin3D { 0, 0, 0 },
+        .aspect = convertToBackingContext->convertToBacking(destination.aspect),
+        .colorSpace = convertToWGPUColorSpace(destination.colorSpace),
+        .premultipliedAlpha = destination.premultipliedAlpha
+    };
+
+    unsigned originX = 0;
+    unsigned originY = 0;
+    if (source.origin) {
+        auto convertedSourceOrigin = convertToBackingContext->convertToBacking(*source.origin);
+        originX = convertedSourceOrigin.x;
+        originY = convertedSourceOrigin.y;
+    }
+    wgpuCopyExternalImageToTexture(m_backing.get(), originX, originY, source.flipY, ioSurface.get(), &backingDestination, width, height);
+    completionHandler(true);
 }
 
 void QueueImpl::setLabelInternal(const String& label)

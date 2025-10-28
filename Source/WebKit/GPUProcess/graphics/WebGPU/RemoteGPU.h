@@ -31,6 +31,7 @@
 #include "RemoteGPURequestAdapterResponse.h"
 #include "RemoteVideoFrameIdentifier.h"
 #include "SharedPreferencesForWebProcess.h"
+#include "SharedVideoFrame.h"
 #include "StreamConnectionWorkQueue.h"
 #include "StreamMessageReceiver.h"
 #include "StreamServerConnection.h"
@@ -62,6 +63,7 @@ struct DDMeshDescriptor;
 }
 
 namespace WebCore {
+class ImageBuffer;
 class MediaPlayer;
 class NativeImage;
 class VideoFrame;
@@ -96,6 +98,8 @@ public:
 
     void paintNativeImageToImageBuffer(WebCore::NativeImage&, WebCore::RenderingResourceIdentifier);
     RefPtr<GPUConnectionToWebProcess> gpuConnectionToWebProcess() const;
+    SharedVideoFrameReader& sharedVideoFrameReader() { return m_sharedVideoFrameReader; }
+    RefPtr<WebCore::ImageBuffer> imageBuffer(WebCore::RenderingResourceIdentifier);
 
 private:
     friend class WebGPU::ObjectHeap;
@@ -143,6 +147,12 @@ private:
     Ref<DDModel::ObjectHeap> m_modelObjectHeap WTF_GUARDED_BY_CAPABILITY(workQueue());
     const WebGPUIdentifier m_identifier;
     Ref<RemoteRenderingBackend> m_renderingBackend;
+#if ENABLE(VIDEO)
+    const Ref<RemoteVideoFrameObjectHeap> m_videoFrameObjectHeap;
+#if PLATFORM(COCOA)
+    SharedVideoFrameReader m_sharedVideoFrameReader;
+#endif
+#endif
 };
 
 } // namespace WebKit

@@ -97,13 +97,7 @@ RemoteDevice::RemoteDevice(GPUConnectionToWebProcess& gpuConnectionToWebProcess,
     , m_objectHeap(objectHeap)
     , m_streamConnection(streamConnection.copyRef())
     , m_identifier(identifier)
-    , m_queue(RemoteQueue::create(device.queue(), objectHeap, WTFMove(streamConnection), gpu, queueIdentifier))
-#if ENABLE(VIDEO)
-    , m_videoFrameObjectHeap(gpuConnectionToWebProcess.videoFrameObjectHeap())
-#if PLATFORM(COCOA)
-    , m_sharedVideoFrameReader(m_videoFrameObjectHeap.ptr(), gpuConnectionToWebProcess.webProcessIdentity())
-#endif
-#endif
+    , m_queue(RemoteQueue::create(gpuConnectionToWebProcess, device.queue(), objectHeap, WTFMove(streamConnection), gpu, queueIdentifier))
     , m_gpuConnectionToWebProcess(gpuConnectionToWebProcess)
     , m_gpu(gpu)
 {
@@ -174,12 +168,12 @@ void RemoteDevice::createSampler(const WebGPU::SamplerDescriptor& descriptor, We
 #if ENABLE(VIDEO) && PLATFORM(COCOA)
 void RemoteDevice::setSharedVideoFrameSemaphore(IPC::Semaphore&& semaphore)
 {
-    m_sharedVideoFrameReader.setSemaphore(WTFMove(semaphore));
+    m_gpu->sharedVideoFrameReader().setSemaphore(WTFMove(semaphore));
 }
 
 void RemoteDevice::setSharedVideoFrameMemory(WebCore::SharedMemory::Handle&& handle)
 {
-    m_sharedVideoFrameReader.setSharedMemory(WTFMove(handle));
+    m_gpu->sharedVideoFrameReader().setSharedMemory(WTFMove(handle));
 }
 #endif
 
@@ -194,7 +188,7 @@ void RemoteDevice::importExternalTextureFromVideoFrame(const WebGPU::ExternalTex
     std::optional<WebKit::SharedVideoFrame> sharedVideoFrame = descriptor.sharedFrame;
     RetainPtr<CVPixelBufferRef> pixelBuffer { nullptr };
     if (sharedVideoFrame) {
-        if (auto videoFrame = m_sharedVideoFrameReader.read(WTFMove(*sharedVideoFrame)))
+        if (auto videoFrame = m_gpu->sharedVideoFrameReader().read(WTFMove(*sharedVideoFrame)))
             pixelBuffer = videoFrame->pixelBuffer();
     } else if (descriptor.mediaIdentifier) {
         if (auto connection = m_gpuConnectionToWebProcess.get()) {

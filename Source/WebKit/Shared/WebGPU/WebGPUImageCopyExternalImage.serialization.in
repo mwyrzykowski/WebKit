@@ -20,8 +20,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#if ENABLE(GPU_PROCESS)
-[AdditionalEncoder=StreamConnectionEncoder] struct WebKit::WebGPU::ImageCopyExternalImage {
+#if ENABLE(GPU_PROCESS) && ENABLE(VIDEO) && ENABLE(WEB_CODECS)
+[RValue] struct WebKit::WebGPU::ImageCopyExternalImage {
+    Variant<std::optional<WebCore::RenderingResourceIdentifier>, std::optional<WebCore::MediaPlayerIdentifier>, std::optional<WebKit::SharedVideoFrame>, std::optional<WTF::MachSendRight>> source;
     std::optional<WebKit::WebGPU::Origin2D> origin;
     bool flipY;
 };
