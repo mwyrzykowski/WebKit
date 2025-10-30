@@ -96,8 +96,26 @@ namespace Metal {
         }\n \
     }\n)
 
+#define DEFINE_AGX3_NON_OPTIMIZED_HELPER_RENAMED(__name, __capitalizedName) \
+    DEFINE_HELPER(__capitalizedName, \
+    template <typename T>\n \
+    auto __wgsl##__capitalizedName(T value)\n \
+    {\n \
+        if constexpr(__wgslMetalAppleGPUFamily < 9) { \n\
+            return __name(value);\n \
+        } else { \n\
+            auto result = [&] [[clang::optnone]] { \
+                return __name(value); \
+            };\n \
+            return result();\n \
+        }\n \
+    }\n)
+
 #define DEFINE_VOLATILE_HELPER(__name, __capitalizedName) \
     DEFINE_VOLATILE_HELPER_RENAMED(__name, __capitalizedName)
+
+#define DEFINE_AGX3_NON_OPTIMIZED_HELPER(__name, __capitalizedName) \
+    DEFINE_AGX3_NON_OPTIMIZED_HELPER_RENAMED(__name, __capitalizedName)
 
 struct HelperGenerator {
     StringBuilder& m_output;
@@ -119,7 +137,8 @@ DEFINE_VOLATILE_HELPER(pack_float_to_snorm2x16, PackFloatToSnorm2x16)
 DEFINE_VOLATILE_HELPER(pack_float_to_unorm2x16, PackFloatToUnorm2x16)
 DEFINE_VOLATILE_HELPER(pack_float_to_snorm4x8, PackFloatToSnorm4x8)
 DEFINE_VOLATILE_HELPER(pack_float_to_unorm4x8, PackFloatToUnorm4x8)
-
+DEFINE_AGX3_NON_OPTIMIZED_HELPER(unpack_unorm2x16_to_float, UnpackUnorm2x16ToFloat)
+DEFINE_AGX3_NON_OPTIMIZED_HELPER(unpack_snorm2x16_to_float, UnpackSnorm2x16ToFloat)
 };
 
 #undef DEFINE_TRIG_HELPER
@@ -2237,8 +2256,8 @@ void FunctionDefinitionWriter::visit(const Type* type, AST::CallExpression& call
             { "round"_s, NOOP_HELPER(rint) },
             { "sign"_s, NOOP_HELPER(__wgslSign) },
             { "sqrt"_s, EMIT_HELPER(Sqrt) },
-            { "unpack2x16snorm"_s, NOOP_HELPER(unpack_snorm2x16_to_float) },
-            { "unpack2x16unorm"_s, NOOP_HELPER(unpack_unorm2x16_to_float) },
+            { "unpack2x16snorm"_s, EMIT_HELPER(UnpackSnorm2x16ToFloat) },
+            { "unpack2x16unorm"_s, EMIT_HELPER(UnpackUnorm2x16ToFloat) },
             { "unpack4x8snorm"_s, NOOP_HELPER(unpack_snorm4x8_to_float) },
             { "unpack4x8unorm"_s, NOOP_HELPER(unpack_unorm4x8_to_float) },
         };
