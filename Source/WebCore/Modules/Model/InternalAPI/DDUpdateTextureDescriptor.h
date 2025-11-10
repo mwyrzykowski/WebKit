@@ -31,6 +31,8 @@ namespace WebCore::DDModel {
 
 struct DDUpdateTextureDescriptor {
     DDImageAsset imageAsset;
+    String identifier;
+    String hashString;
 };
 
 }

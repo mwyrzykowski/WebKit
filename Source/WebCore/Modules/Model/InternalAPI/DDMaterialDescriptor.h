@@ -155,7 +155,8 @@ struct DDMaterialGraph {
 };
 
 struct DDMaterialDescriptor {
-    DDMaterialGraph materialGraph;
+    Vector<uint8_t> materialGraph;
+    String identifier;
 };
 
 }

@@ -9,8 +9,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/Model/InternalAPI/DDMeshDescriptor.h
     Modules/Model/InternalAPI/DDMeshPart.h
     Modules/Model/InternalAPI/DDModel.serialization.in
-    Modules/Model/InternalAPI/DDReplaceVertices.h
-    Modules/Model/InternalAPI/DDTextureDescriptor.h
     Modules/Model/InternalAPI/DDUpdateMaterialDescriptor.h
     Modules/Model/InternalAPI/DDUpdateMeshDescriptor.h
     Modules/Model/InternalAPI/DDUpdateTextureDescriptor.h
