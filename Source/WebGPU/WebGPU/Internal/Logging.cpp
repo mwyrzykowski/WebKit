@@ -26,6 +26,8 @@
 #include "config.h"
 #include "Logging.h"
 
+#ifdef __cplusplus
+
 namespace WebGPU_Internal {
 
 #if !LOG_DISABLED || !RELEASE_LOG_DISABLED
@@ -35,3 +37,5 @@ WEBGPU_LOG_CHANNELS(DEFINE_LOG_CHANNEL)
 #endif // !LOG_DISABLED || !RELEASE_LOG_DISABLED
 
 }
+
+#endif

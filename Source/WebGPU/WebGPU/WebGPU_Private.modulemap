@@ -1,0 +1,8 @@
+framework module WebGPU_Private [system] {
+    requires cplusplus20
+    umbrella "PrivateHeaders"
+    
+    explicit module * {
+        export *
+    }
+}

@@ -26,6 +26,8 @@
 #pragma once
 
 #ifdef __cplusplus
+#include <WebGPU/WebGPU.h>
+#include <WebGPU/WebGPUExt.h>
 #include <wtf/text/WTFString.h>
 
 extern "C" {
@@ -56,15 +58,15 @@ typedef void (*WGPUProcShaderModuleGetCompilationInfoWithBlock)(WGPUShaderModule
 
 #if !defined(WGPU_SKIP_DECLARATIONS)
 
-void wgpuAdapterRequestDeviceWithBlock(WGPUAdapter, const WGPUDeviceDescriptor*, WGPURequestDeviceBlockCallback);
-void wgpuBufferMapAsyncWithBlock(WGPUBuffer, WGPUMapModeFlags, size_t offset, size_t, WGPUBufferMapBlockCallback);
-void wgpuDeviceCreateComputePipelineAsyncWithBlock(WGPUDevice, const WGPUComputePipelineDescriptor*, WGPUCreateComputePipelineAsyncBlockCallback);
-void wgpuDeviceCreateRenderPipelineAsyncWithBlock(WGPUDevice, const WGPURenderPipelineDescriptor*, WGPUCreateRenderPipelineAsyncBlockCallback);
-void wgpuDevicePopErrorScopeWithBlock(WGPUDevice, WGPUErrorBlockCallback);
-void wgpuDeviceSetUncapturedErrorCallbackWithBlock(WGPUDevice, WGPUErrorBlockCallback);
-void wgpuInstanceRequestAdapterWithBlock(WGPUInstance, const WGPURequestAdapterOptions*, WGPURequestAdapterBlockCallback);
-void wgpuQueueOnSubmittedWorkDoneWithBlock(WGPUQueue, WGPUQueueWorkDoneBlockCallback);
-void wgpuShaderModuleGetCompilationInfoWithBlock(WGPUShaderModule, WGPUCompilationInfoBlockCallback);
+WGPU_EXPORT void wgpuAdapterRequestDeviceWithBlock(WGPUAdapter, const WGPUDeviceDescriptor*, WGPURequestDeviceBlockCallback);
+WGPU_EXPORT void wgpuBufferMapAsyncWithBlock(WGPUBuffer, WGPUMapModeFlags, size_t offset, size_t, WGPUBufferMapBlockCallback);
+WGPU_EXPORT void wgpuDeviceCreateComputePipelineAsyncWithBlock(WGPUDevice, const WGPUComputePipelineDescriptor*, WGPUCreateComputePipelineAsyncBlockCallback);
+WGPU_EXPORT void wgpuDeviceCreateRenderPipelineAsyncWithBlock(WGPUDevice, const WGPURenderPipelineDescriptor*, WGPUCreateRenderPipelineAsyncBlockCallback);
+WGPU_EXPORT void wgpuDevicePopErrorScopeWithBlock(WGPUDevice, WGPUErrorBlockCallback);
+WGPU_EXPORT void wgpuDeviceSetUncapturedErrorCallbackWithBlock(WGPUDevice, WGPUErrorBlockCallback);
+WGPU_EXPORT void wgpuInstanceRequestAdapterWithBlock(WGPUInstance, const WGPURequestAdapterOptions*, WGPURequestAdapterBlockCallback);
+WGPU_EXPORT void wgpuQueueOnSubmittedWorkDoneWithBlock(WGPUQueue, WGPUQueueWorkDoneBlockCallback);
+WGPU_EXPORT void wgpuShaderModuleGetCompilationInfoWithBlock(WGPUShaderModule, WGPUCompilationInfoBlockCallback);
 
 #endif // !defined(WGPU_SKIP_DECLARATIONS)
 

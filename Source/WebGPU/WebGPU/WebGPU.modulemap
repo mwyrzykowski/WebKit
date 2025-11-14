@@ -1,6 +1,7 @@
 framework module WebGPU {
-  umbrella header "WebGPU.h"
-  header "WebGPUExt.h"
-  export *
-  module * { export * }
+    requires cplusplus20
+    umbrella header "WebGPU.h"
+    header "WebGPUExt.h"
+    export *
+    module * { export * }
 }

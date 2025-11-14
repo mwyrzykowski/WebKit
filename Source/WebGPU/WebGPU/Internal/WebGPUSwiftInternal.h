@@ -25,6 +25,8 @@
 
 #pragma once
 
+#ifdef __cplusplus
+
 #include "APIConversions.h"
 #include "Buffer.h"
 #include "CommandBuffer.h"
@@ -142,4 +144,6 @@ inline ThreadSafeWeakPtr<WebGPU::CommandBuffer> commandBufferThreadSafeWeakPtr(c
 
 #ifndef __swift__
 #include "WebGPUSwift-Generated.h"
+#endif
+
 #endif

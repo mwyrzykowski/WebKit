@@ -25,9 +25,11 @@
 
 #pragma once
 
-#include "ExportMacros.h"
+#include <WebGPU/ExportMacros.h>
 #include <wtf/Assertions.h>
 #include <wtf/Forward.h>
+
+#ifdef __cplusplus
 
 namespace WebGPU_Internal {
 
@@ -51,3 +53,4 @@ WEBGPU_LOG_CHANNELS(DECLARE_LOG_CHANNEL)
 
 } // namespace WebGPU_Internal
 
+#endif
