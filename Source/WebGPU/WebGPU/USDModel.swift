@@ -32,6 +32,12 @@ import WebGPU_Internal
 import USDStageKit
 import _USDStageKit_SwiftUI
 import ShaderGraph
+
+// FIXME: rdar://166014064 - this shouldn't be necessary yet it seems to be
+extension _USDStageKit_SwiftUI._Proto_MeshDataUpdate_v1 {
+    @_silgen_name("$s20_USDStageKit_SwiftUI24_Proto_MeshDataUpdate_v1V18instanceTransformsSaySo13simd_float4x4aGvg")
+    fileprivate func instanceTransformsCompat() -> [simd_float4x4]
+}
 #endif
 
 @objc
@@ -1151,13 +1157,13 @@ final class Converter {
     ) -> DDBridgeUpdateMesh {
         var webRequestInstanceTransforms: DDBridgeChainedFloat4x4?
 
-        if request.instanceTransforms.count > 0 {
-            let countMinusOne = request.instanceTransforms.count - 1
-            webRequestInstanceTransforms = DDBridgeChainedFloat4x4(transform: request.instanceTransforms[0])
+        if request.instanceTransformsCompat().count > 0 {
+            let countMinusOne = request.instanceTransformsCompat().count - 1
+            webRequestInstanceTransforms = DDBridgeChainedFloat4x4(transform: request.instanceTransformsCompat()[0])
             var instanceTransforms = webRequestInstanceTransforms
             if countMinusOne > 0 {
                 for i in 1...countMinusOne {
-                    instanceTransforms?.next = DDBridgeChainedFloat4x4(transform: request.instanceTransforms[i])
+                    instanceTransforms?.next = DDBridgeChainedFloat4x4(transform: request.instanceTransformsCompat()[i])
                     instanceTransforms = instanceTransforms?.next
                 }
             }
@@ -1176,7 +1182,7 @@ final class Converter {
             indexData: request.indexData,
             vertexData: request.vertexData,
             instanceTransforms: webRequestInstanceTransforms,
-            instanceTransformsCount: request.instanceTransforms.count,
+            instanceTransformsCount: request.instanceTransformsCompat().count,
             materialPrims: request.materialPrims
         )
     }
