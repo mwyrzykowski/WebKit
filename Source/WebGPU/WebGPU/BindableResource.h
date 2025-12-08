@@ -131,8 +131,8 @@ struct DrawIndexCacheContainerValue {
         , icb2(key[4])
     {
     }
-    uint32_t primitiveOffset() { return static_cast<MTLIndexType>(primitiveOffsetWithIndexType & 0x1); }
-    MTLIndexType indexType() { return static_cast<MTLIndexType>(primitiveOffsetWithIndexType & 0x2); }
+    uint32_t primitiveOffset() { return primitiveOffsetWithIndexType & 0x1; }
+    MTLIndexType indexType() { return static_cast<MTLIndexType>((primitiveOffsetWithIndexType & 0x2) >> 1); }
 };
 
 using DrawIndexCacheContainer = HashMap<GenericHashKey<DrawIndexCacheContainerKey>, uint32_t>;
