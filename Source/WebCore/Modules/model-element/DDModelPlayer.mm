@@ -42,6 +42,7 @@
 #import "Page.h"
 #import "PlatformCALayer.h"
 #import "PlatformCALayerDelegatedContents.h"
+#import <CoreGraphics/CGCFData.h>
 #import <WebCore/DDMesh.h>
 #import <WebGPU/DDModelTypes.h>
 #import <wtf/RetainPtr.h>
@@ -50,7 +51,7 @@ namespace WebCore {
 
 class ModelDisplayBufferDisplayDelegate final : public GraphicsLayerContentsDisplayDelegate {
 public:
-    static Ref<ModelDisplayBufferDisplayDelegate> create(DDModelPlayer& modelPlayer, bool isOpaque = true, float contentsScale = 1)
+    static Ref<ModelDisplayBufferDisplayDelegate> create(DDModelPlayer& modelPlayer, bool isOpaque = false, float contentsScale = 1)
     {
         return adoptRef(*new ModelDisplayBufferDisplayDelegate(modelPlayer, isOpaque, contentsScale));
     }
@@ -138,6 +139,18 @@ void DDModelPlayer::ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDMode
     });
 }
 
+static Vector<uint8_t> loadData(RetainPtr<CFStringRef> filename)
+{
+    RetainPtr webCoreBundle = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.WebCore"));
+    RetainPtr fileURL = adoptCF(CFBundleCopyResourceURL(webCoreBundle.get(), filename.get(), CFSTR(""), nullptr));
+
+    if (!fileURL)
+        RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("File not found in bundle");
+
+    RetainPtr cfData = adoptCF(CGCFDataCreateWithContentsOfFileAtURL(fileURL.get(), true));
+    return makeVector(cfData.get());
+}
+
 // MARK: - ModelPlayer overrides.
 
 void DDModelPlayer::load(Model& modelSource, LayoutSize size)
@@ -157,7 +170,34 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
     if (!gpu)
         return;
 
-    m_currentModel = gpu->backing().createModelBacking(size.width().toUnsigned(), size.height().toUnsigned(), [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
+    DDModel::DDImageAsset diffuseTexture {
+        .data = loadData(adoptCF(static_cast<CFStringRef>(@"modelDefaultDiffuseData"))),
+        .width = 64,
+        .height = 64,
+        .depth = 1,
+        .bytesPerPixel = 2,
+        .textureType = MTLTextureTypeCube,
+        .pixelFormat = MTLPixelFormatR16Float,
+        .mipmapLevelCount = 0,
+        .arrayLength = 6,
+        .textureUsage = MTLTextureUsageShaderRead,
+        .swizzle = { }
+    };
+    DDModel::DDImageAsset specularTexture {
+        .data = loadData(adoptCF(static_cast<CFStringRef>(@"modelDefaultSpecularData"))),
+        .width = 256,
+        .height = 256,
+        .depth = 1,
+        .bytesPerPixel = 2,
+        .textureType = MTLTextureTypeCube,
+        .pixelFormat = MTLPixelFormatR16Float,
+        .mipmapLevelCount = 0,
+        .arrayLength = 6,
+        .textureUsage = MTLTextureUsageShaderRead,
+        .swizzle = { }
+    };
+
+    m_currentModel = gpu->backing().createModelBacking(size.width().toUnsigned(), size.height().toUnsigned(), diffuseTexture, specularTexture, [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
         if (surfaceHandles.size())
             protectedThis->m_displayBuffers = WTF::move(surfaceHandles);
     });
@@ -350,7 +390,7 @@ GraphicsLayerContentsDisplayDelegate* DDModelPlayer::contentsDisplayDelegate()
 void DDModelPlayer::simulate(float elapsedTime)
 {
     RefPtr model = m_currentModel;
-    if (!model)
+    if (!model || !m_didFinishLoading)
         return;
 
     m_yawAcceleration *= 0.95f;
@@ -376,13 +416,15 @@ void DDModelPlayer::update()
     simulate(elapsedTime);
 
     [m_modelLoader update:elapsedTime];
-    if (RefPtr currentModel = m_currentModel)
-        currentModel->render();
+    if (m_didFinishLoading) {
+        if (RefPtr currentModel = m_currentModel)
+            currentModel->render();
 
-    if (++m_currentTexture >= m_displayBuffers.size())
-        m_currentTexture = 0;
-    if (auto* machSendRight = displayBuffer(); machSendRight && contentsDisplayDelegate())
-        RefPtr { m_contentsDisplayDelegate }->setDisplayBuffer(*machSendRight);
+        if (++m_currentTexture >= m_displayBuffers.size())
+            m_currentTexture = 0;
+        if (auto* machSendRight = displayBuffer(); machSendRight && contentsDisplayDelegate())
+            RefPtr { m_contentsDisplayDelegate }->setDisplayBuffer(*machSendRight);
+    }
 
     if (RefPtr client = m_client.get())
         client->didUpdate(*this);

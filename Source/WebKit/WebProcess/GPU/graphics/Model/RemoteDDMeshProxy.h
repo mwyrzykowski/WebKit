@@ -32,6 +32,7 @@
 #include <WebCore/DDFloat4x4.h>
 #include <WebCore/DDMesh.h>
 #include <WebCore/DDMeshDescriptor.h>
+#include <wtf/HashMap.h>
 #include <wtf/TZoneMalloc.h>
 
 #if PLATFORM(COCOA)

@@ -72,6 +72,8 @@ typedef struct WGPUDDCreateMeshDescriptor {
     unsigned width;
     unsigned height;
     Vector<RetainPtr<IOSurfaceRef>> ioSurfaces;
+    id diffuseTexture;
+    id specularTexture;
 } WGPUDDCreateMeshDescriptor;
 
 const int WGPUTextureSampleType_ExternalTexture = WGPUTextureSampleType_Force32 - 1;

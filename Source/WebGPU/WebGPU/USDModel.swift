@@ -1,4 +1,4 @@
-// Copyright (C) 2024 Apple Inc. All rights reserved.
+// Copyright (C) 2025 Apple Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -22,6 +22,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 
 internal import Metal
+internal import OSLog
 internal import WebGPU_Private.DDModelTypes
 internal import simd
 
@@ -33,336 +34,28 @@ internal import simd
 import USDStageKit
 import _USDStageKit_SwiftUI
 import ShaderGraph
-#endif
+import RealityCoreDeformation
 
-typealias String = Swift.String
-
-@objc
-@implementation
-extension DDBridgeVertexAttributeFormat {
-    let semantic: Int
-    let format: UInt
-    let layoutIndex: Int
-    let offset: Int
-
-    init(
-        semantic: Int,
-        format: UInt,
-        layoutIndex: Int,
-        offset: Int
-    ) {
-        self.semantic = semantic
-        self.format = format
-        self.layoutIndex = layoutIndex
-        self.offset = offset
-    }
+extension _USDStageKit_SwiftUI._Proto_MeshDataUpdate_v1 {
+    @_silgen_name("$s20_USDStageKit_SwiftUI24_Proto_MeshDataUpdate_v1V18instanceTransformsSaySo13simd_float4x4aGvg")
+    internal func instanceTransformsCompat() -> [simd_float4x4]
 }
 
-@objc
-@implementation
-extension DDBridgeVertexLayout {
-    let bufferIndex: Int
-    let bufferOffset: Int
-    let bufferStride: Int
-
-    init(
-        bufferIndex: Int,
-        bufferOffset: Int,
-        bufferStride: Int
-    ) {
-        self.bufferIndex = bufferIndex
-        self.bufferOffset = bufferOffset
-        self.bufferStride = bufferStride
-    }
+extension _USDStageKit_SwiftUI._Proto_DeformationData_v1.SkinningData {
+    @_silgen_name("$s20_USDStageKit_SwiftUI25_Proto_DeformationData_v1V08SkinningG0V21geometryBindTransformSo13simd_float4x4avg")
+    internal func geometryBindTransformCompat() -> simd_float4x4
 }
 
-@objc
-@implementation
-extension DDBridgeMeshPart {
-    let indexOffset: Int
-    let indexCount: Int
-    let topology: MTLPrimitiveType
-    let materialIndex: Int
-    let boundsMin: simd_float3
-    let boundsMax: simd_float3
-
-    init(
-        indexOffset: Int,
-        indexCount: Int,
-        topology: MTLPrimitiveType,
-        materialIndex: Int,
-        boundsMin: simd_float3,
-        boundsMax: simd_float3
-    ) {
-        self.indexOffset = indexOffset
-        self.indexCount = indexCount
-        self.topology = topology
-        self.materialIndex = materialIndex
-        self.boundsMin = boundsMin
-        self.boundsMax = boundsMax
-    }
+extension _USDStageKit_SwiftUI._Proto_DeformationData_v1.SkinningData {
+    @_silgen_name("$s20_USDStageKit_SwiftUI25_Proto_DeformationData_v1V08SkinningG0V15jointTransformsSaySo13simd_float4x4aGvg")
+    internal func jointTransformsCompat() -> [simd_float4x4]
 }
 
-@objc
-@implementation
-extension DDBridgeMeshDescriptor {
-    let vertexBufferCount: Int
-    let vertexCapacity: Int
-    let vertexAttributes: [DDBridgeVertexAttributeFormat]
-    let vertexLayouts: [DDBridgeVertexLayout]
-    let indexCapacity: Int
-    let indexType: MTLIndexType
-
-    init(
-        vertexBufferCount: Int,
-        vertexCapacity: Int,
-        vertexAttributes: [DDBridgeVertexAttributeFormat],
-        vertexLayouts: [DDBridgeVertexLayout],
-        indexCapacity: Int,
-        indexType: MTLIndexType
-    ) {
-        self.vertexBufferCount = vertexBufferCount
-        self.vertexCapacity = vertexCapacity
-        self.vertexAttributes = vertexAttributes
-        self.vertexLayouts = vertexLayouts
-        self.indexCapacity = indexCapacity
-        self.indexType = indexType
-    }
+extension _USDStageKit_SwiftUI._Proto_DeformationData_v1.SkinningData {
+    @_silgen_name("$s20_USDStageKit_SwiftUI25_Proto_DeformationData_v1V08SkinningG0V16inverseBindPosesSaySo13simd_float4x4aGvg")
+    internal func inverseBindPosesCompat() -> [simd_float4x4]
 }
 
-@objc
-@implementation
-extension DDBridgeChainedFloat4x4 {
-    var transform: simd_float4x4
-    var next: DDBridgeChainedFloat4x4?
-
-    init(
-        transform: simd_float4x4
-    ) {
-        self.transform = transform
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeUpdateMesh {
-    let identifier: String
-    let updateType: DDBridgeDataUpdateType
-    let descriptor: DDBridgeMeshDescriptor?
-    let parts: [DDBridgeMeshPart]
-    let indexData: Data?
-    let vertexData: [Data]
-    var instanceTransforms: DDBridgeChainedFloat4x4? // array of float4x4
-    let instanceTransformsCount: Int
-    let materialPrims: [String]
-
-    init(
-        identifier: String,
-        updateType: DDBridgeDataUpdateType,
-        descriptor: DDBridgeMeshDescriptor?,
-        parts: [DDBridgeMeshPart],
-        indexData: Data?,
-        vertexData: [Data],
-        instanceTransforms: DDBridgeChainedFloat4x4?,
-        instanceTransformsCount: Int,
-        materialPrims: [String]
-    ) {
-        self.identifier = identifier
-        self.updateType = updateType
-        self.descriptor = descriptor
-        self.parts = parts
-        self.indexData = indexData
-        self.vertexData = vertexData
-        self.instanceTransforms = instanceTransforms
-        self.instanceTransformsCount = instanceTransformsCount
-        self.materialPrims = materialPrims
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeImageAsset {
-    let data: Data?
-    let width: Int
-    let height: Int
-    let depth: Int
-    let bytesPerPixel: Int
-    let textureType: MTLTextureType
-    let pixelFormat: MTLPixelFormat
-    let mipmapLevelCount: Int
-    let arrayLength: Int
-    let textureUsage: MTLTextureUsage
-    let swizzle: MTLTextureSwizzleChannels
-
-    init(
-        data: Data?,
-        width: Int,
-        height: Int,
-        depth: Int,
-        bytesPerPixel: Int,
-        textureType: MTLTextureType,
-        pixelFormat: MTLPixelFormat,
-        mipmapLevelCount: Int,
-        arrayLength: Int,
-        textureUsage: MTLTextureUsage,
-        swizzle: MTLTextureSwizzleChannels
-    ) {
-        self.data = data
-        self.width = width
-        self.height = height
-        self.depth = depth
-        self.bytesPerPixel = bytesPerPixel
-        self.textureType = textureType
-        self.pixelFormat = pixelFormat
-        self.mipmapLevelCount = mipmapLevelCount
-        self.arrayLength = arrayLength
-        self.textureUsage = textureUsage
-        self.swizzle = swizzle
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeUpdateTexture {
-    let imageAsset: DDBridgeImageAsset?
-    let identifier: String
-    let hashString: String
-
-    init(
-        imageAsset: DDBridgeImageAsset?,
-        identifier: String,
-        hashString: String
-    ) {
-        self.imageAsset = imageAsset
-        self.identifier = identifier
-        self.hashString = hashString
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeUpdateMaterial {
-    let materialGraph: Data?
-    let identifier: String
-
-    init(
-        materialGraph: Data?,
-        identifier: String
-    ) {
-        self.materialGraph = materialGraph
-        self.identifier = identifier
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeNode {
-    let bridgeNodeType: DDBridgeNodeType
-    let builtin: DDBridgeBuiltin
-    let constant: DDBridgeConstantContainer
-
-    init(
-        bridgeNodeType: DDBridgeNodeType,
-        builtin: DDBridgeBuiltin,
-        constant: DDBridgeConstantContainer
-    ) {
-        self.bridgeNodeType = bridgeNodeType
-        self.builtin = builtin
-        self.constant = constant
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeInputOutput {
-    let type: DDBridgeDataType
-    let name: String
-
-    init(
-        type: DDBridgeDataType,
-        name: String
-    ) {
-        self.type = type
-        self.name = name
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeConstantContainer {
-    let constant: DDBridgeConstant
-    let constantValues: [DDValueString]
-    let name: String
-
-    init(
-        constant: DDBridgeConstant,
-        constantValues: [DDValueString],
-        name: String
-    ) {
-        self.constant = constant
-        self.constantValues = constantValues
-        self.name = name
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeBuiltin {
-    let definition: String
-    let name: String
-
-    init(
-        definition: String,
-        name: String
-    ) {
-        self.definition = definition
-        self.name = name
-    }
-}
-
-@objc
-@implementation
-extension DDBridgeEdge {
-    let upstreamNodeIndex: Int
-    let downstreamNodeIndex: Int
-    let upstreamOutputName: String
-    let downstreamInputName: String
-
-    init(
-        upstreamNodeIndex: Int,
-        downstreamNodeIndex: Int,
-        upstreamOutputName: String,
-        downstreamInputName: String
-    ) {
-        self.upstreamNodeIndex = upstreamNodeIndex
-        self.downstreamNodeIndex = downstreamNodeIndex
-        self.upstreamOutputName = upstreamOutputName
-        self.downstreamInputName = downstreamInputName
-    }
-}
-
-@objc
-@implementation
-extension DDValueString {
-    let number: NSNumber
-    let string: String
-
-    init(
-        string: String
-    ) {
-        self.number = NSNumber(value: 0)
-        self.string = string
-    }
-
-    init(
-        number: NSNumber
-    ) {
-        self.number = number
-        self.string = ""
-    }
-}
-
-#if canImport(RealityCoreRenderer, _version: 9999)
 extension MTLCaptureDescriptor {
     fileprivate convenience init(from device: MTLDevice?) {
         self.init()
@@ -379,23 +72,23 @@ extension MTLCaptureDescriptor {
     }
 }
 
-nonisolated func mapSemantic(_ semantic: Int) -> _Proto_LowLevelMeshResource_v1.VertexSemantic {
+private func mapSemantic(_ semantic: Int) -> _Proto_LowLevelMeshResource_v1.VertexSemantic {
     switch semantic {
-    case 0: return .position
-    case 1: return .color
-    case 2: return .normal
-    case 3: return .tangent
-    case 4: return .bitangent
-    case 5: return .uv0
-    case 6: return .uv1
-    case 7: return .uv2
-    case 8: return .uv3
-    case 9: return .uv4
-    case 10: return .uv5
-    case 11: return .uv6
-    case 12: return .uv7
-    default:
-        return .unspecified
+    case 0: .position
+    case 1: .color
+    case 2: .normal
+    case 3: .tangent
+    case 4: .bitangent
+    case 5: .uv0
+    case 6: .uv1
+    case 7: .uv2
+    case 8: .uv3
+    case 9: .uv4
+    case 10: .uv5
+    case 11: .uv6
+    case 12: .uv7
+    case 13: .unspecified
+    default: .unspecified
     }
 }
 
@@ -421,40 +114,25 @@ extension _Proto_LowLevelMeshResource_v1.Descriptor {
     }
 }
 
-extension _Proto_LowLevelTextureResource_v1.Descriptor {
-    static func from(_ texture: MTLTexture) -> _Proto_LowLevelTextureResource_v1.Descriptor {
-        var descriptor = _Proto_LowLevelTextureResource_v1.Descriptor()
-        descriptor.width = texture.width
-        descriptor.height = texture.height
-        descriptor.depth = texture.depth
-        descriptor.mipmapLevelCount = texture.mipmapLevelCount
-        descriptor.arrayLength = texture.arrayLength
-        descriptor.pixelFormat = texture.pixelFormat
-        descriptor.textureType = texture.textureType
-        descriptor.textureUsage = texture.usage
-        descriptor.swizzle = texture.swizzle
-
-        return descriptor
-    }
-}
-
-nonisolated func isNonZero(value: Float) -> Bool {
+private func isNonZero(value: Float) -> Bool {
     abs(value) > Float.ulpOfOne
 }
 
-nonisolated func isNonZero(_ vector: simd_float4) -> Bool {
+private func isNonZero(_ vector: simd_float4) -> Bool {
     isNonZero(value: vector[0]) || isNonZero(value: vector[1]) || isNonZero(value: vector[2]) || isNonZero(value: vector[3])
 }
 
-nonisolated func isNonZero(matrix: simd_float4x4) -> Bool {
+private func isNonZero(matrix: simd_float4x4) -> Bool {
     isNonZero(_: matrix.columns.0) || isNonZero(_: matrix.columns.1) || isNonZero(_: matrix.columns.2) || isNonZero(_: matrix.columns.3)
 }
 
-nonisolated func makeTextureFromImageAsset(
+private func makeTextureFromImageAsset(
     _ imageAsset: DDBridgeImageAsset,
     device: MTLDevice,
-    context: _Proto_LowLevelResourceContext_v1,
-    commandQueue: MTLCommandQueue
+    resourceContext: _Proto_LowLevelResourceContext_v1,
+    commandQueue: MTLCommandQueue,
+    generateMips: Bool,
+    swizzle: MTLTextureSwizzleChannels = .init(red: .red, green: .green, blue: .blue, alpha: .alpha)
 ) -> _Proto_LowLevelTextureResource_v1? {
     guard let imageAssetData = imageAsset.data else {
         logError("no image data")
@@ -465,29 +143,52 @@ nonisolated func makeTextureFromImageAsset(
     )
 
     var pixelFormat = imageAsset.pixelFormat
-    switch imageAsset.bytesPerPixel {
-    case 1:
-        pixelFormat = .r8Unorm
-    case 2:
-        pixelFormat = .rg8Unorm
-    case 4:
-        pixelFormat = .rgba8Unorm
-    default:
-        pixelFormat = .rgba8Unorm
+    if imageAsset.textureType != .typeCube {
+        switch imageAsset.bytesPerPixel {
+        case 1:
+            pixelFormat = .r8Unorm
+        case 2:
+            pixelFormat = .rg8Unorm
+        case 4:
+            pixelFormat = .rgba8Unorm
+        default:
+            pixelFormat = .rgba8Unorm
+        }
     }
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
-        pixelFormat: pixelFormat,
-        width: imageAsset.width,
-        height: imageAsset.height,
-        mipmapped: false
-    )
+
+    let (textureDescriptor, sliceCount) =
+        switch imageAsset.textureType {
+        case .typeCube:
+            (
+                MTLTextureDescriptor.textureCubeDescriptor(
+                    pixelFormat: pixelFormat,
+                    size: imageAsset.width,
+                    mipmapped: generateMips
+                ), 6
+            )
+        default:
+            (
+                MTLTextureDescriptor.texture2DDescriptor(
+                    pixelFormat: pixelFormat,
+                    width: imageAsset.width,
+                    height: imageAsset.height,
+                    mipmapped: generateMips
+                ), 1
+            )
+        }
+
+    textureDescriptor.usage = .shaderRead
+    textureDescriptor.storageMode = .shared
 
     guard let mtlTexture = device.makeTexture(descriptor: textureDescriptor) else {
         logError("failed to device.makeTexture")
         return nil
     }
 
-    try unsafe imageAssetData.bytes.withUnsafeBytes { textureBytes in
+    let bytesPerRow = imageAsset.width * imageAsset.bytesPerPixel
+    let bytesPerImage = bytesPerRow * imageAsset.height
+
+    unsafe imageAssetData.bytes.withUnsafeBytes { textureBytes in
         guard let textureBytesBaseAddress = textureBytes.baseAddress else {
             return
         }
@@ -495,41 +196,55 @@ nonisolated func makeTextureFromImageAsset(
             logError("bytesPerPixel == 0")
             fatalError()
         }
-        unsafe mtlTexture.replace(
-            region: MTLRegionMake2D(0, 0, imageAsset.width, imageAsset.height),
-            mipmapLevel: 0,
-            withBytes: textureBytesBaseAddress,
-            bytesPerRow: imageAsset.width * imageAsset.bytesPerPixel
-        )
+        for face in 0..<sliceCount {
+            let offset = face * bytesPerImage
+            let facePointer = unsafe textureBytesBaseAddress.advanced(by: offset)
+
+            unsafe mtlTexture.replace(
+                region: MTLRegionMake2D(0, 0, imageAsset.width, imageAsset.height),
+                mipmapLevel: 0,
+                slice: face,
+                withBytes: facePointer,
+                bytesPerRow: bytesPerRow,
+                bytesPerImage: bytesPerImage
+            )
+        }
     }
 
-    guard let commandBuffer = commandQueue.makeCommandBuffer() else {
-        fatalError("Could not create command buffer")
-    }
-    guard let blitEncoder = commandBuffer.makeBlitCommandEncoder() else {
-        fatalError("Could not create blit encoder")
-    }
-    let descriptor = _Proto_LowLevelTextureResource_v1.Descriptor.from(mtlTexture)
-    if let textureResource = try? context.makeTextureResource(descriptor: descriptor) {
+    let descriptor = _Proto_LowLevelTextureResource_v1.Descriptor.from(mtlTexture, swizzle: swizzle)
+    if let textureResource = try? resourceContext.makeTextureResource(descriptor: descriptor) {
+        guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+            fatalError("Could not create command buffer")
+        }
+        guard let blitEncoder = commandBuffer.makeBlitCommandEncoder() else {
+            fatalError("Could not create blit encoder")
+        }
+        if generateMips {
+            blitEncoder.generateMipmaps(for: mtlTexture)
+        }
+
         let outTexture = textureResource.replace(using: commandBuffer)
         blitEncoder.copy(from: mtlTexture, to: outTexture)
 
         blitEncoder.endEncoding()
         commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
         return textureResource
     }
 
     return nil
 }
 
-nonisolated func makeParameters(
-    parameterMapping: _Proto_LowLevelMaterialParameterMapping_v1?,
-    argumentTableDescriptor: _Proto_LowLevelArgumentTable_v1.Descriptor,
+private func makeParameters(
+    for function: _Proto_LowLevelMaterialResource_v1.Function?,
     resourceContext: _Proto_LowLevelResourceContext_v1,
+    renderer: _Proto_LowLevelRenderer_v1,
     textureResources: [String: _Proto_LowLevelTextureResource_v1]
-) throws
-    -> (buffers: [(buffer: _Proto_LowLevelBufferResource_v1, offset: Int)], textures: [_Proto_LowLevelTextureResource_v1])
-{
+) throws -> _Proto_LowLevelArgumentBuffer_v1? {
+    guard let function else { return nil }
+    guard let argumentTableDescriptor = function.argumentBufferDescriptor?.table else { return nil }
+    let parameterMapping = function.parameterMapping
+
     var optTextures: [_Proto_LowLevelTextureResource_v1?] = argumentTableDescriptor.textures.map({ _ in nil })
     for parameter in parameterMapping?.textures ?? [] {
         guard let textureResource = textureResources[parameter.name] else {
@@ -537,10 +252,9 @@ nonisolated func makeParameters(
         }
         optTextures[parameter.textureIndex] = textureResource
     }
-    // swift-format-ignore: NeverForceUnwrap
     let textures = optTextures.map({ $0! })
 
-    let buffers: [(buffer: _Proto_LowLevelBufferResource_v1, offset: Int)] = try argumentTableDescriptor.buffers.map { bufferRequirements in
+    let buffers: [_Proto_LowLevelBufferSpan_v1] = try argumentTableDescriptor.buffers.map { bufferRequirements in
         let capacity = (bufferRequirements.size + 16 - 1) / 16 * 16
         let buffer = try resourceContext.makeBufferResource(descriptor: .init(capacity: capacity))
         buffer.replace { span in
@@ -548,96 +262,32 @@ nonisolated func makeParameters(
                 span.storeBytes(of: 0, toByteOffset: byteOffset, as: UInt8.self)
             }
         }
-        return (buffer, 0)
+        return try _Proto_LowLevelBufferSpan_v1(buffer: buffer, offset: 0, size: bufferRequirements.size)
     }
 
-    return (buffers: buffers, textures: textures)
+    let parametersTable = try resourceContext.makeArgumentTable(
+        descriptor: argumentTableDescriptor,
+        buffers: buffers,
+        textures: textures
+    )
+    let parameters = try renderer.makeArgumentBuffer(for: parametersTable, function: function)
+    return parameters
 }
 
 extension Logger {
     fileprivate static let modelGPU = Logger(subsystem: "com.apple.WebKit", category: "model")
 }
 
-nonisolated func logError(_ error: String) {
+private func logError(_ error: String) {
     Logger.modelGPU.error("\(error)")
 }
 
-nonisolated func logInfo(_ info: String) {
+private func logInfo(_ info: String) {
     Logger.modelGPU.info("\(info)")
 }
 
-extension _Proto_LowLevelMeshResource_v1 {
-    nonisolated func replaceVertexData(_ vertexData: [Data]) {
-        for (vertexBufferIndex, vertexData) in vertexData.enumerated() {
-            let bufferSizeInByte = vertexData.bytes.byteCount
-            self.replaceVertices(at: vertexBufferIndex) { vertexBytes in
-                unsafe vertexBytes.withUnsafeMutableBytes { ptr in
-                    // swift-format-ignore: NeverForceUnwrap
-                    unsafe vertexData.copyBytes(to: ptr.baseAddress!.assumingMemoryBound(to: UInt8.self), count: bufferSizeInByte)
-                }
-            }
-        }
-    }
-
-    nonisolated func replaceIndexData(_ indexData: Data?) {
-        if let indexData = indexData {
-            self.replaceIndices { indicesBytes in
-                unsafe indicesBytes.withUnsafeMutableBytes { ptr in
-                    // swift-format-ignore: NeverForceUnwrap
-                    unsafe indexData.copyBytes(to: ptr.baseAddress!.assumingMemoryBound(to: UInt8.self), count: ptr.count)
-                }
-            }
-        }
-    }
-
-    nonisolated func replaceData(indexData: Data?, vertexData: [Data]) {
-        // Copy index data
-        self.replaceIndexData(indexData)
-
-        // Copy vertex data
-        self.replaceVertexData(vertexData)
-    }
-}
-
-extension _Proto_LowLevelArgumentTable_v1 {
-    nonisolated func updateInstanceConstantsTransform(
-        _ transform: simd_float4x4,
-        instanceConstants: _Proto_LowLevelResourceContext_v1.InstanceConstantsDescriptor
-    ) {
-        guard self.descriptor == instanceConstants.argumentTableDescriptor else {
-            fatalError("Expected descriptors to match")
-        }
-        guard let (buffer, offset) = self.buffer(at: 0) else {
-            fatalError("Failed to get buffer at index 0")
-        }
-        buffer.replace { mutableSpan in
-            mutableSpan.storeBytes(
-                of: transform,
-                toByteOffset: instanceConstants.parameters.objectToWorld.offset + offset,
-                as: simd_float4x4.self
-            )
-            let normalToWorld = transform.inverse.minor
-            mutableSpan.storeBytes(
-                of: normalToWorld,
-                toByteOffset: instanceConstants.parameters.normalToWorld.offset + offset,
-                as: simd_float3x3.self
-            )
-            mutableSpan.storeBytes(
-                of: 0,
-                toByteOffset: instanceConstants.parameters.screenSpaceDepthBias.offset + offset,
-                as: Float.self
-            )
-            mutableSpan.storeBytes(
-                of: 0,
-                toByteOffset: instanceConstants.parameters.userInstanceIndex.offset + offset,
-                as: UInt32.self
-            )
-        }
-    }
-}
-
 extension simd_float4x4 {
-    nonisolated var minor: simd_float3x3 {
+    fileprivate var minor: simd_float3x3 {
         .init(
             [self.columns.0.x, self.columns.0.y, self.columns.0.z],
             [self.columns.1.x, self.columns.1.y, self.columns.1.z],
@@ -647,189 +297,414 @@ extension simd_float4x4 {
 }
 
 private class RenderTargetWrapper {
-    let descriptor: _Proto_LowLevelRenderTarget_v1.Descriptor
-    init(_ descriptor: _Proto_LowLevelRenderTarget_v1.Descriptor) {
-        self.descriptor = descriptor
+    var descriptor: _Proto_LowLevelRenderTarget_v1.Descriptor?
+}
+
+@objc
+@implementation
+extension DDUSDConfiguration {
+    @nonobjc
+    fileprivate let device: MTLDevice
+    @nonobjc
+    fileprivate let appRenderer: Renderer
+    @nonobjc
+    fileprivate final var commandQueue: MTLCommandQueue {
+        get { appRenderer.commandQueue }
+    }
+    @nonobjc
+    fileprivate final var renderer: _Proto_LowLevelRenderer_v1 {
+        get { appRenderer.renderer }
+    }
+    @nonobjc
+    fileprivate final var resourceContext: _Proto_LowLevelResourceContext_v1 {
+        get { appRenderer.resourceContext }
+    }
+    @nonobjc
+    fileprivate final var materialCompiler: _Proto_LowLevelMaterialCompiler_v1 {
+        get {
+            // swift-format-ignore: NeverForceUnwrap
+            appRenderer.materialCompiler!
+        }
+    }
+    @nonobjc
+    fileprivate let renderTargetWrapper = RenderTargetWrapper()
+    @nonobjc
+    fileprivate final var renderTarget: _Proto_LowLevelRenderTarget_v1.Descriptor {
+        get {
+            // swift-format-ignore: NeverForceUnwrap
+            renderTargetWrapper.descriptor!
+        }
+        set { renderTargetWrapper.descriptor = newValue }
+    }
+
+    @objc(initWithDevice:)
+    init(device: MTLDevice) {
+        let renderTarget = _Proto_LowLevelRenderTarget_v1.Descriptor.texture(color: .bgra8Unorm, sampleCount: 4)
+        self.renderTargetWrapper.descriptor = renderTarget
+        self.device = device
+        do {
+            self.appRenderer = try Renderer(device: device, renderTargetDescriptor: .texture(color: .bgra8Unorm, sampleCount: 4))
+        } catch {
+            fatalError("Exception creating renderer \(error)")
+        }
+    }
+
+    @objc(createMaterialCompiler:)
+    func createMaterialCompiler() async {
+        do {
+            try await self.appRenderer.createMaterialCompiler()
+        } catch {
+            fatalError("Exception creating renderer \(error)")
+        }
     }
 }
 
-private struct Material {
-    fileprivate let resource: _Proto_LowLevelMaterialResource_v1
-    fileprivate let geometryParameters: _Proto_LowLevelArgumentTable_v1
-    fileprivate let surfaceParameters: _Proto_LowLevelArgumentTable_v1
-}
+extension DDBridgeReceiver {
+    fileprivate func configureDeformation(
+        identifier: _Proto_ResourceId,
+        deformationData: DDBridgeDeformationData,
+        commandBuffer: MTLCommandBuffer
+    ) {
+        var deformers: [_Proto_LowLevelDeformerDescription_v1] = []
 
-private class DrawCalls {
-    var drawCalls: _Proto_LowLevelDrawCallCollection_v1
-    init(_ drawCalls: _Proto_LowLevelDrawCallCollection_v1) {
-        self.drawCalls = drawCalls
+        if let skinningData = deformationData.skinningData {
+            let skinningDeformer = skinningData.makeDeformerDescription(device: self.device)
+            deformers.append(skinningDeformer)
+        }
+
+        // swift-format-ignore: NeverForceUnwrap
+        let meshResource = meshResources[identifier]!
+
+        var inputMeshDescription: _Proto_LowLevelDeformationDescription_v1.MeshDescription?
+        if self.meshResourceToDeformationContext[identifier] == nil {
+            // swift-format-ignore: NeverForceUnwrap
+            let vertexPositionsBuffer = meshResource.readVertices(at: 1, using: commandBuffer)!
+            // swift-format-ignore: NeverForceUnwrap
+            let inputPositionsBuffer = device.makeBuffer(length: vertexPositionsBuffer.length, options: .storageModeShared)!
+
+            // Copy data from vertexPositionsBuffer to inputPositionsBuffer
+            // swift-format-ignore: NeverForceUnwrap
+            let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
+            blitEncoder.copy(
+                from: vertexPositionsBuffer,
+                sourceOffset: 0,
+                to: inputPositionsBuffer,
+                destinationOffset: 0,
+                size: vertexPositionsBuffer.length
+            )
+            blitEncoder.endEncoding()
+
+            // swift-format-ignore: NeverForceUnwrap
+            let inputPositions = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+                inputPositionsBuffer,
+                offset: 0,
+                occupiedLength: inputPositionsBuffer.length,
+                elementType: .float3
+            )!
+            inputMeshDescription = _Proto_LowLevelDeformationDescription_v1.MeshDescription(descriptions: [
+                _Proto_LowLevelDeformationDescription_v1.SemanticBuffer(.position, inputPositions)
+            ])
+        } else {
+            // swift-format-ignore: NeverForceUnwrap
+            inputMeshDescription = self.meshResourceToDeformationContext[identifier]!.description.input
+        }
+
+        guard let inputMeshDescription else {
+            logError("inputMeshDescription is unexpectedly nil")
+            return
+        }
+
+        // swift-format-ignore: NeverForceUnwrap
+        let outputPositionsBuffer = meshResource.replaceVertices(at: 1, using: commandBuffer)!
+        // swift-format-ignore: NeverForceUnwrap
+        let outputPositions = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+            outputPositionsBuffer,
+            offset: 0,
+            occupiedLength: outputPositionsBuffer.length,
+            elementType: .float3
+        )!
+
+        let outputMeshDescription = _Proto_LowLevelDeformationDescription_v1.MeshDescription(descriptions: [
+            _Proto_LowLevelDeformationDescription_v1.SemanticBuffer(.position, outputPositions)
+        ])
+
+        guard
+            let deformationDescription =
+                try? _Proto_LowLevelDeformationDescription_v1.make(
+                    input: inputMeshDescription,
+                    deformers: deformers,
+                    output: outputMeshDescription
+                )
+                .get()
+        else {
+            logError("_Proto_LowLevelDeformationDescription_v1.make failed unexpectedly")
+            return
+        }
+
+        // swift-format-ignore: NeverForceUnwrap
+        guard let deformation = try? self.deformationSystem.make(description: deformationDescription).get() else {
+            logError("deformationSystem.make failed unexpectedly")
+            return
+        }
+
+        self.meshResourceToDeformationContext[identifier] = DeformationContext.init(
+            deformation: deformation,
+            description: deformationDescription,
+            dirty: true
+        )
     }
 }
 
-private class InstanceConstants {
-    let descriptor: _Proto_LowLevelResourceContext_v1.InstanceConstantsDescriptor
-    init(_ descriptor: _Proto_LowLevelResourceContext_v1.InstanceConstantsDescriptor) {
-        self.descriptor = descriptor
-    }
+func modelTransformToCameraTransform(_ modelTransform: simd_float4x4, _ distance: Float) -> CameraTransform {
+    let inverted = modelTransform.inverse
+
+    // Extract the upper-left 3x3 (rotation + scale)
+    let col0 = simd_float3(inverted.columns.0.x, inverted.columns.0.y, inverted.columns.0.z)
+    let col1 = simd_float3(inverted.columns.1.x, inverted.columns.1.y, inverted.columns.1.z)
+    let col2 = simd_float3(inverted.columns.2.x, inverted.columns.2.y, inverted.columns.2.z)
+
+    // Extract uniform scale
+    let scale = length(col0)
+
+    // Normalize rotation matrix (remove scale)
+    let rotationMatrix = simd_float3x3(
+        col0 / scale,
+        col1 / scale,
+        col2 / scale
+    )
+
+    // Convert to quaternion
+    let rotation = simd_quatf(rotationMatrix)
+
+    // Extract model center position
+    let modelCenter = simd_float3(
+        modelTransform.columns.3.x,
+        modelTransform.columns.3.y,
+        modelTransform.columns.3.z
+    )
+
+    // Calculate camera position: move back from model center along camera's forward direction
+    // Camera forward is typically -Z in camera space, which is the negative of the third column
+    let cameraForward = -normalize(col2 / scale)
+    let translation = modelCenter + cameraForward * distance * scale
+
+    return CameraTransform(
+        rotation: rotation,
+        translation: translation,
+        scale: simd_make_float3(1, 1, 1)
+    )
 }
 
 @objc
 @implementation
 extension DDBridgeReceiver {
+    @nonobjc
     fileprivate let device: MTLDevice
+    @nonobjc
+    fileprivate let commandQueue: MTLCommandQueue
 
     @nonobjc
     fileprivate let resourceContext: _Proto_LowLevelResourceContext_v1
     @nonobjc
-    fileprivate var materialCompiler: _Proto_LowLevelMaterialCompiler_v1?
-    @nonobjc
-    fileprivate let renderTarget: RenderTargetWrapper
-    @nonobjc
-    fileprivate var meshTransforms: [_Proto_ResourceId: [simd_float4x4]] = [:]
-    @nonobjc
-    fileprivate var meshResources: [String: _Proto_LowLevelMeshResource_v1] = [:]
-    @nonobjc
-    fileprivate var camera: _Proto_LowLevelCamera_v1?
-    @nonobjc
     fileprivate let renderer: _Proto_LowLevelRenderer_v1
+    @nonobjc
+    fileprivate let appRenderer: Renderer
+    @nonobjc
+    fileprivate let materialCompiler: _Proto_LowLevelMaterialCompiler_v1
+    @nonobjc
+    fileprivate let lightingFunction: _Proto_LowLevelMaterialResource_v1.LightingFunction
+    @nonobjc
+    fileprivate var lightingArgumentBuffer: _Proto_LowLevelArgumentBuffer_v1?
+
+    @nonobjc
+    private let renderTargetWrapper = RenderTargetWrapper()
+    @nonobjc
+    private final var renderTarget: _Proto_LowLevelRenderTarget_v1.Descriptor {
+        get {
+            // swift-format-ignore: NeverForceUnwrap
+            renderTargetWrapper.descriptor!
+        }
+        set { renderTargetWrapper.descriptor = newValue }
+    }
+    @nonobjc
+    fileprivate var meshInstancePlainArray: [_Proto_LowLevelMeshInstance_v1?]
+    @nonobjc
+    fileprivate var meshInstances: _Proto_LowLevelMeshInstanceArray_v1
+
+    @nonobjc
+    fileprivate var meshResources: [_Proto_ResourceId: _Proto_LowLevelMeshResource_v1] = [:]
     @nonobjc
     fileprivate var meshResourceToMaterials: [_Proto_ResourceId: [_Proto_ResourceId]] = [:]
     @nonobjc
-    fileprivate var drawCalls: DrawCalls
+    fileprivate var meshToMeshInstances: [_Proto_ResourceId: [_Proto_LowLevelMeshInstance_v1]] = [:]
     @nonobjc
-    fileprivate var meshToDrawCalls: [_Proto_ResourceId: [_Proto_LowLevelDrawCall_v1]] = [:]
+    fileprivate var meshTransforms: [_Proto_ResourceId: [simd_float4x4]] = [:]
+    @nonobjc
+    fileprivate var rotationAngle: Float = 0
 
     @nonobjc
-    fileprivate var lightingParameters: _Proto_LowLevelArgumentTable_v1?
-    @nonobjc
-    fileprivate var instanceConstants: InstanceConstants?
+    fileprivate let deformationSystem: _Proto_LowLevelDeformationSystem_v1
 
+    struct DeformationContext {
+        let deformation: _Proto_Deformation_v1
+        var description: _Proto_LowLevelDeformationDescription_v1
+        var dirty: Bool
+    }
+    @nonobjc
+    fileprivate var meshResourceToDeformationContext: [_Proto_ResourceId: DeformationContext] = [:]
+
+    struct Material {
+        let resource: _Proto_LowLevelMaterialResource_v1
+        let geometryArguments: _Proto_LowLevelArgumentBuffer_v1?
+        let surfaceArguments: _Proto_LowLevelArgumentBuffer_v1?
+    }
     @nonobjc
     fileprivate var materialsAndParams: [_Proto_ResourceId: Material] = [:]
+
     @nonobjc
     fileprivate var textureResources: [String: _Proto_LowLevelTextureResource_v1] = [:]
     @nonobjc
     fileprivate var textureData: [_Proto_ResourceId: (MTLTexture, String)] = [:]
-    @nonobjc
-    fileprivate let commandQueue: MTLCommandQueue?
-    @nonobjc
-    fileprivate let captureManager: MTLCaptureManager
-    @nonobjc
-    fileprivate var textureFromPath: [String: String] = [:]
 
     @nonobjc
     fileprivate var modelTransform: simd_float4x4
     @nonobjc
     fileprivate var modelDistance: Float
 
+    @nonobjc
+    fileprivate var dontCaptureAgain: Bool = false
+
     init(
-        device: MTLDevice
-    ) {
-        self.device = device
+        configuration: DDUSDConfiguration,
+        diffuseAsset: DDBridgeImageAsset,
+        specularAsset: DDBridgeImageAsset
+    ) throws {
+        self.materialCompiler = configuration.materialCompiler
+        self.resourceContext = configuration.resourceContext
+        self.renderer = configuration.renderer
+        self.appRenderer = configuration.appRenderer
+        self.device = configuration.device
+        self.commandQueue = configuration.commandQueue
+        self.deformationSystem = try _Proto_LowLevelDeformationSystem_v1.make(configuration.device, configuration.commandQueue).get()
         modelTransform = matrix_identity_float4x4
         modelDistance = 1.0
-
-        resourceContext = _Proto_LowLevelResourceContext_v1(device: device)
-        self.renderTarget = RenderTargetWrapper(_Proto_LowLevelRenderTarget_v1.Descriptor.texture(color: .bgra8Unorm, sampleCount: 4))
-        self.drawCalls = .init(_Proto_LowLevelDrawCallCollection_v1(renderTarget: self.renderTarget.descriptor))
-        commandQueue = device.makeCommandQueue()
-        renderer = _Proto_LowLevelRenderer_v1(configuration: .init(device: device, commandQueue: commandQueue))
-        captureManager = MTLCaptureManager.shared()
-    }
-
-    @objc(initRenderer:completionHandler:)
-    func initRenderer(_ texture: MTLTexture) async {
-        do {
-            materialCompiler = try await _Proto_LowLevelMaterialCompiler_v1(device: device)
-            guard let materialCompiler else {
-                fatalError("materialCompiler could not be created")
-            }
-            let lighting = materialCompiler.makePhysicallyBasedLighting()
-            lightingParameters = try resourceContext.makeArgumentTable(
-                descriptor: lighting.argumentTableDescriptor,
-                buffers: [],
-                textures: []
+        self.meshInstancePlainArray = []
+        self.meshInstances = _Proto_LowLevelMeshInstanceArray_v1(
+            renderTarget: configuration.renderTarget,
+            resourceContext: configuration.resourceContext,
+            count: 16
+        )
+        let lightingFunction = materialCompiler.makePhysicallyBasedLightingFunction()
+        guard
+            let diffuseTexture = makeTextureFromImageAsset(
+                diffuseAsset,
+                device: device,
+                resourceContext: resourceContext,
+                commandQueue: configuration.commandQueue,
+                generateMips: true,
+                swizzle: .init(red: .red, green: .red, blue: .red, alpha: .one)
             )
-            instanceConstants = InstanceConstants(resourceContext.makeInstanceConstantsDescriptor())
+        else {
+            fatalError("Could not create diffuseTexture")
+        }
+        guard
+            let specularTexture = makeTextureFromImageAsset(
+                specularAsset,
+                device: device,
+                resourceContext: resourceContext,
+                commandQueue: configuration.commandQueue,
+                generateMips: true,
+                swizzle: .init(red: .red, green: .red, blue: .red, alpha: .one)
+            )
+        else {
+            fatalError("Could not create specularTexture")
+        }
+        self.lightingFunction = lightingFunction
+        self.renderTargetWrapper.descriptor = configuration.renderTarget
+        do {
+            // swift-format-ignore: NeverForceUnwrap
+            let lightingFunctionDescriptor = lightingFunction.argumentBufferDescriptor!
+            // swift-format-ignore: NeverForceUnwrap
+            let lightingFunctionTable = lightingFunctionDescriptor.table!
+            let lightingArgumentTable = try self.resourceContext.makeArgumentTable(
+                descriptor: lightingFunctionTable,
+                buffers: [],
+                textures: [
+                    diffuseTexture, specularTexture,
+                ]
+            )
+            let lightingArgumentBuffer = try self.renderer.makeArgumentBuffer(for: lightingArgumentTable, function: lightingFunction)
+
+            self.lightingArgumentBuffer = lightingArgumentBuffer
         } catch {
-            logError("failed to create renderer")
+            fatalError("EXCEPTION \(error)")
         }
     }
 
     @objc(renderWithTexture:)
     func render(with texture: MTLTexture) {
-        guard let instanceConstants = instanceConstants?.descriptor else { fatalError("instanceConstants must exist") }
-        for (identifier, drawCallsArray) in meshToDrawCalls {
+        for (identifier, meshes) in meshToMeshInstances {
+            let originalTransforms = meshTransforms[identifier]
             // swift-format-ignore: NeverForceUnwrap
-            let meshTransformsArray = meshTransforms[identifier]!
-            for (instanceIndex, instance) in meshTransformsArray.enumerated() {
-                let originalTransform = meshTransformsArray[instanceIndex]
-                let angle: Float = 0.707
-                let rotationY90 = simd_float4x4(
-                    simd_float4(angle, 0, angle, 0), // column 0
-                    simd_float4(0, 1, 0, 0), // column 1
-                    simd_float4(-angle, 0, angle, 0), // column 2
-                    simd_float4(0, 0, 0, 1) // column 3
-                )
-                let computedTransform = modelTransform * rotationY90 * originalTransform
-                let instanceParameters = drawCallsArray[instanceIndex].instanceParameters
-                do {
-                    instanceParameters.updateInstanceConstantsTransform(computedTransform, instanceConstants: instanceConstants)
-                } catch {
-                    logError("Could not update transform for \(identifier)")
-                }
+            let angle: Float = 0.707
+            let rotationY90 = simd_float4x4(
+                simd_float4(angle, 0, angle, 0), // column 0
+                simd_float4(0, 1, 0, 0), // column 1
+                simd_float4(-angle, 0, angle, 0), // column 2
+                simd_float4(0, 0, 0, 1) // column 3
+            )
+
+            for (index, meshInstance) in meshes.enumerated() {
+                // swift-format-ignore: NeverForceUnwrap
+                let computedTransform = modelTransform * rotationY90 * originalTransforms![index]
+                meshInstance.setTransform(.single(computedTransform))
             }
         }
 
+        // animate
+        if !meshResourceToDeformationContext.isEmpty {
+            // swift-format-ignore: NeverForceUnwrap
+            let commandBuffer = self.commandQueue.makeCommandBuffer()!
+
+            for (identifier, deformationContext) in meshResourceToDeformationContext where deformationContext.dirty {
+                deformationContext.deformation.execute(deformation: deformationContext.description, commandBuffer: commandBuffer) {
+                    (commandBuffer: any MTLCommandBuffer) in
+                }
+                // swift-format-ignore: NeverForceUnwrap
+                meshResourceToDeformationContext[identifier]!.dirty = false
+            }
+
+            commandBuffer.enqueue()
+            commandBuffer.commit()
+        }
+
         // render
-        let captureDescriptor = MTLCaptureDescriptor(from: device)
+        if dontCaptureAgain == false {
+            let captureDescriptor = MTLCaptureDescriptor(from: device)
+            let captureManager = MTLCaptureManager.shared()
+            do {
+                try captureManager.startCapture(with: captureDescriptor)
+                print("Capture started at \(captureDescriptor.outputURL?.absoluteString ?? "")")
+            } catch {
+                logError("failed to start gpu capture \(error)")
+                dontCaptureAgain = true
+            }
+        }
+
         do {
-            try captureManager.startCapture(with: captureDescriptor)
-            print("Capture started at \(captureDescriptor.outputURL?.absoluteString ?? "")")
+            try appRenderer.render(meshInstances: meshInstances, texture: texture)
         } catch {
             logError("failed to start gpu capture \(error)")
         }
 
-        let aspect = Float(texture.width) / Float(texture.height)
-        let projection = _Proto_LowLevelCamera_v1.Projection.perspective(
-            fovYRadians: 90 * .pi / 180,
-            aspectRatio: aspect,
-            nearZ: 0.01,
-            farZ: 100.0,
-            reverseZ: true
-        )
-
-        let camera: _Proto_LowLevelCamera_v1
-        if let existingCamera = self.camera {
-            camera = existingCamera
-        } else {
-            camera = _Proto_LowLevelCamera_v1(
-                target: .texture(color: texture, sampleCount: 4),
-                pose: .init(translation: [0, 0, 1], rotation: simd_quatf(angle: 0, axis: [0, 0, 1])),
-                projection: projection
-            )
-            self.camera = camera
+        let captureManager = MTLCaptureManager.shared()
+        if captureManager.isCapturing {
+            captureManager.stopCapture()
         }
-
-        camera.target = .texture(color: texture, sampleCount: 4)
-        camera.projection = projection
-        camera.pose = .init(
-            translation: [0, 0, modelDistance],
-            rotation: simd_quatf(angle: 0, axis: [0, 0, 1]),
-        )
-
-        do {
-            let content = try _Proto_LowLevelRenderer_v1.Content(drawCalls: drawCalls.drawCalls, camera: camera)
-            renderer.render(content)
-        } catch {
-            logError("Could not create render content")
-        }
-
-        captureManager.stopCapture()
     }
 
-    @objc(updateTexture:completionHandler:)
-    func updateTexture(_ data: DDBridgeUpdateTexture) async {
+    @objc(updateTexture:)
+    func updateTexture(_ data: DDBridgeUpdateTexture) {
         guard let asset = data.imageAsset else {
             logError("Image asset was nil")
             return
@@ -841,64 +716,55 @@ extension DDBridgeReceiver {
             return
         }
 
-        if let commandQueue {
-            if let newTexture = makeTextureFromImageAsset(
-                asset,
-                device: device,
-                context: resourceContext,
-                commandQueue: commandQueue
-            ) {
-                textureResources[textureHash] = newTexture
-            }
+        let commandQueue = appRenderer.commandQueue
+        if let textureResource = makeTextureFromImageAsset(
+            asset,
+            device: device,
+            resourceContext: resourceContext,
+            commandQueue: commandQueue,
+            generateMips: true
+        ) {
+            textureResources[textureHash] = textureResource
         }
     }
 
     @objc(updateMaterial:completionHandler:)
-    func updateMaterial(_ data: DDBridgeUpdateMaterial) async {
+    func updateMaterial(_ data: consuming sending DDBridgeUpdateMaterial) async {
         logInfo("updateMaterial (pre-dispatch) \(data.identifier)")
         do {
             let identifier = data.identifier
             logInfo("updateMaterial \(identifier)")
             let materialSourceArchive = data.materialGraph
-            let materialSource = try ShaderGraphService.sourceFromArchive(data: materialSourceArchive)
-            guard let materialCompiler = self.materialCompiler else {
-                fatalError("materialCompiler is not initialized")
-            }
-            let sgMaterial = try ShaderGraphService.materialFromSource(materialSource, functionConstantValues: .init())
+            let shaderGraphFunctions = try await materialCompiler.makeShaderGraphFunctions(materialSourceArchive)
 
-            logInfo("before await \(identifier)")
-
-            let materialResource = try await materialCompiler.makeShaderGraphMaterial(sgMaterial)
-            logInfo("after await  \(identifier)")
-            let (geometryBuffers, geometryTextures) = try makeParameters(
-                parameterMapping: materialResource.geometry.parameterMapping,
-                argumentTableDescriptor: materialResource.geometry.argumentTableDescriptor,
+            let geometryArguments = try makeParameters(
+                for: shaderGraphFunctions.geometryModifier,
                 resourceContext: resourceContext,
+                renderer: renderer,
                 textureResources: textureResources
             )
-            let (surfaceBuffers, surfaceTextures) = try makeParameters(
-                parameterMapping: materialResource.surface.parameterMapping,
-                argumentTableDescriptor: materialResource.surface.argumentTableDescriptor,
+            let surfaceArguments = try makeParameters(
+                for: shaderGraphFunctions.surfaceShader,
                 resourceContext: resourceContext,
+                renderer: renderer,
                 textureResources: textureResources
             )
 
-            let geometryParameters = try resourceContext.makeArgumentTable(
-                descriptor: materialResource.geometry.argumentTableDescriptor,
-                buffers: geometryBuffers,
-                textures: geometryTextures
-            )
-            let surfaceParameters = try resourceContext.makeArgumentTable(
-                descriptor: materialResource.surface.argumentTableDescriptor,
-                buffers: surfaceBuffers,
-                textures: surfaceTextures
+            let geometryModifier = shaderGraphFunctions.geometryModifier ?? materialCompiler.makeDefaultGeometryModifier()
+            let surfaceShader = shaderGraphFunctions.surfaceShader
+            let materialResource = try await materialCompiler.makeMaterialResource(
+                descriptor: .init(
+                    geometryModifier: geometryModifier,
+                    surfaceShader: surfaceShader,
+                    lightingFunction: lightingFunction
+                )
             )
 
             logInfo("inserting \(identifier) into materialsAndParams")
             materialsAndParams[identifier] = .init(
                 resource: materialResource,
-                geometryParameters: geometryParameters,
-                surfaceParameters: surfaceParameters
+                geometryArguments: geometryArguments,
+                surfaceArguments: surfaceArguments
             )
         } catch {
             logError("updateMaterial failed \(error)")
@@ -906,24 +772,20 @@ extension DDBridgeReceiver {
     }
 
     @objc(updateMesh:completionHandler:)
-    func updateMesh(_ data: DDBridgeUpdateMesh) async {
+    func updateMesh(_ data: consuming sending DDBridgeUpdateMesh) async {
         let identifier = data.identifier
         logInfo("(update mesh) \(identifier) Material ids \(data.materialPrims)")
 
         do {
+            let identifier = data.identifier
+
             let meshResource: _Proto_LowLevelMeshResource_v1
-            // swift-format-ignore: NeverForceUnwrap
-            if data.updateType == .initial || (data.descriptor != nil && data.descriptor!.vertexBufferCount > 0) {
-                // swift-format-ignore: NeverForceUnwrap
+            if data.updateType == .initial || data.descriptor != nil {
                 let meshDescriptor = data.descriptor!
                 let descriptor = _Proto_LowLevelMeshResource_v1.Descriptor.fromLlmDescriptor(meshDescriptor)
-                do {
-                    meshResource = try resourceContext.makeMeshResource(descriptor: descriptor)
-                    meshResource.replaceData(indexData: data.indexData, vertexData: data.vertexData)
-                    meshResources[identifier] = meshResource
-                } catch {
-                    fatalError("Update mesh failed for \(identifier) error \(error.localizedDescription) descriptor \(meshDescriptor)")
-                }
+                meshResource = try resourceContext.makeMeshResource(descriptor: descriptor)
+                meshResource.replaceData(indexData: data.indexData, vertexData: data.vertexData)
+                meshResources[identifier] = meshResource
             } else {
                 guard let cachedMeshResource = meshResources[identifier] else {
                     fatalError("Mesh resource should already be created from previous update")
@@ -935,30 +797,30 @@ extension DDBridgeReceiver {
                 meshResource = cachedMeshResource
             }
 
-            guard let instanceConstants = instanceConstants?.descriptor else { fatalError("instanceConstants must exist") }
-            guard let lightingParameters = lightingParameters else { fatalError("lightingParameters must exist") }
+            if let deformationData = data.deformationData {
+                // swift-format-ignore: NeverForceUnwrap
+                let commandBuffer = self.commandQueue.makeCommandBuffer()!
+                // TODO: delta update
+                configureDeformation(identifier: identifier, deformationData: deformationData, commandBuffer: commandBuffer)
+                commandBuffer.enqueue()
+                commandBuffer.commit()
+            }
+
             if data.instanceTransformsCount > 0 {
                 // Make new instances
-                if meshToDrawCalls[identifier] == nil {
-                    meshToDrawCalls[identifier] = []
+                if meshToMeshInstances[identifier] == nil {
+                    meshToMeshInstances[identifier] = []
                     meshTransforms[identifier] = []
 
                     for (partIndex, _) in data.parts.enumerated() {
                         let materialIdentifier = data.materialPrims[partIndex]
                         guard let material = materialsAndParams[materialIdentifier] else {
-                            fatalError("Material was nil for \(materialIdentifier)")
+                            fatalError("Material \(materialIdentifier) could not be found")
                         }
 
-                        logInfo("Creating material for \(materialIdentifier)")
-                        logInfo("try makeRenderPipelineState \(materialIdentifier)")
-                        let pipeline = try await materialCompiler?
-                            .makeRenderPipelineState(
-                                descriptor: .descriptor(
-                                    mesh: meshResource.descriptor,
-                                    material: material.resource,
-                                    renderTarget: renderTarget.descriptor
-                                )
-                            )
+                        let pipeline = try await materialCompiler.makeRenderPipelineState(
+                            descriptor: .descriptor(mesh: meshResource.descriptor, material: material.resource, renderTarget: renderTarget)
+                        )
 
                         let meshPart = try resourceContext.makeMeshPart(
                             resource: meshResource,
@@ -970,69 +832,61 @@ extension DDBridgeReceiver {
                             boundsMax: .one
                         )
 
-                        guard let pipeline else {
-                            fatalError("Pipeline failed to create")
-                        }
-                        var instanceTransformsPointer = data.instanceTransforms
-                        while instanceTransformsPointer != nil {
-                            // swift-format-ignore: NeverForceUnwrap
-                            let instanceTransform = instanceTransformsPointer?.transform
-                            let bufferSize = (instanceConstants.argumentTableDescriptor.buffers[0].size + 15) / 16 * 16
-                            let buffer = try resourceContext.makeBufferResource(descriptor: .init(capacity: bufferSize))
-                            let instanceParameters = try resourceContext.makeArgumentTable(
-                                descriptor: instanceConstants.argumentTableDescriptor,
-                                buffers: [(buffer, 0)],
-                                textures: []
+                        for instanceTransform in data.instanceTransforms {
+                            let meshInstance = try _Proto_LowLevelMeshInstance_v1(
+                                meshPart: meshPart,
+                                pipeline: pipeline,
+                                geometryArguments: material.geometryArguments,
+                                surfaceArguments: material.surfaceArguments,
+                                lightingArguments: lightingArgumentBuffer,
+                                transform: .single(instanceTransform),
+                                category: .opaque
                             )
 
                             // swift-format-ignore: NeverForceUnwrap
-                            instanceParameters.updateInstanceConstantsTransform(instanceTransform!, instanceConstants: instanceConstants)
-                            let drawCall = try _Proto_LowLevelDrawCall_v1(
-                                meshPart: meshPart,
-                                pipeline: pipeline,
-                                geometryParameters: material.geometryParameters,
-                                surfaceParameters: material.surfaceParameters,
-                                lightingParameters: lightingParameters,
-                                instanceParameters: instanceParameters
-                            )
+                            meshToMeshInstances[identifier]!.append(meshInstance)
                             // swift-format-ignore: NeverForceUnwrap
-                            meshTransforms[identifier]!.append(instanceTransform!)
-                            // swift-format-ignore: NeverForceUnwrap
-                            meshToDrawCalls[identifier]!.append(drawCall)
-                            try drawCalls.drawCalls.append(drawCall)
-                            instanceTransformsPointer = instanceTransformsPointer?.next
+                            meshTransforms[identifier]!.append(instanceTransform)
+
+                            let meshInstanceIndex = meshInstancePlainArray.count
+                            meshInstancePlainArray.append(meshInstance)
+                            if meshInstances.count < meshInstancePlainArray.count {
+                                let meshInstances = _Proto_LowLevelMeshInstanceArray_v1(
+                                    renderTarget: renderTarget,
+                                    resourceContext: resourceContext,
+                                    count: meshInstances.count * 2
+                                )
+                                for index in meshInstancePlainArray.indices {
+                                    try meshInstances.setMeshInstance(meshInstancePlainArray[index], index: index)
+                                }
+                                self.meshInstances = meshInstances
+                            } else {
+                                try meshInstances.setMeshInstance(meshInstance, index: meshInstanceIndex)
+                            }
                         }
-                        logInfo("updateMaterial for \(materialIdentifier) completed")
                     }
                 } else {
-                    logInfo("updating transforms for \(identifier)")
                     // Update transforms otherwise
+
                     // swift-format-ignore: NeverForceUnwrap
-                    let partCount = meshToDrawCalls[identifier]!.count / data.instanceTransformsCount
-                    var instanceTransformsPointer = data.instanceTransforms
-                    var instanceIndex: Int = 0
-                    while instanceTransformsPointer != nil {
-                        let instanceTransform = instanceTransformsPointer?.transform
-                        // swift-format-ignore: NeverForceUnwrap
-                        meshTransforms[identifier]![instanceIndex] = instanceTransform!
+                    let partCount = meshToMeshInstances[identifier]!.count / data.instanceTransformsCount
+                    for (instanceIndex, instanceTransform) in data.instanceTransforms.enumerated() {
                         for partIndex in 0..<partCount {
-                            // FIXME: remove placeholder force unwrapping
                             // swift-format-ignore: NeverForceUnwrap
-                            let instanceParameters = meshToDrawCalls[identifier]![instanceIndex * data.parts.count + partIndex]
-                                .instanceParameters
+                            let meshInstance = meshToMeshInstances[identifier]![instanceIndex * data.parts.count + partIndex]
+                            meshInstance.setTransform(.single(instanceTransform))
                             // swift-format-ignore: NeverForceUnwrap
-                            instanceParameters.updateInstanceConstantsTransform(instanceTransform!, instanceConstants: instanceConstants)
+                            meshTransforms[identifier]![instanceIndex * data.parts.count + partIndex] = instanceTransform
                         }
-                        instanceTransformsPointer = instanceTransformsPointer?.next
-                        instanceIndex += 1
                     }
                 }
             }
+
             if !data.materialPrims.isEmpty {
                 meshResourceToMaterials[identifier] = data.materialPrims
             }
         } catch {
-            fatalError("Update mesh failed for \(identifier) error \(error.localizedDescription)")
+            logError(error.localizedDescription)
         }
     }
 
@@ -1044,6 +898,7 @@ extension DDBridgeReceiver {
     @objc
     func setCameraDistance(_ distance: Float) {
         modelDistance = distance
+        appRenderer.setCameraDistance(modelDistance)
     }
 
     @objc
@@ -1052,143 +907,64 @@ extension DDBridgeReceiver {
     }
 }
 
-final class Converter {
-    static func toWebImageAsset(_ asset: LowLevelTexture.Descriptor, data: Data) -> DDBridgeImageAsset {
-        DDBridgeImageAsset(
-            data: data,
-            width: asset.width,
-            height: asset.height,
-            depth: asset.depth,
-            bytesPerPixel: 0, // client calculates this
-            textureType: asset.textureType,
-            pixelFormat: asset.pixelFormat,
-            mipmapLevelCount: asset.mipmapLevelCount,
-            arrayLength: asset.arrayLength,
-            textureUsage: asset.textureUsage,
-            swizzle: asset.swizzle
+private func webPartsFromParts(_ parts: [LowLevelMesh.Part]) -> [DDBridgeMeshPart] {
+    parts.map({ a in
+        DDBridgeMeshPart(
+            indexOffset: a.indexOffset,
+            indexCount: a.indexCount,
+            topology: a.topology,
+            materialIndex: a.materialIndex,
+            boundsMin: a.bounds.min,
+            boundsMax: a.bounds.max
         )
+    })
+}
+
+private func convert(_ m: _Proto_DataUpdateType_v1) -> DDBridgeDataUpdateType {
+    if m == .initial {
+        return .initial
+    }
+    return .delta
+}
+
+private func webUpdateTextureRequestFromUpdateTextureRequest(_ request: _Proto_TextureDataUpdate_v1) -> DDBridgeUpdateTexture {
+    // FIXME: remove placeholder code
+    // swift-format-ignore: NeverForceUnwrap
+    let descriptor = request.descriptor!
+    let data = request.data
+    return DDBridgeUpdateTexture(
+        imageAsset: .init(descriptor, data: data),
+        identifier: request.identifier,
+        hashString: request.hashString
+    )
+}
+
+private func webUpdateMeshRequestFromUpdateMeshRequest(
+    _ request: _Proto_MeshDataUpdate_v1
+) -> DDBridgeUpdateMesh {
+    var descriptor: DDBridgeMeshDescriptor?
+    if let requestDescriptor = request.descriptor {
+        descriptor = .init(requestDescriptor)
     }
 
-    static func convertSemantic(_ semantic: LowLevelMesh.VertexSemantic) -> Int {
-        switch semantic {
-        case .position: return 0
-        case .color: return 1
-        case .normal: return 2
-        case .tangent: return 3
-        case .bitangent: return 4
-        case .uv0: return 5
-        case .uv1: return 6
-        case .uv2: return 7
-        case .uv3: return 8
-        case .uv4: return 9
-        case .uv5: return 10
-        case .uv6: return 11
-        case .uv7: return 12
-        default: return 13
-        }
-    }
+    return DDBridgeUpdateMesh(
+        identifier: request.identifier,
+        updateType: convert(request.updateType),
+        descriptor: descriptor,
+        parts: webPartsFromParts(request.parts),
+        indexData: request.indexData,
+        vertexData: request.vertexData,
+        instanceTransforms: toData(request.instanceTransformsCompat()),
+        instanceTransformsCount: request.instanceTransformsCompat().count,
+        materialPrims: request.materialPrims,
+        deformationData: .init(request.deformationData)
+    )
+}
 
-    static func webAttributesFromAttributes(_ attributes: [LowLevelMesh.Attribute]) -> [DDBridgeVertexAttributeFormat] {
-        attributes.map({ a in
-            DDBridgeVertexAttributeFormat(
-                semantic: Converter.convertSemantic(a.semantic),
-                format: a.format.rawValue,
-                layoutIndex: a.layoutIndex,
-                offset: a.offset
-            )
-        })
-    }
-
-    static func webLayoutsFromLayouts(_ attributes: [LowLevelMesh.Layout]) -> [DDBridgeVertexLayout] {
-        attributes.map({ a in
-            DDBridgeVertexLayout(bufferIndex: a.bufferIndex, bufferOffset: a.bufferOffset, bufferStride: a.bufferStride)
-        })
-    }
-
-    static func webMeshDescriptorFromMeshDescriptor(_ request: LowLevelMesh.Descriptor) -> DDBridgeMeshDescriptor {
-        DDBridgeMeshDescriptor(
-            vertexBufferCount: request.vertexBufferCount,
-            vertexCapacity: request.vertexCapacity,
-            vertexAttributes: Converter.webAttributesFromAttributes(request.vertexAttributes),
-            vertexLayouts: Converter.webLayoutsFromLayouts(request.vertexLayouts),
-            indexCapacity: request.indexCapacity,
-            indexType: request.indexType
-        )
-    }
-
-    static func webPartsFromParts(_ parts: [LowLevelMesh.Part]) -> [DDBridgeMeshPart] {
-        parts.map({ a in
-            DDBridgeMeshPart(
-                indexOffset: a.indexOffset,
-                indexCount: a.indexCount,
-                topology: a.topology,
-                materialIndex: a.materialIndex,
-                boundsMin: a.bounds.min,
-                boundsMax: a.bounds.max
-            )
-        })
-    }
-
-    static func convert(_ m: _Proto_DataUpdateType_v1) -> DDBridgeDataUpdateType {
-        if m == .initial {
-            return .initial
-        }
-        return .delta
-    }
-
-    static func webUpdateTextureRequestFromUpdateTextureRequest(_ request: _Proto_TextureDataUpdate_v1) -> DDBridgeUpdateTexture {
-        // FIXME: remove placeholder code
-        // swift-format-ignore: NeverForceUnwrap
-        let descriptor = request.descriptor!
-        // swift-format-ignore: NeverForceUnwrap
-        let data = request.data!
-        return DDBridgeUpdateTexture(
-            imageAsset: toWebImageAsset(descriptor, data: data),
-            identifier: request.identifier,
-            hashString: request.hashString
-        )
-    }
-
-    static func webUpdateMeshRequestFromUpdateMeshRequest(
-        _ request: _Proto_MeshDataUpdate_v1
-    ) -> DDBridgeUpdateMesh {
-        var webRequestInstanceTransforms: DDBridgeChainedFloat4x4?
-
-        if request.instanceTransforms.count > 0 {
-            let countMinusOne = request.instanceTransforms.count - 1
-            webRequestInstanceTransforms = DDBridgeChainedFloat4x4(transform: request.instanceTransforms[0])
-            var instanceTransforms = webRequestInstanceTransforms
-            if countMinusOne > 0 {
-                for i in 1...countMinusOne {
-                    instanceTransforms?.next = DDBridgeChainedFloat4x4(transform: request.instanceTransforms[i])
-                    instanceTransforms = instanceTransforms?.next
-                }
-            }
-        }
-
-        var descriptor: DDBridgeMeshDescriptor?
-        if let requestDescriptor = request.descriptor {
-            descriptor = Converter.webMeshDescriptorFromMeshDescriptor(requestDescriptor)
-        }
-
-        return DDBridgeUpdateMesh(
-            identifier: request.identifier,
-            updateType: Converter.convert(request.updateType),
-            descriptor: descriptor,
-            parts: Converter.webPartsFromParts(request.parts),
-            indexData: request.indexData,
-            vertexData: request.vertexData,
-            instanceTransforms: webRequestInstanceTransforms,
-            instanceTransformsCount: request.instanceTransforms.count,
-            materialPrims: request.materialPrims
-        )
-    }
-
-    static func webUpdateMaterialRequestFromUpdateMaterialRequest(
-        _ request: _Proto_MaterialDataUpdate_v1
-    ) -> DDBridgeUpdateMaterial {
-        DDBridgeUpdateMaterial(materialGraph: request.materialSourceArchive, identifier: request.identifier)
-    }
+nonisolated func webUpdateMaterialRequestFromUpdateMaterialRequest(
+    _ request: _Proto_MaterialDataUpdate_v1
+) -> DDBridgeUpdateMaterial {
+    DDBridgeUpdateMaterial(materialGraph: request.materialSourceArchive, identifier: request.identifier)
 }
 
 final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
@@ -1215,37 +991,45 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
         usdLoader.delegate = self
     }
 
+    func iblTextureUpdated(data: consuming sending _Proto_TextureDataUpdate_v1) {
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=299480 - [Model element] Support `environmentMap` attribute in GPU process model element
+    }
+
+    func iblTextureDestroyed(identifier: _Proto_ResourceId) {
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
+    }
+
     func meshUpdated(data: consuming sending _Proto_MeshDataUpdate_v1) {
         let identifier = data.identifier
         self.dispatchSerialQueue.async {
-            self.objcLoader.updateMesh(webRequest: Converter.webUpdateMeshRequestFromUpdateMeshRequest(data))
+            self.objcLoader.updateMesh(webRequest: webUpdateMeshRequestFromUpdateMeshRequest(data))
         }
     }
 
     func meshDestroyed(identifier: String) {
-        //
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
     }
 
     func materialUpdated(data: consuming sending _Proto_MaterialDataUpdate_v1) {
         let identifier = data.identifier
         self.dispatchSerialQueue.async {
-            self.objcLoader.updateMaterial(webRequest: Converter.webUpdateMaterialRequestFromUpdateMaterialRequest(data))
+            self.objcLoader.updateMaterial(webRequest: webUpdateMaterialRequestFromUpdateMaterialRequest(data))
         }
     }
 
     func materialDestroyed(identifier: String) {
-        //
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
     }
 
     func textureUpdated(data: consuming sending _Proto_TextureDataUpdate_v1) {
         let identifier = data.identifier
         self.dispatchSerialQueue.async {
-            self.objcLoader.updateTexture(webRequest: Converter.webUpdateTextureRequestFromUpdateTextureRequest(data))
+            self.objcLoader.updateTexture(webRequest: webUpdateTextureRequestFromUpdateTextureRequest(data))
         }
     }
 
     func textureDestroyed(identifier: String) {
-        //
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
     }
 
     func loadModel(from url: Foundation.URL) {
@@ -1261,7 +1045,6 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     }
 
     func loadModel(from data: Data) {
-        // usdLoader.loadModel(from: data)
     }
 
     func update(deltaTime: TimeInterval) {
@@ -1343,23 +1126,108 @@ extension DDBridgeModelLoader {
         }
     }
 }
+
+extension DDBridgeSkinningData {
+    fileprivate func makeDeformerDescription(device: MTLDevice) -> _Proto_LowLevelDeformerDescription_v1 {
+        // swift-format-ignore: NeverForceUnwrap
+        let jointTransformsBuffer = device.makeBuffer(
+            bytes: self.jointTransforms,
+            length: self.jointTransforms.count * MemoryLayout<simd_float4x4>.size,
+            options: .storageModeShared
+        )!
+
+        // swift-format-ignore: NeverForceUnwrap
+        let jointTransformsDescription = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+            jointTransformsBuffer,
+            offset: 0,
+            occupiedLength: jointTransformsBuffer.length,
+            elementType: .float4x4
+        )!
+
+        // swift-format-ignore: NeverForceUnwrap
+        let inverseBindPosesBuffer = device.makeBuffer(
+            bytes: self.inverseBindPoses,
+            length: self.inverseBindPoses.count * MemoryLayout<simd_float4x4>.size,
+            options: .storageModeShared
+        )!
+
+        // swift-format-ignore: NeverForceUnwrap
+        let inverseBindPosesDescription = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+            inverseBindPosesBuffer,
+            offset: 0,
+            occupiedLength: inverseBindPosesBuffer.length,
+            elementType: .float4x4
+        )!
+
+        // swift-format-ignore: NeverForceUnwrap
+        let jointIndicesBuffer = device.makeBuffer(
+            bytes: self.influenceJointIndices,
+            length: self.influenceJointIndices.count * MemoryLayout<UInt32>.size,
+            options: .storageModeShared
+        )!
+        // swift-format-ignore: NeverForceUnwrap
+        let jointIndicesDescription = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+            jointIndicesBuffer,
+            offset: 0,
+            occupiedLength: jointIndicesBuffer.length,
+            elementType: .uint
+        )!
+
+        // swift-format-ignore: NeverForceUnwrap
+        let influenceWeightsBuffer = device.makeBuffer(
+            bytes: self.influenceWeights,
+            length: self.influenceWeights.count * MemoryLayout<Float>.size,
+            options: .storageModeShared
+        )!
+        // swift-format-ignore: NeverForceUnwrap
+        let influenceWeightsDescription = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
+            influenceWeightsBuffer,
+            offset: 0,
+            occupiedLength: influenceWeightsBuffer.length,
+            elementType: .float
+        )!
+
+        let deformerDescription = _Proto_LowLevelSkinningDescription_v1(
+            jointTransforms: jointTransformsDescription,
+            inverseBindPoses: inverseBindPosesDescription,
+            influenceJointIndices: jointIndicesDescription,
+            influenceWeights: influenceWeightsDescription,
+            geometryBindTransform: self.geometryBindTransform,
+            influencePerVertexCount: self.influencePerVertexCount
+        )
+
+        return deformerDescription
+    }
+}
+
 #else
 @objc
 @implementation
-extension DDBridgeReceiver {
+extension DDUSDConfiguration {
     init(device: MTLDevice) {
     }
 
-    @objc(initRenderer:completionHandler:)
-    func initRenderer(_ texture: MTLTexture) async {
+    @objc(createMaterialCompiler:)
+    func createMaterialCompiler() async {
+    }
+}
+
+@objc
+@implementation
+extension DDBridgeReceiver {
+    init(
+        configuration: DDUSDConfiguration,
+        diffuseAsset: DDBridgeImageAsset,
+        specularAsset: DDBridgeImageAsset
+    ) throws {
     }
 
     @objc(renderWithTexture:)
     func render(with texture: MTLTexture) {
     }
 
-    @objc(updateTexture:completionHandler:)
-    func updateTexture(_ data: DDBridgeUpdateTexture) async {
+    @objc(updateTexture:)
+    func updateTexture(_ data: DDBridgeUpdateTexture) {
     }
 
     @objc(updateMaterial:completionHandler:)
