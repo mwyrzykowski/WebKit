@@ -264,14 +264,14 @@ void RemoteGPU::paintNativeImageToImageBuffer(WebCore::NativeImage& nativeImage,
     semaphore.wait();
 }
 
-void RemoteGPU::createModelBacking(unsigned width, unsigned height, DDModelIdentifier identifier, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
+void RemoteGPU::createModelBacking(unsigned width, unsigned height, const WebCore::DDModel::DDImageAsset& diffuseTexture, const WebCore::DDModel::DDImageAsset& specularTexture, DDModelIdentifier identifier, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
 {
     assertIsCurrent(workQueue());
 
     Ref objectHeap = m_modelObjectHeap.get();
 
     RefPtr gpu = m_backing.get();
-    auto mesh = gpu->createModelBacking(width, height, WTF::move(callback));
+    auto mesh = gpu->createModelBacking(width, height, diffuseTexture, specularTexture, WTF::move(callback));
 #if ENABLE(GPU_PROCESS_MODEL)
     auto remoteMesh = RemoteDDMesh::create(*m_gpuConnectionToWebProcess.get(), *this, *mesh, objectHeap, Ref { *m_streamConnection }, identifier);
     objectHeap->addObject(identifier, remoteMesh);

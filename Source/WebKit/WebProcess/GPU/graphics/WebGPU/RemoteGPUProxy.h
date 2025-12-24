@@ -119,7 +119,7 @@ private:
     }
 
     void requestAdapter(const WebCore::WebGPU::RequestAdapterOptions&, CompletionHandler<void(RefPtr<WebCore::WebGPU::Adapter>&&)>&&) final;
-    RefPtr<WebCore::DDModel::DDMesh> createModelBacking(unsigned width, unsigned height, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
+    RefPtr<WebCore::DDModel::DDMesh> createModelBacking(unsigned width, unsigned height, const WebCore::DDModel::DDImageAsset& diffuseTexture, const WebCore::DDModel::DDImageAsset& specularTexture, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
 
     RefPtr<WebCore::WebGPU::PresentationContext> createPresentationContext(const WebCore::WebGPU::PresentationContextDescriptor&) final;
 

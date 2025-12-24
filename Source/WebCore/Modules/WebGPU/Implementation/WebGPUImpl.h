@@ -107,7 +107,7 @@ private:
     WGPUInstance backing() const { return m_backing.get(); }
 
     void requestAdapter(const RequestAdapterOptions&, CompletionHandler<void(RefPtr<Adapter>&&)>&&) final;
-    RefPtr<DDModel::DDMesh> createModelBacking(unsigned width, unsigned height, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
+    RefPtr<DDModel::DDMesh> createModelBacking(unsigned width, unsigned height, const DDModel::DDImageAsset& diffuseTexture, const DDModel::DDImageAsset& specularTexture, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
 
     RefPtr<PresentationContext> createPresentationContext(const PresentationContextDescriptor&) final;
 

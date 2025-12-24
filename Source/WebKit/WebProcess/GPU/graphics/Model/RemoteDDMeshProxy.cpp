@@ -134,15 +134,20 @@ void RemoteDDMeshProxy::update(const WebCore::DDModel::DDUpdateMeshDescriptor& d
 {
 #if ENABLE(GPU_PROCESS_MODEL)
     auto [minCorner, maxCorner] = computeMinAndMaxCorners(descriptor.parts, descriptor.instanceTransforms);
-    m_minCorner = simd_min(minCorner, m_minCorner);
-    m_maxCorner = simd_max(maxCorner, m_maxCorner);
+    auto boundingBoxChanged = minCorner.x <= maxCorner.x && minCorner.y <= maxCorner.y && minCorner.z <= maxCorner.z;
+    if (boundingBoxChanged) {
+        m_minCorner = simd_min(m_minCorner, minCorner);
+        m_maxCorner = simd_max(m_maxCorner, maxCorner);
+    }
 
     auto [center, extents] = getCenterAndExtents();
-    setCameraDistance(std::max(extents.x, extents.y) * .5f);
+    if (boundingBoxChanged)
+        setCameraDistance(std::max(extents.x, extents.y) * .5f);
 
     auto sendResult = send(Messages::RemoteDDMesh::Update(descriptor));
     UNUSED_PARAM(sendResult);
-    setEntityTransform(buildTranslation(-center.x, -center.y, -center.z));
+    if (boundingBoxChanged)
+        setEntityTransform(buildTranslation(-center.x, -center.y, -center.z));
 #else
     UNUSED_PARAM(descriptor);
 #endif
@@ -197,6 +202,9 @@ std::pair<simd_float4, simd_float4> RemoteDDMeshProxy::getCenterAndExtents() con
 
 void RemoteDDMeshProxy::setEntityTransform(const WebCore::DDModel::DDFloat4x4& transform)
 {
+    if (m_transform && *m_transform == transform)
+        return;
+
     m_transform = transform;
 #if ENABLE(GPU_PROCESS_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::UpdateTransform(transform));
