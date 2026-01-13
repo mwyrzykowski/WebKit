@@ -94,6 +94,7 @@ private:
 #if ENABLE(GPU_PROCESS_MODEL)
     void setRotation(float yaw, float pitch, float roll) final;
 #endif
+    void setEnvironmentMap(const WebCore::DDModel::DDImageAsset&) final;
 
     const DDModelIdentifier m_backing;
     const Ref<ConvertToBackingContext> m_convertToBackingContext;

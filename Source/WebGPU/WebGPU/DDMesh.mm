@@ -200,6 +200,15 @@ void DDMesh::setCameraDistance(float distance)
 #endif
 }
 
+void DDMesh::setEnvironmentMap(DDBridgeImageAsset *imageAsset)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    [m_ddReceiver setEnvironmentMap:imageAsset];
+#else
+    UNUSED_PARAM(imageAsset);
+#endif
+}
+
 void DDMesh::play(bool play)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
@@ -246,6 +255,11 @@ WGPU_EXPORT void wgpuDDMeshTextureUpdate(WGPUDDMesh mesh, id desc)
 WGPU_EXPORT void wgpuDDMeshMaterialUpdate(WGPUDDMesh mesh, id desc)
 {
     WebGPU::protectedFromAPI(mesh)->updateMaterial(desc);
+}
+
+WGPU_EXPORT void wgpuDDMeshSetEnvironmentMap(WGPUDDMesh mesh, id image)
+{
+    WebGPU::protectedFromAPI(mesh)->setEnvironmentMap(image);
 }
 
 WGPU_EXPORT void wgpuDDMeshSetCameraDistance(WGPUDDMesh mesh, float distance)

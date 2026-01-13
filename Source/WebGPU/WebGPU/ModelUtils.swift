@@ -25,9 +25,8 @@
 
 import DirectResource
 import Metal
-@_spi(RealityCoreRendererAPI) import RealityCoreRenderer
-import RealityKit
-@_spi(SGInternal) import ShaderGraph
+@_spi(RealityCoreRendererAPI) import RealityKit
+@_spi(SGInternal) import RealityKit
 internal import WebGPU_Private.DDModelTypes
 @_spi(UsdLoaderAPI) import _USDStageKit_SwiftUI
 
@@ -107,6 +106,21 @@ extension _Proto_LowLevelMeshResource_v1 {
 }
 
 extension _Proto_LowLevelTextureResource_v1.Descriptor {
+    static func from(_ textureDescriptor: MTLTextureDescriptor) -> _Proto_LowLevelTextureResource_v1.Descriptor {
+        var descriptor = _Proto_LowLevelTextureResource_v1.Descriptor()
+        descriptor.width = textureDescriptor.width
+        descriptor.height = textureDescriptor.height
+        descriptor.depth = textureDescriptor.depth
+        descriptor.mipmapLevelCount = textureDescriptor.mipmapLevelCount
+        descriptor.arrayLength = textureDescriptor.arrayLength
+        descriptor.pixelFormat = textureDescriptor.pixelFormat
+        descriptor.textureType = textureDescriptor.textureType
+        descriptor.textureUsage = textureDescriptor.usage
+        descriptor.swizzle = textureDescriptor.swizzle
+
+        return descriptor
+    }
+
     static func from(_ texture: MTLTexture, swizzle: MTLTextureSwizzleChannels) -> _Proto_LowLevelTextureResource_v1.Descriptor {
         var descriptor = _Proto_LowLevelTextureResource_v1.Descriptor()
         descriptor.width = texture.width

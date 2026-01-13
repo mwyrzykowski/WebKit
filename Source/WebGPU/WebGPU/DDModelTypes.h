@@ -382,6 +382,7 @@ NS_SWIFT_SENDABLE
 - (void)setTransform:(simd_float4x4)transform;
 - (void)setCameraDistance:(float)distance;
 - (void)setPlaying:(BOOL)play;
+- (void)setEnvironmentMap:(DDBridgeImageAsset *)imageAsset;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (nullable instancetype)initWithConfiguration:(DDUSDConfiguration *)configuration diffuseAsset:(DDBridgeImageAsset *)diffuseAsset specularAsset:(DDBridgeImageAsset *)specularAsset error:(NSError **)error NS_DESIGNATED_INITIALIZER;

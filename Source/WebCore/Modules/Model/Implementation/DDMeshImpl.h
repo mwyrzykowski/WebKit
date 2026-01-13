@@ -78,6 +78,7 @@ private:
     std::optional<DDFloat4x4> entityTransform() const final;
     void setCameraDistance(float) final;
     void play(bool) final;
+    void setEnvironmentMap(const WebCore::DDModel::DDImageAsset&) final;
 
     void render() final;
 

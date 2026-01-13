@@ -25,7 +25,6 @@ import Metal
 internal import WebGPU_Private.DDModelTypes
 
 #if canImport(RealityCoreRenderer, _version: 9999)
-@_spi(RealityCoreRendererAPI) @_spi(ShaderGraph) import RealityCoreRenderer
 @_spi(RealityCoreRendererAPI) @_spi(ShaderGraph) import RealityKit
 @_spi(UsdLoaderAPI) import _USDStageKit_SwiftUI
 @_spi(SwiftAPI) import DirectResource

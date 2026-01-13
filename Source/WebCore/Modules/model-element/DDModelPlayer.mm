@@ -47,6 +47,10 @@
 #import <WebGPU/DDModelTypes.h>
 #import <wtf/RetainPtr.h>
 
+#if PLATFORM(COCOA)
+#import <Metal/Metal.h>
+#endif
+
 namespace WebCore {
 
 class ModelDisplayBufferDisplayDelegate final : public GraphicsLayerContentsDisplayDelegate {
@@ -221,6 +225,12 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
                 auto [simdCenter, simdExtents] = model->getCenterAndExtents();
                 client->didUpdateBoundingBox(protectedThis.get(), FloatPoint3D(simdCenter.x, simdCenter.y, simdCenter.z), FloatPoint3D(simdExtents.x, simdExtents.y, simdExtents.z));
                 protectedThis->notifyEntityTransformUpdated();
+
+                auto environmentMap = protectedThis->m_environmentMap;
+                if (model && environmentMap) {
+                    model->setEnvironmentMap(*environmentMap);
+                    protectedThis->m_environmentMap = std::nullopt;
+                }
             }
         });
     } textureUpdatedCallback:^(DDBridgeUpdateTexture *updateTexture) {
@@ -497,6 +507,103 @@ void DDModelPlayer::setEntityTransform(TransformationMatrix matrix)
         model->setEntityTransform(static_cast<simd_float4x4>(matrix));
         notifyEntityTransformUpdated();
     }
+}
+
+static MTLPixelFormat computePixelFormat(size_t bytesPerComponent, size_t channelCount)
+{
+    switch (bytesPerComponent) {
+    default:
+    case 1:
+        switch (channelCount) {
+        case 1:
+            return MTLPixelFormatR8Unorm;
+        case 2:
+            return MTLPixelFormatRG8Unorm;
+        case 3:
+            return MTLPixelFormatRGB8Unorm;
+        case 4:
+        default:
+            return MTLPixelFormatRGBA8Unorm;
+        }
+    case 2:
+        switch (channelCount) {
+        case 1:
+            return MTLPixelFormatR16Float;
+        case 2:
+            return MTLPixelFormatRG16Float;
+        case 3:
+            return MTLPixelFormatRGB16Float;
+        case 4:
+        default:
+            return MTLPixelFormatRGBA16Float;
+        }
+    case 4:
+        switch (channelCount) {
+        case 1:
+            return MTLPixelFormatR32Float;
+        case 2:
+            return MTLPixelFormatRG32Float;
+        case 3:
+            return MTLPixelFormatRGB32Float;
+        case 4:
+        default:
+            return MTLPixelFormatRGBA32Float;
+        }
+    }
+
+    RELEASE_ASSERT_NOT_REACHED();
+}
+
+static std::optional<WebCore::DDModel::DDImageAsset> loadIBL(Ref<WebCore::SharedBuffer>&& data)
+{
+    RetainPtr imageAssetData = data->createNSData();
+    RetainPtr imageSource = adoptCF(CGImageSourceCreateWithData((CFDataRef)imageAssetData.get(), nullptr));
+    RetainPtr platformImage = adoptCF(CGImageSourceCreateImageAtIndex(imageSource.get(), 0, nullptr));
+    if (!platformImage.get()) {
+        ASSERT_NOT_REACHED();
+        return std::nullopt;
+    }
+
+    RetainPtr pixelDataCfData = adoptCF(CGDataProviderCopyData(CGImageGetDataProvider(platformImage.get())));
+    auto byteSpan = span(pixelDataCfData.get());
+
+    auto width = CGImageGetWidth(platformImage.get());
+    auto height = CGImageGetHeight(platformImage.get());
+    auto bytesPerPixel = static_cast<size_t>(byteSpan.size() / (width * height));
+    auto bytesPerComponent = CGImageGetBitsPerComponent(platformImage.get()) / 8;
+
+    MTLPixelFormat pixelFormat = computePixelFormat(bytesPerComponent, bytesPerPixel / bytesPerComponent);
+
+    return WebCore::DDModel::DDImageAsset {
+        .data = Vector<uint8_t> { byteSpan },
+        .width = static_cast<long>(width),
+        .height = static_cast<long>(height),
+        .depth = 1,
+        .bytesPerPixel = static_cast<long>(bytesPerPixel),
+        .textureType = MTLTextureType2D,
+        .pixelFormat = pixelFormat,
+        .mipmapLevelCount = 1,
+        .arrayLength = 1,
+        .textureUsage = MTLTextureUsageShaderRead,
+        .swizzle = WebCore::DDModel::DDImageAssetSwizzle {
+            .red = MTLTextureSwizzleRed,
+            .green = MTLTextureSwizzleGreen,
+            .blue = MTLTextureSwizzleBlue,
+            .alpha = MTLTextureSwizzleAlpha
+        }
+    };
+}
+
+void DDModelPlayer::setEnvironmentMap(Ref<WebCore::SharedBuffer>&& data)
+{
+    m_environmentMap = loadIBL(WTF::move(data));
+    if (RefPtr currentModel = m_currentModel; currentModel && m_didFinishLoading) {
+        currentModel->setEnvironmentMap(*m_environmentMap);
+        m_environmentMap = std::nullopt;
+    }
+
+    if (RefPtr client = m_client.get())
+        client->didFinishEnvironmentMapLoading(*this, !!m_environmentMap);
 }
 
 } // namespace WebCore

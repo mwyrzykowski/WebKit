@@ -220,6 +220,14 @@ void RemoteDDMeshProxy::play(bool playing)
 #endif
 }
 
+void RemoteDDMeshProxy::setEnvironmentMap(const WebCore::DDModel::DDImageAsset& imageAsset)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::SetEnvironmentMap(imageAsset));
+    UNUSED_PARAM(sendResult);
+#endif
+}
+
 std::optional<WebCore::DDModel::DDFloat4x4> RemoteDDMeshProxy::entityTransform() const
 {
     return m_transform;

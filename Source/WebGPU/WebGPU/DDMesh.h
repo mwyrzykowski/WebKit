@@ -36,6 +36,7 @@ typedef struct CF_BRIDGED_TYPE(id) __CVBuffer* CVPixelBufferRef;
 struct WGPUDDMeshImpl {
 };
 
+@class DDBridgeImageAsset;
 @class DDBridgeReceiver;
 @class DDBridgeUpdateMaterial;
 @class DDBridgeUpdateMesh;
@@ -69,6 +70,7 @@ public:
     void render() const;
     void setTransform(const simd_float4x4&);
     void setCameraDistance(float);
+    void setEnvironmentMap(DDBridgeImageAsset *);
 
 private:
     DDMesh(const WGPUDDCreateMeshDescriptor&, Instance&);
