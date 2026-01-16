@@ -24,9 +24,7 @@
  */
 #pragma once
 
-#import <wtf/Platform.h>
-
-#if ENABLE(WEBGPU_SWIFT)
+#if defined(ENABLE_WEBGPU_SWIFT) && ENABLE_WEBGPU_SWIFT
 
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
