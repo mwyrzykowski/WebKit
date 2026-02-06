@@ -32,13 +32,12 @@
 #include "RemoteMeshMessages.h"
 #include <WebCore/StageModeOperations.h>
 #include <WebCore/TransformationMatrix.h>
-#include <WebCore/WebModel.h>
 #include <wtf/TZoneMallocInlines.h>
 
 #if ENABLE(GPU_PROCESS_MODEL)
-#include <WebGPU/Float3.h>
-#include <WebGPU/Float4x4.h>
-#include <WebGPU/ModelTypes.h>
+#include "Float3.h"
+#include "Float4x4.h"
+#include "ModelTypes.h"
 #endif
 
 namespace WebKit {

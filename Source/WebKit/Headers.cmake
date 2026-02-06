@@ -150,3 +150,8 @@ set(WebKit_PUBLIC_FRAMEWORK_HEADERS
     WebProcess/InjectedBundle/API/c/WKBundleRangeHandlePrivate.h
     WebProcess/InjectedBundle/API/c/WKBundleScriptWorld.h
 )
+
+set(WebKit_PRIVATE_FRAMEWORK_HEADERS
+    GPUProcess/graphics/Model/Float3.h
+    GPUProcess/graphics/Model/Float4x4.h
+)

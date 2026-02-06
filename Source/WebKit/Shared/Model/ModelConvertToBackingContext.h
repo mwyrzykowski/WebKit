@@ -30,20 +30,14 @@
 #include "WebModelIdentifier.h"
 #include <wtf/RefCounted.h>
 
-namespace WebCore {
-class Mesh;
-struct ObjectDescriptorBase;
-}
-
 namespace WebKit {
-
-struct ObjectDescriptorBase;
+class Mesh;
 
 class ModelConvertToBackingContext : public RefCounted<ModelConvertToBackingContext> {
 public:
     virtual ~ModelConvertToBackingContext() = default;
 
-    virtual WebModelIdentifier convertToBacking(const WebCore::Mesh&) = 0;
+    virtual WebModelIdentifier convertToBacking(const WebKit::Mesh&) = 0;
 };
 
 }

@@ -27,6 +27,7 @@
 
 #import <wtf/Platform.h>
 
+#import "ModelTypes.h" // NOLINT
 #import "UIWindowScene+Extras.h"
 #import "WKMaterialHostingSupport.h"
 #import "WKMouseDeviceObserver.h"

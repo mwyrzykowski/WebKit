@@ -28,7 +28,6 @@
 
 #if HAVE(WEBGPU_IMPLEMENTATION)
 
-#include "ModelConvertToBackingContext.h"
 #include "WebGPUAdapterImpl.h"
 #include "WebGPUCompositorIntegrationImpl.h"
 #include "WebGPUDowncastConvertToBackingContext.h"
@@ -45,10 +44,9 @@ namespace WebCore::WebGPU {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(GPUImpl);
 
-GPUImpl::GPUImpl(WebGPUPtr<WGPUInstance>&& instance, ConvertToBackingContext& convertToBackingContext, ModelConvertToBackingContext& modelConvertToBackingContext)
+GPUImpl::GPUImpl(WebGPUPtr<WGPUInstance>&& instance, ConvertToBackingContext& convertToBackingContext)
     : m_backing(WTF::move(instance))
     , m_convertToBackingContext(convertToBackingContext)
-    , m_modelConvertToBackingContext(modelConvertToBackingContext)
 {
 }
 

@@ -30,21 +30,13 @@
 #include "WebModelIdentifier.h"
 #include <wtf/RefCounted.h>
 
-namespace WebCore {
-
-class Mesh;
-struct ObjectDescriptorBase;
-
-}
-
 namespace WebKit {
-
-struct ObjectDescriptorBase;
+class Mesh;
 
 class ModelConvertFromBackingContext {
 public:
     virtual ~ModelConvertFromBackingContext() = default;
-    virtual WeakPtr<WebCore::Mesh> convertMeshFromBacking(WebModelIdentifier) = 0;
+    virtual WeakPtr<WebKit::Mesh> convertMeshFromBacking(WebModelIdentifier) = 0;
 };
 
 }

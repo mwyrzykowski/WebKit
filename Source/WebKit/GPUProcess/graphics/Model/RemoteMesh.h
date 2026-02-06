@@ -61,7 +61,7 @@ class ObjectHeap;
 class RemoteMesh final : public IPC::StreamMessageReceiver {
     WTF_MAKE_TZONE_ALLOCATED(RemoteMesh);
 public:
-    static Ref<RemoteMesh> create(GPUConnectionToWebProcess& gpuConnectionToWebProcess, RemoteGPU& gpu, WebCore::Mesh& mesh, ModelObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, WebModelIdentifier identifier)
+    static Ref<RemoteMesh> create(GPUConnectionToWebProcess& gpuConnectionToWebProcess, RemoteGPU& gpu, WebKit::Mesh& mesh, ModelObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, WebModelIdentifier identifier)
     {
         return adoptRef(*new RemoteMesh(gpuConnectionToWebProcess, gpu, mesh, objectHeap, WTF::move(streamConnection), identifier));
     }
@@ -75,14 +75,14 @@ public:
 private:
     friend class ModelObjectHeap;
 
-    RemoteMesh(GPUConnectionToWebProcess&, RemoteGPU&, WebCore::Mesh&, ModelObjectHeap&, Ref<IPC::StreamServerConnection>&&, WebModelIdentifier);
+    RemoteMesh(GPUConnectionToWebProcess&, RemoteGPU&, WebKit::Mesh&, ModelObjectHeap&, Ref<IPC::StreamServerConnection>&&, WebModelIdentifier);
 
     RemoteMesh(const RemoteMesh&) = delete;
     RemoteMesh(RemoteMesh&&) = delete;
     RemoteMesh& operator=(const RemoteMesh&) = delete;
     RemoteMesh& operator=(RemoteMesh&&) = delete;
 
-    WebCore::Mesh& backing() { return m_backing; }
+    WebKit::Mesh& backing() { return m_backing; }
 
     RefPtr<IPC::Connection> connection() const;
 
@@ -101,7 +101,7 @@ private:
 
     void render();
 
-    const Ref<WebCore::Mesh> m_backing;
+    const Ref<WebKit::Mesh> m_backing;
     WeakRef<ModelObjectHeap> m_objectHeap;
     const Ref<IPC::StreamServerConnection> m_streamConnection;
     const WebModelIdentifier m_identifier;

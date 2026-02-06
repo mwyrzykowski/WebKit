@@ -30,11 +30,11 @@
 
 #include "GPUConnectionToWebProcess.h"
 #include "Logging.h"
+#include "MeshImpl.h"
 #include "ModelObjectHeap.h"
+#include "ModelTypes.h"
 #include "RemoteMeshMessages.h"
 #include "StreamServerConnection.h"
-#include <WebCore/Mesh.h>
-#include <WebCore/WebModel.h>
 #include <wtf/TZoneMallocInlines.h>
 
 #define MESSAGE_CHECK(assertion) MESSAGE_CHECK_OPTIONAL_CONNECTION_BASE(assertion, connection())
@@ -43,7 +43,7 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteMesh);
 
-RemoteMesh::RemoteMesh(GPUConnectionToWebProcess& gpuConnectionToWebProcess, RemoteGPU& gpu, WebCore::Mesh& mesh, ModelObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, WebModelIdentifier identifier)
+RemoteMesh::RemoteMesh(GPUConnectionToWebProcess& gpuConnectionToWebProcess, RemoteGPU& gpu, WebKit::Mesh& mesh, ModelObjectHeap& objectHeap, Ref<IPC::StreamServerConnection>&& streamConnection, WebModelIdentifier identifier)
     : m_backing(mesh)
     , m_objectHeap(objectHeap)
     , m_streamConnection(WTF::move(streamConnection))

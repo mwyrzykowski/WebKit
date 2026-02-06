@@ -240,6 +240,15 @@
 		07FE63E82ED11D5900D5ED9E /* ClassStructPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 07FE63E72ED11D5900D5ED9E /* ClassStructPtr.h */; };
 		07FEBC9A2E035A8B004A6D5D /* WKMouseDeviceObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FEBC992E035950004A6D5D /* WKMouseDeviceObserver.swift */; };
 		0D4599052C86B00F00435F48 /* WKDigitalCredentialsPicker.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D9D28E72C81473B002CB4C7 /* WKDigitalCredentialsPicker.h */; };
+		0D653B3B2F3459210022454D /* Float3.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D653B322F3453C40022454D /* Float3.h */; };
+		0D653B3C2F34592B0022454D /* Float4x4.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D653B332F3453C40022454D /* Float4x4.h */; };
+		0D653B3D2F3459340022454D /* ModelTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D653B382F3453C40022454D /* ModelTypes.h */; };
+		0D653B3E2F34718F0022454D /* ModelBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B342F3453C40022454D /* ModelBridge.swift */; };
+		0D653B3F2F3471960022454D /* ModelIBLTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B352F3453C40022454D /* ModelIBLTextures.swift */; };
+		0D653B402F3471960022454D /* USDModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B3A2F3453C40022454D /* USDModel.swift */; };
+		0D653B412F3471960022454D /* ModelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B362F3453C40022454D /* ModelParameters.swift */; };
+		0D653B422F3471960022454D /* ModelRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B372F3453C40022454D /* ModelRenderer.swift */; };
+		0D653B432F3471960022454D /* ModelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D653B392F3453C40022454D /* ModelUtils.swift */; };
 		0D9649182E7489AF000F9CDA /* ModelDowncastConvertToBackingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D9649122E748610000F9CDA /* ModelDowncastConvertToBackingContext.h */; };
 		0DD656D42C8F0A4400278C3B /* DigitalCredentialsCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D20EA1C2C59E2F900CA61BD /* DigitalCredentialsCoordinator.h */; };
 		0E97D74D200E900400BF6643 /* SafeBrowsingSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E97D74C200E8FF300BF6643 /* SafeBrowsingSPI.h */; };
@@ -3497,6 +3506,23 @@
 		0D20EA1C2C59E2F900CA61BD /* DigitalCredentialsCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DigitalCredentialsCoordinator.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcfilelist; };
 		0D25BC912B69D92100916722 /* WebGPUInternalError.serialization.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = WebGPUInternalError.serialization.in; sourceTree = "<group>"; };
 		0D60CB352E8AFA4B00A3FF66 /* WebModelIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebModelIdentifier.h; sourceTree = "<group>"; };
+		0D653B242F3431D10022454D /* WebModelPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebModelPlayer.h; sourceTree = "<group>"; };
+		0D653B252F3431D10022454D /* WebModelPlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WebModelPlayer.mm; sourceTree = "<group>"; };
+		0D653B262F3434B90022454D /* ModelInlineConverters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModelInlineConverters.h; sourceTree = "<group>"; };
+		0D653B272F34371D0022454D /* Mesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
+		0D653B2E2F34517E0022454D /* MeshImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MeshImpl.h; sourceTree = "<group>"; };
+		0D653B2F2F34517E0022454D /* MeshImpl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MeshImpl.cpp; sourceTree = "<group>"; };
+		0D653B302F34517E0022454D /* WebKitMesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebKitMesh.h; sourceTree = "<group>"; };
+		0D653B312F34517E0022454D /* WebKitMesh.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WebKitMesh.mm; sourceTree = "<group>"; };
+		0D653B322F3453C40022454D /* Float3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Float3.h; sourceTree = "<group>"; };
+		0D653B332F3453C40022454D /* Float4x4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Float4x4.h; sourceTree = "<group>"; };
+		0D653B342F3453C40022454D /* ModelBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelBridge.swift; sourceTree = "<group>"; };
+		0D653B352F3453C40022454D /* ModelIBLTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelIBLTextures.swift; sourceTree = "<group>"; };
+		0D653B362F3453C40022454D /* ModelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelParameters.swift; sourceTree = "<group>"; };
+		0D653B372F3453C40022454D /* ModelRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRenderer.swift; sourceTree = "<group>"; };
+		0D653B382F3453C40022454D /* ModelTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModelTypes.h; sourceTree = "<group>"; };
+		0D653B392F3453C40022454D /* ModelUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUtils.swift; sourceTree = "<group>"; };
+		0D653B3A2F3453C40022454D /* USDModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDModel.swift; sourceTree = "<group>"; };
 		0D6D0AA32C6AD99B0073F63D /* RemoteXRView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteXRView.h; sourceTree = "<group>"; };
 		0D6D0AA42C6AD99B0073F63D /* RemoteXRView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteXRView.cpp; sourceTree = "<group>"; };
 		0D6D0AA52C6AD99B0073F63D /* RemoteXRView.messages.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = RemoteXRView.messages.in; sourceTree = "<group>"; };
@@ -9716,11 +9742,24 @@
 		0D078EB72E7387FA00A9B266 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0D653B322F3453C40022454D /* Float3.h */,
+				0D653B332F3453C40022454D /* Float4x4.h */,
+				0D653B2F2F34517E0022454D /* MeshImpl.cpp */,
+				0D653B2E2F34517E0022454D /* MeshImpl.h */,
+				0D653B342F3453C40022454D /* ModelBridge.swift */,
+				0D653B352F3453C40022454D /* ModelIBLTextures.swift */,
 				0D078EBB2E738BCD00A9B266 /* ModelObjectHeap.cpp */,
 				0D078EBA2E738BCD00A9B266 /* ModelObjectHeap.h */,
+				0D653B362F3453C40022454D /* ModelParameters.swift */,
+				0D653B372F3453C40022454D /* ModelRenderer.swift */,
+				0D653B382F3453C40022454D /* ModelTypes.h */,
+				0D653B392F3453C40022454D /* ModelUtils.swift */,
 				0D078EB52E7387FA00A9B266 /* RemoteMesh.cpp */,
 				0D078EB42E7387FA00A9B266 /* RemoteMesh.h */,
 				0D078EB62E7387FA00A9B266 /* RemoteMesh.messages.in */,
+				0D653B3A2F3453C40022454D /* USDModel.swift */,
+				0D653B302F34517E0022454D /* WebKitMesh.h */,
+				0D653B312F34517E0022454D /* WebKitMesh.mm */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -16116,6 +16155,8 @@
 				BC2B410B2732EF7500A2D191 /* mac */,
 				7177AD5C2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.h */,
 				7177AD5B2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.mm */,
+				0D653B272F34371D0022454D /* Mesh.h */,
+				0D653B262F3434B90022454D /* ModelInlineConverters.h */,
 				2DA8152F28A462B400CF811C /* ModelProcessConnection.cpp */,
 				2DA8153128A462B400CF811C /* ModelProcessConnection.h */,
 				2DA8153228A462B400CF811C /* ModelProcessConnection.messages.in */,
@@ -16128,6 +16169,8 @@
 				54BBB5F82B7C3FE200BF1A8A /* ModelProcessModelPlayerManager.h */,
 				52597BBB2DC4138600CAAF01 /* ModelProcessModelPlayerTransformState.cpp */,
 				52597BBA2DC4138600CAAF01 /* ModelProcessModelPlayerTransformState.h */,
+				0D653B242F3431D10022454D /* WebModelPlayer.h */,
+				0D653B252F3431D10022454D /* WebModelPlayer.mm */,
 				BC2B411B2732F66E00A2D191 /* WebModelPlayerProvider.cpp */,
 				BC2B411A2732F66E00A2D191 /* WebModelPlayerProvider.h */,
 			);
@@ -17975,6 +18018,8 @@
 				DD4DB789280F9471001700D4 /* FindNodes.js in Headers */,
 				0250C2512B5DCB2000D05C0B /* FindStringCallbackAggregator.h in Headers */,
 				D6C27CBC2EC275F600AA941F /* FindTextMatchesCallbackAggregator.h in Headers */,
+				0D653B3B2F3459210022454D /* Float3.h in Headers */,
+				0D653B3C2F34592B0022454D /* Float4x4.h in Headers */,
 				C59C4A5918B81174007BDCB6 /* FocusedElementInformation.h in Headers */,
 				DD4DB78A280F9471001700D4 /* FormElementClear.js in Headers */,
 				DD4DB78B280F9471001700D4 /* FormSubmit.js in Headers */,
@@ -18150,6 +18195,7 @@
 				07E0651B2F19E06500ECDA2E /* ModelProcessModelPlayerManagerProxy.h in Headers */,
 				07E065182F19E05700ECDA2E /* ModelProcessModelPlayerProxy.h in Headers */,
 				52597BBC2DC41A3200CAAF01 /* ModelProcessModelPlayerTransformState.h in Headers */,
+				0D653B3D2F3459340022454D /* ModelTypes.h in Headers */,
 				C0E3AA7C1209E83C00A49D01 /* Module.h in Headers */,
 				E539DFEB2A44A6A600769F09 /* MRUIKitSPI.h in Headers */,
 				2D50366B1BCDE17900E20BB3 /* NativeWebGestureEvent.h in Headers */,
@@ -21616,6 +21662,11 @@
 				E326F4DC2CA6C44F00182187 /* LogStream.mm in Sources */,
 				9B4790912531563200EC11AB /* MessageArgumentDescriptions.cpp in Sources */,
 				EBA8D3B627A5E33F00CB7900 /* MockPushServiceConnection.mm in Sources */,
+				0D653B3E2F34718F0022454D /* ModelBridge.swift in Sources */,
+				0D653B3F2F3471960022454D /* ModelIBLTextures.swift in Sources */,
+				0D653B412F3471960022454D /* ModelParameters.swift in Sources */,
+				0D653B422F3471960022454D /* ModelRenderer.swift in Sources */,
+				0D653B432F3471960022454D /* ModelUtils.swift in Sources */,
 				57B826452304F14000B72EB0 /* NearFieldSoftLink.mm in Sources */,
 				C1C1B30F2540F50D00D9100B /* NetworkConnectionToWebProcessMac.mm in Sources */,
 				41E242E026E0C908009A8C64 /* NetworkRTCUtilitiesCocoa.mm in Sources */,
@@ -21923,6 +21974,7 @@
 				FA580B4D2DA64B5F005E4965 /* UnifiedSource179.cpp in Sources */,
 				FA580B3B2DA64B5F005E4965 /* UnifiedSource180.cpp in Sources */,
 				078B04442CF1149200B453A6 /* URLSchemeHandler.swift in Sources */,
+				0D653B402F3471960022454D /* USDModel.swift in Sources */,
 				52CDC5C62731DA0D00A3E3EB /* VirtualAuthenticatorManager.cpp in Sources */,
 				52F4B46A27E1197700FFD129 /* VirtualAuthenticatorUtils.mm in Sources */,
 				5252A51A27E048740094BEB9 /* VirtualHidConnection.cpp in Sources */,

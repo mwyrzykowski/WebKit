@@ -71,6 +71,8 @@ NetworkProcess/webrtc/NetworkRTCUDPSocketCocoa.mm @nonARC
 GPUProcess/EntryPoint/Cocoa/XPCService/GPUServiceEntryPoint.mm @nonARC
 GPUProcess/cocoa/GPUConnectionToWebProcessCocoa.mm @nonARC
 GPUProcess/cocoa/GPUProcessCocoa.mm @nonARC
+GPUProcess/graphics/Model/MeshImpl.cpp
+GPUProcess/graphics/Model/WebKitMesh.mm
 GPUProcess/graphics/RemoteGraphicsContextGLCocoa.cpp
 GPUProcess/graphics/ScopedRenderingResourcesRequestCocoa.mm @nonARC @no-unify
 GPUProcess/ios/GPUProcessIOS.mm @nonARC
@@ -247,6 +249,7 @@ Shared/RemoteLayerTree/RemoteLayerTreeTransaction.mm @nonARC
 Shared/RemoteLayerTree/RemoteScrollingCoordinatorTransaction.cpp
 Shared/RemoteLayerTree/RemoteScrollingUIState.cpp
 
+WebProcess/Model/WebModelPlayer.mm
 WebProcess/GPU/webrtc/SharedVideoFrame.cpp
 
 UIProcess/_WKWebViewPrintFormatter.mm @nonARC

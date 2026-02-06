@@ -107,11 +107,6 @@ module WebGPU_Internal [system] {
         export *
     }
 
-    explicit module Mesh {
-        header "../Mesh.h"
-        export *
-    }
-
     explicit module PipelineLayout {
         header "../PipelineLayout.h"
         export *

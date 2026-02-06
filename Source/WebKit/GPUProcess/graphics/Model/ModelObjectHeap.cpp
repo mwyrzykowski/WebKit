@@ -31,7 +31,7 @@
 #include "RemoteMesh.h"
 #include <wtf/TZoneMallocInlines.h>
 
-#include <WebCore/Mesh.h>
+#include "Mesh.h"
 
 namespace WebKit {
 
@@ -66,7 +66,7 @@ void ModelObjectHeap::clear()
     m_objects.clear();
 }
 
-WeakPtr<WebCore::Mesh> ModelObjectHeap::convertMeshFromBacking(WebModelIdentifier identifier)
+WeakPtr<WebKit::Mesh> ModelObjectHeap::convertMeshFromBacking(WebModelIdentifier identifier)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
     auto iterator = m_objects.find(identifier);
@@ -77,24 +77,6 @@ WeakPtr<WebCore::Mesh> ModelObjectHeap::convertMeshFromBacking(WebModelIdentifie
     UNUSED_PARAM(identifier);
     return nullptr;
 #endif
-}
-
-ModelObjectHeap::ExistsAndValid ModelObjectHeap::objectExistsAndValid(const WebCore::WebGPU::GPU& gpu, WebModelIdentifier identifier) const
-{
-    ExistsAndValid result;
-    auto it = m_objects.find(identifier);
-    if (it == m_objects.end())
-        return result;
-
-    result.exists = true;
-    result.valid = WTF::switchOn(it->value, [&](std::monostate) -> bool {
-        return false;
-    },
-    [&](auto&) -> bool {
-        return true;
-    });
-
-    return result;
 }
 
 }

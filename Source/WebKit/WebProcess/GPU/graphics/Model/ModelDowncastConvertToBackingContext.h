@@ -31,11 +31,9 @@
 #include "WebModelIdentifier.h"
 #include <wtf/TZoneMalloc.h>
 
-namespace WebCore {
-class Mesh;
-}
-
 namespace WebKit {
+
+class Mesh;
 
 class ModelDowncastConvertToBackingContext final : public ModelConvertToBackingContext {
     WTF_MAKE_TZONE_ALLOCATED(ModelDowncastConvertToBackingContext);
@@ -47,7 +45,7 @@ public:
 
     virtual ~ModelDowncastConvertToBackingContext() = default;
 
-    WebModelIdentifier convertToBacking(const WebCore::Mesh&) final;
+    WebModelIdentifier convertToBacking(const Mesh&) final;
 
 private:
     ModelDowncastConvertToBackingContext() = default;

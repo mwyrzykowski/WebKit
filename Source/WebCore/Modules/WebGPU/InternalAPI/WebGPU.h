@@ -41,6 +41,9 @@ namespace WebCore {
 class NativeImage;
 class IntSize;
 class GraphicsContext;
+}
+
+namespace WebKit {
 class Mesh;
 }
 
@@ -82,10 +85,9 @@ struct PresentationContextDescriptor;
 
 class GPU : public AbstractRefCounted {
 public:
-    virtual ~GPU() = default;
+    WEBCORE_EXPORT virtual ~GPU() = default;
 
     virtual void requestAdapter(const RequestAdapterOptions&, CompletionHandler<void(RefPtr<Adapter>&&)>&&) = 0;
-    virtual RefPtr<WebCore::Mesh> createModelBacking(unsigned width, unsigned height, const WebModel::ImageAsset& diffuseTexture, const WebModel::ImageAsset& specularTexture, CompletionHandler<void(Vector<MachSendRight>&&)>&&) = 0;
 
     virtual RefPtr<PresentationContext> createPresentationContext(const PresentationContextDescriptor&) = 0;
 

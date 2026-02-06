@@ -25,7 +25,6 @@
 
 #pragma once
 
-#import <WebGPU/ModelTypes.h>
 #import <WebGPU/WebGPU.h>
 #import <WebGPU/WebGPUExt.h>
 #import <wtf/CompletionHandler.h>
@@ -82,7 +81,6 @@ public:
     using WorkItem = Function<void()>;
     void scheduleWork(WorkItem&&);
     const std::optional<const MachSendRight>& webProcessID() const;
-    Ref<WebModel::Mesh> createModelBacking(const WebModelCreateMeshDescriptor&);
     id<MTLDevice> device() const;
 
 private:

@@ -33,6 +33,7 @@
 #include "CommonAtomStrings.h"
 #include "ContextDestructionObserverInlines.h"
 #include "Document.h"
+#include "DocumentPage.h"
 #include "ExceptionCode.h"
 #include "FileReaderLoader.h"
 #include "GraphicsContext.h"

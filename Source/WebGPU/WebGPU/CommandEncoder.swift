@@ -31,6 +31,8 @@ internal import WebGPU_Internal.QuerySet
 internal import WebGPU_Internal.TextureOrTextureView
 public import WebGPU_Private.WebGPU
 
+typealias String = Swift.String
+
 // FIXME: Eventually all these "thunks" should be removed.
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 public func clearBuffer(

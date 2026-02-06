@@ -35,7 +35,7 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(ModelDowncastConvertToBackingContext);
 
-WebModelIdentifier ModelDowncastConvertToBackingContext::convertToBacking(const WebCore::Mesh& mesh)
+WebModelIdentifier ModelDowncastConvertToBackingContext::convertToBacking(const Mesh& mesh)
 {
     return downcast<RemoteMeshProxy>(mesh).backing();
 }

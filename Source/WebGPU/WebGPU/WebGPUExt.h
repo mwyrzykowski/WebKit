@@ -100,9 +100,6 @@ WGPU_EXPORT WGPUTexture wgpuSwapChainGetCurrentTexture(WGPUSwapChain swapChain, 
 
 WGPU_EXPORT WGPUExternalTexture wgpuDeviceImportExternalTexture(WGPUDevice device, const WGPUExternalTextureDescriptor* descriptor);
 
-WGPU_EXPORT void webModelMeshReference(WebMesh mesh);
-WGPU_EXPORT void webModelMeshRelease(WebMesh mesh);
-
 WGPU_EXPORT void wgpuDeviceSetDeviceLostCallback(WGPUDevice device, WGPUDeviceLostCallback callback, void* userdata);
 WGPU_EXPORT void wgpuDeviceSetDeviceLostCallbackWithBlock(WGPUDevice device, WGPUDeviceLostBlockCallback callback);
 WGPU_EXPORT void wgpuExternalTextureReference(WGPUExternalTexture externalTexture);

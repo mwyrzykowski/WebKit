@@ -30,7 +30,6 @@
 #include "ModelConvertFromBackingContext.h"
 #include "ScopedActiveMessageReceiveQueue.h"
 #include "WebModelIdentifier.h"
-#include <WebCore/WebGPU.h>
 #include <functional>
 #include <wtf/HashMap.h>
 #include <wtf/Ref.h>
@@ -42,6 +41,7 @@ class Mesh;
 }
 
 namespace WebKit {
+class Mesh;
 class RemoteMesh;
 }
 
@@ -63,13 +63,12 @@ public:
 
     void clear();
 
-    WeakPtr<WebCore::Mesh> convertMeshFromBacking(WebModelIdentifier) final;
+    WeakPtr<WebKit::Mesh> convertMeshFromBacking(WebModelIdentifier) final;
 
     struct ExistsAndValid {
         bool exists { false };
         bool valid { false };
     };
-    ExistsAndValid objectExistsAndValid(const WebCore::WebGPU::GPU&, WebModelIdentifier) const;
 private:
     ModelObjectHeap();
 

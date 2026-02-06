@@ -36,7 +36,6 @@
 #import "Device.h"
 #import "ExternalTexture.h"
 #import "Instance.h"
-#import "Mesh.h"
 #import "PipelineLayout.h"
 #import "PresentationContext.h"
 #import "QuerySet.h"
@@ -204,16 +203,6 @@ inline XRView& fromAPI(WGPUXRView view)
 inline String fromAPI(const char* string)
 {
     return String::fromUTF8(string);
-}
-
-inline WebModel::Mesh& fromAPI(WebMesh mesh)
-{
-    return static_cast<WebModel::Mesh&>(*mesh);
-}
-
-inline Ref<WebModel::Mesh> protectedFromAPI(WebMesh mesh)
-{
-    return static_cast<WebModel::Mesh&>(*mesh);
 }
 
 inline Ref<Adapter> protectedFromAPI(WGPUAdapter adapter)

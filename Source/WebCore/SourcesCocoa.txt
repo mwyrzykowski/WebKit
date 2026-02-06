@@ -81,7 +81,6 @@ JSSpeechSynthesisErrorCode.cpp
 JSSpeechSynthesisErrorEvent.cpp
 JSSpeechSynthesisErrorEventInit.cpp
 JSSpeechSynthesisEventInit.cpp
-Modules/Model/Implementation/MeshImpl.cpp
 Modules/ShapeDetection/Implementation/Cocoa/BarcodeDetectorImplementation.mm @nonARC
 Modules/ShapeDetection/Implementation/Cocoa/FaceDetectorImplementation.mm @nonARC
 Modules/ShapeDetection/Implementation/Cocoa/TextDetectorImplementation.mm @nonARC
@@ -122,7 +121,6 @@ Modules/async-clipboard/mac/ClipboardImageReaderMac.mm @nonARC
 Modules/compression/cocoa/CompressionStreamEncoderCocoa.mm @nonARC
 Modules/compression/cocoa/DecompressionStreamDecoderCocoa.mm @nonARC
 Modules/mediastream/RTCRtpSFrameTransformerCocoa.cpp
-Modules/model-element/WebModelPlayer.mm
 Modules/model-element/scenekit/SceneKitModel.mm @nonARC
 Modules/model-element/scenekit/SceneKitModelLoader.mm @nonARC
 Modules/model-element/scenekit/SceneKitModelLoaderClient.mm @nonARC

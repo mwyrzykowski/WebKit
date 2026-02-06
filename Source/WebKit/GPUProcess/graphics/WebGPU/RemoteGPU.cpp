@@ -30,6 +30,7 @@
 
 #include "GPUConnectionToWebProcess.h"
 #include "Logging.h"
+#include "MeshImpl.h"
 #include "ModelObjectHeap.h"
 #include "RemoteAdapter.h"
 #include "RemoteCompositorIntegration.h"
@@ -41,7 +42,6 @@
 #include "StreamServerConnection.h"
 #include "WebGPUObjectHeap.h"
 #include <WebCore/GraphicsContext.h>
-#include <WebCore/Mesh.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/RenderingResourceIdentifier.h>
 #include <WebCore/WebGPU.h>
@@ -53,6 +53,11 @@
 #if HAVE(WEBGPU_IMPLEMENTATION)
 #include <WebCore/ProcessIdentity.h>
 #include <WebCore/WebGPUCreateImpl.h>
+#endif
+
+#if ENABLE(GPU_PROCESS_MODEL)
+#include "ModelTypes.h"
+#include "WebKitMesh.h"
 #endif
 
 #define MESSAGE_CHECK(assertion) MESSAGE_CHECK_BASE(assertion, m_streamConnection)
@@ -264,19 +269,65 @@ void RemoteGPU::paintNativeImageToImageBuffer(WebCore::NativeImage& nativeImage,
     semaphore.wait();
 }
 
+
+#if ENABLE(GPU_PROCESS_MODEL)
+static Vector<UniqueRef<WebCore::IOSurface>> createIOSurfaces(unsigned width, unsigned height)
+{
+    const auto colorFormat = WebCore::IOSurface::Format::BGRA;
+    const auto colorSpace = WebCore::DestinationColorSpace::LinearDisplayP3();
+
+    Vector<UniqueRef<WebCore::IOSurface>> ioSurfaces;
+
+    constexpr auto surfaceCount = 3;
+    for (auto i = 0; i < surfaceCount; ++i) {
+        if (auto buffer = WebCore::IOSurface::create(nullptr, WebCore::IntSize(width, height), colorSpace, WebCore::IOSurface::Name::WebGPU, colorFormat))
+            ioSurfaces.append(makeUniqueRefFromNonNullUniquePtr(WTF::move(buffer)));
+    }
+
+    return ioSurfaces;
+}
+#endif
+
+#if ENABLE(GPU_PROCESS_MODEL)
+static RefPtr<WebKit::Mesh> createModelBackingInternal(unsigned width, unsigned height, const WebModel::ImageAsset& diffuseTexture, const WebModel::ImageAsset& specularTexture, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
+{
+    auto ioSurfaceVector = createIOSurfaces(width, height);
+    Vector<RetainPtr<IOSurfaceRef>> ioSurfaces;
+    for (UniqueRef<WebCore::IOSurface>& ioSurface : ioSurfaceVector)
+        ioSurfaces.append(ioSurface->surface());
+
+    WebModelCreateMeshDescriptor backingDescriptor {
+        .width = width,
+        .height = height,
+        .ioSurfaces = WTF::move(ioSurfaces),
+        .diffuseTexture = diffuseTexture,
+        .specularTexture = specularTexture,
+    };
+
+    auto mesh = WebKit::MeshImpl::create(WebMesh::create(backingDescriptor), WTF::move(ioSurfaceVector));
+    callback(mesh->ioSurfaceHandles());
+    return mesh;
+}
+#endif
+
 void RemoteGPU::createModelBacking(unsigned width, unsigned height, const WebModel::ImageAsset& diffuseTexture, const WebModel::ImageAsset& specularTexture, WebModelIdentifier identifier, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
 {
+#if ENABLE(GPU_PROCESS_MODEL)
     assertIsCurrent(workQueue());
 
     Ref objectHeap = m_modelObjectHeap.get();
 
     RefPtr gpu = m_backing.get();
-    auto mesh = gpu->createModelBacking(width, height, diffuseTexture, specularTexture, WTF::move(callback));
-#if ENABLE(GPU_PROCESS_MODEL)
+    auto mesh = createModelBackingInternal(width, height, diffuseTexture, specularTexture, WTF::move(callback));
     auto remoteMesh = RemoteMesh::create(*m_gpuConnectionToWebProcess.get(), *this, *mesh, objectHeap, Ref { *m_streamConnection }, identifier);
     objectHeap->addObject(identifier, remoteMesh);
 #else
-    UNUSED_PARAM(mesh);
+    UNUSED_PARAM(width);
+    UNUSED_PARAM(height);
+    UNUSED_PARAM(diffuseTexture);
+    UNUSED_PARAM(specularTexture);
+    UNUSED_PARAM(identifier);
+    UNUSED_PARAM(callback);
 #endif
 }
 

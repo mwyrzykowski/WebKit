@@ -1,10 +1,4 @@
 set(WebCore_PRIVATE_FRAMEWORK_HEADERS
-    Modules/Model/Implementation/MeshImpl.h
-
-    Modules/Model/InternalAPI/Mesh.h
-    Modules/Model/InternalAPI/WebModel.h
-    Modules/Model/InternalAPI/WebModel.serialization.in
-
     Modules/ShapeDetection/Interfaces/BarcodeDetectorInterface.h
     Modules/ShapeDetection/Interfaces/BarcodeDetectorOptionsInterface.h
     Modules/ShapeDetection/Interfaces/BarcodeFormatInterface.h
@@ -622,7 +616,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/mediastream/UserMediaRequest.h
     Modules/mediastream/libwebrtc/LibWebRTCUtils.h
 
-    Modules/model-element/WebModelPlayer.h
     Modules/model-element/HTMLModelElement.h
     Modules/model-element/HTMLModelElementCamera.h
     Modules/model-element/ModelPlayer.h

@@ -63,6 +63,10 @@ class NativeImage;
 class VideoFrame;
 }
 
+namespace WebModel {
+struct ImageAsset;
+}
+
 namespace WebKit {
 
 class GPUConnectionToWebProcess;
