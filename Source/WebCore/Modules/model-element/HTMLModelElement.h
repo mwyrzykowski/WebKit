@@ -63,7 +63,7 @@ class LayoutPoint;
 class LayoutSize;
 class Model;
 class ModelPlayerProvider;
-class MouseEvent;
+class MouseRelatedEvent;
 
 template<typename IDLType> class DOMPromiseDeferred;
 template<typename IDLType> class DOMPromiseProxy;
@@ -265,11 +265,11 @@ private:
     void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree) override;
 
     void defaultEventHandler(Event&) final;
-    void dragDidStart(MouseEvent&);
-    void dragDidChange(MouseEvent&);
-    void dragDidEnd(MouseEvent&);
+    void dragDidStart(WebCore::MouseRelatedEvent&);
+    void dragDidChange(WebCore::MouseRelatedEvent&);
+    void dragDidEnd(WebCore::MouseRelatedEvent&);
 
-    LayoutPoint flippedLocationInElementForMouseEvent(MouseEvent&);
+    LayoutPoint flippedLocationInElementForMouseEvent(WebCore::MouseRelatedEvent&);
 
     void setAnimationIsPlaying(bool, DOMPromiseDeferred<void>&&);
 

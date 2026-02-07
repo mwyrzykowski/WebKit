@@ -91,6 +91,10 @@
 #include "DocumentImmersive.h"
 #endif
 
+#if ENABLE(TOUCH_EVENTS)
+#include <WebCore/TouchEvent.h>
+#endif
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -864,7 +868,25 @@ void HTMLModelElement::defaultEventHandler(Event& event)
         return;
 
     auto type = event.type();
-    if (type != eventNames().mousedownEvent && type != eventNames().mousemoveEvent && type != eventNames().mouseupEvent)
+    bool isMouseEvent = type == eventNames().mousedownEvent || type == eventNames().mousemoveEvent || type == eventNames().mouseupEvent;
+
+#if ENABLE(TOUCH_EVENTS)
+    bool isTouchEvent = type == eventNames().touchstartEvent || type == eventNames().touchmoveEvent || type == eventNames().touchendEvent;
+
+    if (isTouchEvent) {
+        auto& touchEvent = downcast<TouchEvent>(event);
+
+        if (type == eventNames().touchstartEvent && !m_isDragging && !event.defaultPrevented() && isInteractive())
+            dragDidStart(touchEvent);
+        else if (type == eventNames().touchmoveEvent && m_isDragging)
+            dragDidChange(touchEvent);
+        else if ((type == eventNames().touchendEvent || type == eventNames().touchcancelEvent) && m_isDragging)
+            dragDidEnd(touchEvent);
+        return;
+    }
+#endif
+
+    if (!isMouseEvent)
         return;
 
     auto& mouseEvent = downcast<MouseEvent>(event);
@@ -880,7 +902,7 @@ void HTMLModelElement::defaultEventHandler(Event& event)
         dragDidEnd(mouseEvent);
 }
 
-LayoutPoint HTMLModelElement::flippedLocationInElementForMouseEvent(MouseEvent& event)
+LayoutPoint HTMLModelElement::flippedLocationInElementForMouseEvent(WebCore::MouseRelatedEvent& event)
 {
     LayoutUnit flippedY { event.offsetY() };
     if (CheckedPtr renderModel = dynamicDowncast<RenderModel>(renderer()))
@@ -888,7 +910,7 @@ LayoutPoint HTMLModelElement::flippedLocationInElementForMouseEvent(MouseEvent& 
     return { LayoutUnit(event.offsetX()), flippedY };
 }
 
-void HTMLModelElement::dragDidStart(MouseEvent& event)
+void HTMLModelElement::dragDidStart(WebCore::MouseRelatedEvent& event)
 {
     ASSERT(!m_isDragging);
 
@@ -904,7 +926,7 @@ void HTMLModelElement::dragDidStart(MouseEvent& event)
         modelPlayer->handleMouseDown(flippedLocationInElementForMouseEvent(event), event.timeStamp());
 }
 
-void HTMLModelElement::dragDidChange(MouseEvent& event)
+void HTMLModelElement::dragDidChange(WebCore::MouseRelatedEvent& event)
 {
     ASSERT(m_isDragging);
 
@@ -914,7 +936,7 @@ void HTMLModelElement::dragDidChange(MouseEvent& event)
         modelPlayer->handleMouseMove(flippedLocationInElementForMouseEvent(event), event.timeStamp());
 }
 
-void HTMLModelElement::dragDidEnd(MouseEvent& event)
+void HTMLModelElement::dragDidEnd(WebCore::MouseRelatedEvent& event)
 {
     ASSERT(m_isDragging);
 
