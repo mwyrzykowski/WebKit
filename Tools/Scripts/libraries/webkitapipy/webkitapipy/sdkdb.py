@@ -424,13 +424,18 @@ class SDKDB:
                     '       group_concat(ew.input_file), '
                     '       sum(e.name IS NOT NULL AND '
                     '           ew.input_file IS NOT NULL) as export_found, '
+                    # Modified: For symbols, use GLOB matching; for others, use exact match
                     '       sum(a.name IS NOT NULL AND '
                     '           a.cond_id IS c.nextid AND '
                     '           (a.class_name = e.class_name IS NOT FALSE) AND '
-                    '           aw.input_file IS NOT NULL) as allow_found '
+                    '           aw.input_file IS NOT NULL AND '
+                    '           (a.kind != ? OR i.name GLOB a.name)) as allow_found '
                     'FROM imports AS i '
                     'LEFT JOIN exports AS e USING (name, kind) '
-                    'FULL JOIN allow AS a USING (name, kind) '
+                    # Modified: For symbols, use GLOB matching; for others, use exact match
+                    'FULL JOIN allow AS a ON (a.kind = i.kind AND '
+                    '                         (a.kind = ? AND i.name GLOB a.name OR '
+                    '                          a.kind != ? AND i.name = a.name)) '
                     # The `input_file` columns added by these joins will be
                     # NULL if the respective export or allowed declaration is
                     # not loaded (i.e. it's in the cache from some other
@@ -450,7 +455,8 @@ class SDKDB:
                     # The remaining logic to identify problem is done in Python below.
                     'GROUP BY i.kind, a.kind, i.name, a.name, i.input_file '
                     'HAVING export_found = 0 OR allow_found > 0 '
-                    'ORDER BY i.input_file, i.kind, a.kind, i.name, a.name')
+                    'ORDER BY i.input_file, i.kind, a.kind, i.name, a.name',
+                    (SYMBOL, SYMBOL, SYMBOL))  # Pass SYMBOL parameter three times
         for (arch, import_kind, input_path, import_name,
              allowed_kind, allowlist_paths, allowed_name, allow_unused,
              export_paths, export_found, allow_found) in cur.fetchall():
