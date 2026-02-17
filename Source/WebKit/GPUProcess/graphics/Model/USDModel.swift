@@ -810,7 +810,7 @@ private func makeMTLTextureFromImageAsset(
     let bytesPerRow = imageAsset.width * imageAsset.bytesPerPixel
     let bytesPerImage = bytesPerRow * imageAsset.height
 
-#if compiler(>=6.2)
+    #if compiler(>=6.2)
     unsafe imageAssetData.bytes.withUnsafeBytes { textureBytes in
         guard let textureBytesBaseAddress = textureBytes.baseAddress else {
             return
@@ -829,7 +829,7 @@ private func makeMTLTextureFromImageAsset(
             )
         }
     }
-#else
+    #else
     imageAssetData.bytes.withUnsafeBytes { textureBytes in
         guard let textureBytesBaseAddress = textureBytes.baseAddress else {
             return
@@ -848,7 +848,7 @@ private func makeMTLTextureFromImageAsset(
             )
         }
     }
-#endif
+    #endif
 
     return mtlTexture
 }
@@ -1453,7 +1453,8 @@ extension WKBridgeReceiver {
                     meshTransforms[identifier] = []
 
                     for (partIndex, _) in data.parts.enumerated() {
-                        let materialIdentifier = data.materialPrims[partIndex]
+                        let materialIdentifier =
+                            data.materialPrims.indices.contains(partIndex) ? data.materialPrims[partIndex] : data.materialPrims[0]
                         guard let material = materialsAndParams[materialIdentifier] else {
                             fatalError("Failed to get material instance \(materialIdentifier)")
                         }
