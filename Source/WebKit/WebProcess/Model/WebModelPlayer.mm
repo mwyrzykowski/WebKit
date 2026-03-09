@@ -129,6 +129,7 @@ WebModelPlayer::WebModelPlayer(WebCore::Page& page, WebCore::ModelPlayerClient& 
 : m_client { client }
 , m_id { WebCore::ModelPlayerIdentifier::generate() }
 , m_page(page)
+, m_serialQueue(dispatch_queue_create("USDStageKit-Serial-Dispatcher", DISPATCH_QUEUE_SERIAL))
 {
 }
 
@@ -293,44 +294,50 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
     m_modelLoader = adoptNS([allocWKBridgeModelLoaderInstance() init]);
     Ref protectedThis = Ref { *this };
     [m_modelLoader setCallbacksWithModelUpdatedCallback:^(WKBridgeUpdateMesh *updateRequest) {
-        ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<WebModelPlayer> protectedThis) {
-            RefPtr model = protectedThis->m_currentModel;
-            if (model) {
-                model->update(toCpp(updateRequest));
-                protectedThis->setStageMode(protectedThis->m_stageMode);
-            }
+        dispatch_async(m_serialQueue, ^{
+            ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<WebModelPlayer> protectedThis) {
+                RefPtr model = protectedThis->m_currentModel;
+                if (model) {
+                    model->update(toCpp(updateRequest));
+                    protectedThis->setStageMode(protectedThis->m_stageMode);
+                }
 
-            [protectedThis->m_modelLoader requestCompleted:updateRequest];
+                [protectedThis->m_modelLoader requestCompleted:updateRequest];
 
-            if (RefPtr client = protectedThis->m_client.get(); client && !protectedThis->m_didFinishLoading) {
-                protectedThis->m_didFinishLoading = true;
-                client->didFinishLoading(protectedThis.get());
-                auto [simdCenter, simdExtents] = model->getCenterAndExtents();
-                client->didUpdateBoundingBox(protectedThis.get(), WebCore::FloatPoint3D(simdCenter.x, simdCenter.y, simdCenter.z), WebCore::FloatPoint3D(simdExtents.x, simdExtents.y, simdExtents.z));
-                protectedThis->notifyEntityTransformUpdated();
+                if (RefPtr client = protectedThis->m_client.get(); client && !protectedThis->m_didFinishLoading) {
+                    protectedThis->m_didFinishLoading = true;
+                    client->didFinishLoading(protectedThis.get());
+                    auto [simdCenter, simdExtents] = model->getCenterAndExtents();
+                    client->didUpdateBoundingBox(protectedThis.get(), WebCore::FloatPoint3D(simdCenter.x, simdCenter.y, simdCenter.z), WebCore::FloatPoint3D(simdExtents.x, simdExtents.y, simdExtents.z));
+                    protectedThis->notifyEntityTransformUpdated();
 
-                auto environmentMap = protectedThis->m_environmentMap;
-                if (model && environmentMap) {
-                    if (auto environmentMapImage = loadIBL(WTF::move(*environmentMap))) {
-                        model->setEnvironmentMap(*environmentMapImage);
-                        protectedThis->m_environmentMap = std::nullopt;
+                    auto environmentMap = protectedThis->m_environmentMap;
+                    if (model && environmentMap) {
+                        if (auto environmentMapImage = loadIBL(WTF::move(*environmentMap))) {
+                            model->setEnvironmentMap(*environmentMapImage);
+                            protectedThis->m_environmentMap = std::nullopt;
+                        }
                     }
                 }
-            }
+            });
         });
     } textureUpdatedCallback:^(WKBridgeUpdateTexture *updateTexture) {
-        ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<WebModelPlayer> protectedThis) {
-            if (protectedThis->m_currentModel)
-                protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
+        dispatch_async(m_serialQueue, ^{
+            ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<WebModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
 
-            [protectedThis->m_modelLoader requestCompleted:updateTexture];
+                [protectedThis->m_modelLoader requestCompleted:updateTexture];
+            });
         });
     } materialUpdatedCallback:^(WKBridgeUpdateMaterial *updateMaterial) {
-        ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<WebModelPlayer> protectedThis) {
-            if (protectedThis->m_currentModel)
-                protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
+        dispatch_async(m_serialQueue, ^{
+            ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<WebModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
 
-            [protectedThis->m_modelLoader requestCompleted:updateMaterial];
+                [protectedThis->m_modelLoader requestCompleted:updateMaterial];
+            });
         });
     }];
 

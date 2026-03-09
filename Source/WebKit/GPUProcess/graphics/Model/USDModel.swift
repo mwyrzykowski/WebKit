@@ -879,9 +879,6 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     private let objcLoader: WKBridgeModelLoader
 
     @nonobjc
-    private let dispatchSerialQueue: DispatchSerialQueue
-
-    @nonobjc
     fileprivate var time: TimeInterval = 0
 
     @nonobjc
@@ -894,7 +891,6 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     init(objcInstance: WKBridgeModelLoader) {
         objcLoader = objcInstance
         usdLoader = _Proto_UsdStageSession_v1.noMetalSession(gpuFamily: MTLGPUFamily.apple7)
-        dispatchSerialQueue = DispatchSerialQueue(label: "USDModelWebProcess", qos: .userInteractive)
         usdLoader.delegate = self
     }
 
@@ -907,9 +903,7 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     }
 
     func meshUpdated(data: consuming sending _Proto_MeshDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateMesh(webRequest: webUpdateMeshRequestFromUpdateMeshRequest(data))
-        }
+        self.objcLoader.updateMesh(webRequest: webUpdateMeshRequestFromUpdateMeshRequest(data))
     }
 
     func meshDestroyed(identifier: String) {
@@ -917,9 +911,7 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     }
 
     func materialUpdated(data: consuming sending _Proto_MaterialDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateMaterial(webRequest: webUpdateMaterialRequestFromUpdateMaterialRequest(data))
-        }
+        self.objcLoader.updateMaterial(webRequest: webUpdateMaterialRequestFromUpdateMaterialRequest(data))
     }
 
     func materialDestroyed(identifier: String) {
@@ -927,9 +919,7 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     }
 
     func textureUpdated(data: consuming sending _Proto_TextureDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateTexture(webRequest: webUpdateTextureRequestFromUpdateTextureRequest(data))
-        }
+        self.objcLoader.updateTexture(webRequest: webUpdateTextureRequestFromUpdateTextureRequest(data))
     }
 
     func textureDestroyed(identifier: String) {

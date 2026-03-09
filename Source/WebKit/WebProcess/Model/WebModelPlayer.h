@@ -135,6 +135,7 @@ private:
     PauseState m_pauseState { PauseState::None };
     std::optional<WebCore::LayoutPoint> m_currentPoint;
     std::optional<Ref<WebCore::SharedBuffer>> m_environmentMap;
+    dispatch_queue_t m_serialQueue;
     float m_yawAcceleration { 0.f };
     float m_pitchAcceleration { 0.f };
     float m_yaw { 0.f };
