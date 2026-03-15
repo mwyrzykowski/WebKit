@@ -23,24 +23,72 @@ PASS :createBindGroupLayout,at_over:limitTest="underDefault";testValueName="over
 PASS :createBindGroupLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="forward"
 PASS :createBindGroupLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="backward"
 PASS :createBindGroupLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="forward"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="backward"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="shiftByHalf"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="forward"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="backward"
-PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf"
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="forward"
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="backward"
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="shiftByHalf"
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="forward"
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="backward"
 PASS :createBindGroupLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="forward"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="backward"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="shiftByHalf"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="forward"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="backward"
-PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf"
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
+FAIL :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Storage buffers count(9) exceeded max count per stage(8):
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+ Reached unreachable code
 PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="forward"
 PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="backward"
 PASS :createBindGroupLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="shiftByHalf"
@@ -83,30 +131,210 @@ PASS :createPipelineLayout,at_over:limitTest="underDefault";testValueName="overL
 PASS :createPipelineLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="forward"
 PASS :createPipelineLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="backward"
 PASS :createPipelineLayout,at_over:limitTest="underDefault";testValueName="overLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="shiftByHalf"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="forward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="backward"
-PASS :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="shiftByHalf"
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="betweenDefaultAndMaximum";testValueName="overLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="atLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: Bind group layout is invalid:
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    expectGPUErrorAsync@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:688:16
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="forward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="backward" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
+FAIL :createPipelineLayout,at_over:limitTest="atMaximum";testValueName="overLimit";type="read-only-storage";order="shiftByHalf" assert_unreached:
+  - EXPECTATION FAILED: unexpected validation error: Storage buffers count(9) exceeded max count per stage(8)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    _testThenDestroyDevice@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:593:16
+    async testDeviceWithRequestedMaximumLimits@http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:660:38
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/maxStorageBuffersInFragmentStage.spec.js:101:47
+ Reached unreachable code
 PASS :createPipelineLayout,at_over:limitTest="overMaximum";testValueName="atLimit";type="storage";order="forward"
 PASS :createPipelineLayout,at_over:limitTest="overMaximum";testValueName="atLimit";type="storage";order="backward"
 PASS :createPipelineLayout,at_over:limitTest="overMaximum";testValueName="atLimit";type="storage";order="shiftByHalf"
@@ -139,6 +367,20 @@ PASS :createPipeline,at_over:limitTest="overMaximum";testValueName="atLimit";asy
 PASS :createPipeline,at_over:limitTest="overMaximum";testValueName="atLimit";async=true
 PASS :createPipeline,at_over:limitTest="overMaximum";testValueName="overLimit";async=false
 PASS :createPipeline,at_over:limitTest="overMaximum";testValueName="overLimit";async=true
-PASS :auto_upgrades_per_stage,maxStorageBuffersPerShaderStage:
-PASS :auto_upgraded_from_per_stage,maxStorageBuffersPerShaderStage:
+FAIL :auto_upgrades_per_stage,maxStorageBuffersPerShaderStage: assert_unreached:
+  - EXPECTATION FAILED: device.limits.maxStorageBuffersPerShaderStage(8) is >= adapter.limits.maxStorageBuffersInFragmentStage(44)
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:1317:15
+    async runTest@http://127.0.0.1:8000/webgpu/common/internal/test_group.js:528:22
+    async run@http://127.0.0.1:8000/webgpu/common/internal/test_group.js:680:31
+    @http://127.0.0.1:8000/webgpu/common/runtime/wpt.js:75:27
+ Reached unreachable code
+FAIL :auto_upgraded_from_per_stage,maxStorageBuffersPerShaderStage: assert_unreached:
+  - EXPECTATION FAILED: maxStorageBuffersInFragmentStage(8) === 44
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/capability_checks/limits/limit_utils.js:1343:13
+    async runTest@http://127.0.0.1:8000/webgpu/common/internal/test_group.js:528:22
+    async run@http://127.0.0.1:8000/webgpu/common/internal/test_group.js:680:31
+    @http://127.0.0.1:8000/webgpu/common/runtime/wpt.js:75:27
+ Reached unreachable code
 

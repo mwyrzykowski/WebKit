@@ -120,9 +120,9 @@ FAIL :f32:inputSource="const";vectorize="_undef_" assert_unreached:
         returned: 4294967295 (0xffffffff)
         expected: 4294967040 (0xffffff00)
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="const";vectorize=2 assert_unreached:
   - EXPECTATION FAILED: (vec2<f32>(77492166656.0 (0x51905725), 3368716075008.0 (0x544415c8)))
@@ -161,9 +161,9 @@ FAIL :f32:inputSource="const";vectorize=2 assert_unreached:
         returned: vec2<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec2<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="const";vectorize=3 assert_unreached:
   - EXPECTATION FAILED: (vec3<f32>(2147483520.0 (0x4effffff), 4294967040.0 (0x4f7fffff), 77492166656.0 (0x51905725)))
@@ -194,9 +194,9 @@ FAIL :f32:inputSource="const";vectorize=3 assert_unreached:
         returned: vec3<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec3<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="const";vectorize=4 assert_unreached:
   - EXPECTATION FAILED: (vec4<f32>(77492166656.0 (0x51905725), 3368716075008.0 (0x544415c8), 136245858533376.0 (0x56f7d46c), 6036739206414336.0 (0x59ab930f)))
@@ -219,9 +219,9 @@ FAIL :f32:inputSource="const";vectorize=4 assert_unreached:
         returned: vec4<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec4<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 PASS :f32:inputSource="uniform";vectorize="_undef_"
 FAIL :f32:inputSource="uniform";vectorize=2 assert_unreached:
@@ -261,9 +261,9 @@ FAIL :f32:inputSource="uniform";vectorize=2 assert_unreached:
         returned: vec2<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec2<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="uniform";vectorize=3 assert_unreached:
   - EXPECTATION FAILED: (vec3<f32>(2147483520.0 (0x4effffff), 4294967040.0 (0x4f7fffff), 77492166656.0 (0x51905725)))
@@ -294,9 +294,9 @@ FAIL :f32:inputSource="uniform";vectorize=3 assert_unreached:
         returned: vec3<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec3<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="uniform";vectorize=4 assert_unreached:
   - EXPECTATION FAILED: (vec4<f32>(77492166656.0 (0x51905725), 3368716075008.0 (0x544415c8), 136245858533376.0 (0x56f7d46c), 6036739206414336.0 (0x59ab930f)))
@@ -319,9 +319,9 @@ FAIL :f32:inputSource="uniform";vectorize=4 assert_unreached:
         returned: vec4<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec4<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 PASS :f32:inputSource="storage_r";vectorize="_undef_"
 FAIL :f32:inputSource="storage_r";vectorize=2 assert_unreached:
@@ -361,9 +361,9 @@ FAIL :f32:inputSource="storage_r";vectorize=2 assert_unreached:
         returned: vec2<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec2<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="storage_r";vectorize=3 assert_unreached:
   - EXPECTATION FAILED: (vec3<f32>(2147483520.0 (0x4effffff), 4294967040.0 (0x4f7fffff), 77492166656.0 (0x51905725)))
@@ -394,9 +394,9 @@ FAIL :f32:inputSource="storage_r";vectorize=3 assert_unreached:
         returned: vec3<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec3<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="storage_r";vectorize=4 assert_unreached:
   - EXPECTATION FAILED: (vec4<f32>(77492166656.0 (0x51905725), 3368716075008.0 (0x544415c8), 136245858533376.0 (0x56f7d46c), 6036739206414336.0 (0x59ab930f)))
@@ -419,9 +419,9 @@ FAIL :f32:inputSource="storage_r";vectorize=4 assert_unreached:
         returned: vec4<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec4<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 PASS :f32:inputSource="storage_rw";vectorize="_undef_"
 FAIL :f32:inputSource="storage_rw";vectorize=2 assert_unreached:
@@ -461,9 +461,9 @@ FAIL :f32:inputSource="storage_rw";vectorize=2 assert_unreached:
         returned: vec2<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec2<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="storage_rw";vectorize=3 assert_unreached:
   - EXPECTATION FAILED: (vec3<f32>(2147483520.0 (0x4effffff), 4294967040.0 (0x4f7fffff), 77492166656.0 (0x51905725)))
@@ -494,9 +494,9 @@ FAIL :f32:inputSource="storage_rw";vectorize=3 assert_unreached:
         returned: vec3<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec3<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 FAIL :f32:inputSource="storage_rw";vectorize=4 assert_unreached:
   - EXPECTATION FAILED: (vec4<f32>(77492166656.0 (0x51905725), 3368716075008.0 (0x544415c8), 136245858533376.0 (0x56f7d46c), 6036739206414336.0 (0x59ab930f)))
@@ -519,9 +519,9 @@ FAIL :f32:inputSource="storage_rw";vectorize=4 assert_unreached:
         returned: vec4<u32>(4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff), 4294967295 (0xffffffff))
         expected: vec4<u32>(4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00), 4294967040 (0xffffff00))
     eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
-    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:695:34
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:524:37
-    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:415:15
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:526:37
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/expression/expression.js:417:15
  Reached unreachable code
 PASS :f16:inputSource="const";vectorize="_undef_"
 PASS :f16:inputSource="const";vectorize=2

@@ -28,7 +28,6 @@ import WebGPU_Private.WebGPU
 
 // FIXME (rdar://162375123): This should be in the standard library.
 extension MutableSpan where Element: BitwiseCopyable {
-    @_lifetime(self: copy self)
     mutating func copyMemory(from source: Span<Element>) {
         // Safety: This is lifetime safe because we have exclusive access to 'self' and we don't escape 'selfBuffer'
         unsafe withUnsafeMutableBufferPointer { selfBuffer in

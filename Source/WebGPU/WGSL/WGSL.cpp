@@ -43,6 +43,7 @@
 #include "UniformityAnalysis.h"
 #include "VisibilityValidator.h"
 #include "WGSLShaderModule.h"
+#include <wtf/text/MakeString.h>
 
 namespace WGSL {
 
@@ -72,6 +73,18 @@ namespace WGSL {
         return pass(__VA_ARGS__); \
     }();
 
+static ASCIILiteral wgslExtensionToWebGPUFeatureName(Extension extension)
+{
+    // Map WGSL extension names to WebGPU feature names
+    // WGSL uses underscores, WebGPU uses hyphens
+    switch (extension) {
+    case Extension::ClipDistances:
+        return "clip-distances"_s;
+    case Extension::F16:
+        return "shader-f16"_s;
+    }
+}
+
 Variant<SuccessfulCheck, FailedCheck> staticCheck(const String& wgsl, const std::optional<SourceMap>&, const Configuration& configuration)
 {
     PhaseTimes phaseTimes;
@@ -79,6 +92,13 @@ Variant<SuccessfulCheck, FailedCheck> staticCheck(const String& wgsl, const std:
     Vector<Warning> warnings;
 
     CHECK_PASS(parse, shaderModule);
+    // Validate that all enabled extensions are supported by the device
+    for (auto extension : shaderModule->enabledExtensions()) {
+        auto featureName = wgslExtensionToWebGPUFeatureName(extension);
+        if (!shaderModule->hasFeature(featureName))
+            return Variant<SuccessfulCheck, FailedCheck>(WTF::InPlaceType<FailedCheck>, Vector<Error> { Error { makeString("Extension '"_s, toString(extension), "' requires feature '"_s, featureName, "' which is not enabled on this device"_s), SourceSpan::empty() } }, Vector<Warning> { });
+    }
+
     CHECK_PASS(reorderGlobals, shaderModule);
     CHECK_PASS(typeCheck, shaderModule);
     CHECK_PASS(validateAttributes, shaderModule);

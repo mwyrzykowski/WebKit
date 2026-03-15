@@ -2,21 +2,193 @@
 PASS :mapAsync,usage:
 PASS :mapAsync,invalidBuffer:
 PASS :mapAsync,state,destroyed:
-PASS :mapAsync,state,mappedAtCreation:
-PASS :mapAsync,state,mapped:
-PASS :mapAsync,state,mappingPending:
+FAIL :mapAsync,state,mappedAtCreation: assert_unreached:
+  - (in subcase: mapMode=1;validUsage=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=1;validUsage=1) INFO: subcase ran
+  - (in subcase: mapMode=2;validUsage=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=2;validUsage=2) INFO: subcase ran
+ Reached unreachable code
+FAIL :mapAsync,state,mapped: assert_unreached:
+  - (in subcase: mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=1) INFO: subcase ran
+  - (in subcase: mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=2) INFO: subcase ran
+ Reached unreachable code
+FAIL :mapAsync,state,mappingPending: assert_unreached:
+  - (in subcase: mapMode=1) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:256:38
+  - (in subcase: mapMode=1) INFO: subcase ran
+  - (in subcase: mapMode=2) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:256:38
+  - (in subcase: mapMode=2) INFO: subcase ran
+ Reached unreachable code
 PASS :mapAsync,sizeUnspecifiedOOB:
 PASS :mapAsync,offsetAndSizeAlignment:
 PASS :mapAsync,offsetAndSizeOOB:
-PASS :mapAsync,earlyRejection:
+FAIL :mapAsync,earlyRejection: assert_unreached:
+  - (in subcase: mapMode=1;offset2=0) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:393:27
+  - (in subcase: mapMode=1;offset2=0) INFO: subcase ran
+  - (in subcase: mapMode=1;offset2=8) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:393:27
+  - (in subcase: mapMode=1;offset2=8) INFO: subcase ran
+  - (in subcase: mapMode=2;offset2=0) VALIDATION FAILED: Validation succeeded unexpectedly.
+      at (elided: only 2 shown)
+  - (in subcase: mapMode=2;offset2=0) INFO: subcase ran
+  - (in subcase: mapMode=2;offset2=8) VALIDATION FAILED: Validation succeeded unexpectedly.
+      at (elided: only 2 shown)
+  - (in subcase: mapMode=2;offset2=8) INFO: subcase ran
+ Reached unreachable code
 PASS :mapAsync,abort_over_invalid_error:
-PASS :getMappedRange,state,mapped:
-PASS :getMappedRange,state,mappedAtCreation:
+FAIL :getMappedRange,state,mapped: assert_unreached:
+  - (in subcase: mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=1) INFO: subcase ran
+  - (in subcase: mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=2) INFO: subcase ran
+ Reached unreachable code
+FAIL :getMappedRange,state,mappedAtCreation: assert_unreached:
+  - (in subcase: bufferUsage=1;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: bufferUsage=1;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=1;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: bufferUsage=1;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=2;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=2;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=2;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=2;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=4;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=4;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=4;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=4;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=8;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=8;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=8;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=8;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=16;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=16;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=16;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=16;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=32;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=32;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=32;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=32;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=64;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=64;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=64;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=64;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=128;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=128;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=128;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=128;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=256;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=256;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=256;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=256;mapMode=2) INFO: subcase ran
+  - (in subcase: bufferUsage=512;mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=512;mapMode=1) INFO: subcase ran
+  - (in subcase: bufferUsage=512;mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+      at (elided: only 2 shown)
+  - (in subcase: bufferUsage=512;mapMode=2) INFO: subcase ran
+ Reached unreachable code
 PASS :getMappedRange,state,invalid_mappedAtCreation:
-PASS :getMappedRange,state,mappedAgain:
+FAIL :getMappedRange,state,mappedAgain: assert_unreached:
+  - (in subcase: mapMode=1) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=1) INFO: subcase ran
+  - (in subcase: mapMode=2) EXPECTATION FAILED: expected early mapAsync rejection, got deferred
+      Rejection: OperationError: map async was not successful
+    expect@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:375:43
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:63:24
+  - (in subcase: mapMode=2) INFO: subcase ran
+ Reached unreachable code
 PASS :getMappedRange,state,unmapped:
 PASS :getMappedRange,state,destroyed:
-PASS :getMappedRange,state,mappingPending:
+FAIL :getMappedRange,state,mappingPending: assert_unreached:
+  - (in subcase: mapMode=1) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:673:38
+  - (in subcase: mapMode=1) INFO: subcase ran
+  - (in subcase: mapMode=2) VALIDATION FAILED: Validation succeeded unexpectedly.
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectValidationError@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:1221:36
+    testMapAsyncCall@http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:28:33
+    @http://127.0.0.1:8000/webgpu/webgpu/api/validation/buffer/mapping.spec.js:673:38
+  - (in subcase: mapMode=2) INFO: subcase ran
+ Reached unreachable code
 PASS :getMappedRange,subrange,mapped:mapMode=1
 PASS :getMappedRange,subrange,mapped:mapMode=2
 PASS :getMappedRange,subrange,mappedAtCreation:

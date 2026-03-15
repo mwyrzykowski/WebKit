@@ -111,7 +111,6 @@ void RemoteAdapter::requestDevice(const WebGPU::DeviceDescriptor& descriptor, We
             limits->maxBufferSize(),
             limits->maxVertexAttributes(),
             limits->maxVertexBufferArrayStride(),
-            limits->maxInterStageShaderComponents(),
             limits->maxInterStageShaderVariables(),
             limits->maxColorAttachments(),
             limits->maxColorAttachmentBytesPerSample(),

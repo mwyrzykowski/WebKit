@@ -1,28 +1,220 @@
 
-PASS :inputs:method="param";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="param";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="param";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="param";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
-PASS :inputs:method="param";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="param";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="param";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="param";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
-PASS :inputs:method="struct";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="struct";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="struct";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="struct";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
-PASS :inputs:method="struct";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="struct";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="struct";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="struct";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
-PASS :inputs:method="mixed";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="mixed";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="mixed";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="mixed";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
-PASS :inputs:method="mixed";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="mixed";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2}
-PASS :inputs:method="mixed";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1}
-PASS :inputs:method="mixed";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11}
+FAIL :inputs:method="param";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="param";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="struct";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="direct";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="direct";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="direct";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      undefined
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="indirect";groupSize={"x":1,"y":1,"z":1};numGroups={"x":8,"y":4,"z":2} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: global_index failed at group(1,0,0) local(0,0,0))
+        expected: 1
+        got:      0
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="indirect";groupSize={"x":8,"y":4,"z":2};numGroups={"x":1,"y":1,"z":1} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
+FAIL :inputs:method="mixed";dispatch="indirect";groupSize={"x":3,"y":7,"z":5};numGroups={"x":13,"y":9,"z":11} assert_unreached:
+  - (in subcase: ) EXPECTATION FAILED: group_index failed at group(0,0,0) local(0,0,0))
+        expected: 0
+        got:      1
+    eventualAsyncExpectation@http://127.0.0.1:8000/webgpu/common/framework/fixture.js:258:33
+    expectGPUBufferValuesPassCheck@http://127.0.0.1:8000/webgpu/webgpu/gpu_test.js:715:34
+    @http://127.0.0.1:8000/webgpu/webgpu/shader/execution/shader_io/compute_builtins.spec.js:302:35
+  - (in subcase: ) INFO: subcase ran
+ Reached unreachable code
 PASS :subgroup_size:sizes=[1,1,1]
 PASS :subgroup_size:sizes=[4,1,1]
 PASS :subgroup_size:sizes=[8,1,1]
@@ -85,4 +277,66 @@ PASS :subgroup_invocation_id:sizes=[3,3,15]
 PASS :subgroup_invocation_id:sizes=[17,5,2]
 PASS :subgroup_invocation_id:sizes=[17,4,2]
 PASS :subgroup_invocation_id:sizes=[15,2,8]
+PASS :subgroup_id:sizes=[1,1,1]
+PASS :subgroup_id:sizes=[4,1,1]
+PASS :subgroup_id:sizes=[8,1,1]
+PASS :subgroup_id:sizes=[16,1,1]
+PASS :subgroup_id:sizes=[32,1,1]
+PASS :subgroup_id:sizes=[64,1,1]
+PASS :subgroup_id:sizes=[128,1,1]
+PASS :subgroup_id:sizes=[256,1,1]
+PASS :subgroup_id:sizes=[1,4,1]
+PASS :subgroup_id:sizes=[1,8,1]
+PASS :subgroup_id:sizes=[1,16,1]
+PASS :subgroup_id:sizes=[1,32,1]
+PASS :subgroup_id:sizes=[1,64,1]
+PASS :subgroup_id:sizes=[1,128,1]
+PASS :subgroup_id:sizes=[1,256,1]
+PASS :subgroup_id:sizes=[1,1,4]
+PASS :subgroup_id:sizes=[1,1,8]
+PASS :subgroup_id:sizes=[1,1,16]
+PASS :subgroup_id:sizes=[1,1,32]
+PASS :subgroup_id:sizes=[1,1,64]
+PASS :subgroup_id:sizes=[3,3,3]
+PASS :subgroup_id:sizes=[4,4,4]
+PASS :subgroup_id:sizes=[16,16,1]
+PASS :subgroup_id:sizes=[16,1,16]
+PASS :subgroup_id:sizes=[1,16,16]
+PASS :subgroup_id:sizes=[15,3,3]
+PASS :subgroup_id:sizes=[3,15,3]
+PASS :subgroup_id:sizes=[3,3,15]
+PASS :subgroup_id:sizes=[17,5,2]
+PASS :subgroup_id:sizes=[17,4,2]
+PASS :subgroup_id:sizes=[15,2,8]
+PASS :num_subgroups:sizes=[1,1,1]
+PASS :num_subgroups:sizes=[4,1,1]
+PASS :num_subgroups:sizes=[8,1,1]
+PASS :num_subgroups:sizes=[16,1,1]
+PASS :num_subgroups:sizes=[32,1,1]
+PASS :num_subgroups:sizes=[64,1,1]
+PASS :num_subgroups:sizes=[128,1,1]
+PASS :num_subgroups:sizes=[256,1,1]
+PASS :num_subgroups:sizes=[1,4,1]
+PASS :num_subgroups:sizes=[1,8,1]
+PASS :num_subgroups:sizes=[1,16,1]
+PASS :num_subgroups:sizes=[1,32,1]
+PASS :num_subgroups:sizes=[1,64,1]
+PASS :num_subgroups:sizes=[1,128,1]
+PASS :num_subgroups:sizes=[1,256,1]
+PASS :num_subgroups:sizes=[1,1,4]
+PASS :num_subgroups:sizes=[1,1,8]
+PASS :num_subgroups:sizes=[1,1,16]
+PASS :num_subgroups:sizes=[1,1,32]
+PASS :num_subgroups:sizes=[1,1,64]
+PASS :num_subgroups:sizes=[3,3,3]
+PASS :num_subgroups:sizes=[4,4,4]
+PASS :num_subgroups:sizes=[16,16,1]
+PASS :num_subgroups:sizes=[16,1,16]
+PASS :num_subgroups:sizes=[1,16,16]
+PASS :num_subgroups:sizes=[15,3,3]
+PASS :num_subgroups:sizes=[3,15,3]
+PASS :num_subgroups:sizes=[3,3,15]
+PASS :num_subgroups:sizes=[17,5,2]
+PASS :num_subgroups:sizes=[17,4,2]
+PASS :num_subgroups:sizes=[15,2,8]
 

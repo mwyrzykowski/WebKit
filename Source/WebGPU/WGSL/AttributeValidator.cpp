@@ -944,18 +944,36 @@ case Builtin::__case: \
     break;
 
     switch (builtin) {
-        CASE(FragDepth, TYPE_CHECK(f32), Fragment, Output)
-        CASE(FrontFacing, TYPE_CHECK(bool), Fragment, Input)
-        CASE(GlobalInvocationId, VEC_CHECK(3, u32), Compute, Input)
-        CASE(InstanceIndex, TYPE_CHECK(u32), Vertex, Input)
-        CASE(LocalInvocationId, VEC_CHECK(3, u32), Compute, Input)
-        CASE(LocalInvocationIndex, TYPE_CHECK(u32), Compute, Input)
-        CASE(NumWorkgroups, VEC_CHECK(3, u32), Compute, Input)
-        CASE(SampleIndex, TYPE_CHECK(u32), Fragment, Input)
-        CASE(VertexIndex, TYPE_CHECK(u32), Vertex, Input)
-        CASE(WorkgroupId, VEC_CHECK(3, u32), Compute, Input)
-        CASE2(SampleMask, TYPE_CHECK(u32), Fragment, Input, Fragment, Output)
-        CASE2(Position, VEC_CHECK(4, f32), Vertex, Output, Fragment, Input)
+    case Builtin::ClipDistances: {
+        // clip_distances requires the extension to be enabled
+        if (!m_shaderModule.enabledExtensions().contains(Extension::ClipDistances)) [[unlikely]] {
+            error(span, "@builtin(clip_distances) requires the 'clip_distances' extension to be enabled"_s);
+            return;
+        }
+        // @builtin(clip_distances) must be array<f32, N> where N is determined by the array size
+        auto* arrayType = std::get_if<Types::Array>(type);
+        if (!arrayType || arrayType->element != m_shaderModule.types().f32Type()) [[unlikely]] {
+            error(span, "store type of @builtin(clip_distances) must be 'array<f32, N>'"_s);
+            return;
+        }
+        if (stage != ShaderStage::Vertex || direction != Direction::Output) [[unlikely]] {
+            error(span, "@builtin(clip_distances) can only be used for vertex shader output"_s);
+            return;
+        }
+        break;
+    }
+    CASE(FragDepth, TYPE_CHECK(f32), Fragment, Output)
+    CASE(FrontFacing, TYPE_CHECK(bool), Fragment, Input)
+    CASE(GlobalInvocationId, VEC_CHECK(3, u32), Compute, Input)
+    CASE(InstanceIndex, TYPE_CHECK(u32), Vertex, Input)
+    CASE(LocalInvocationId, VEC_CHECK(3, u32), Compute, Input)
+    CASE(LocalInvocationIndex, TYPE_CHECK(u32), Compute, Input)
+    CASE(NumWorkgroups, VEC_CHECK(3, u32), Compute, Input)
+    CASE(SampleIndex, TYPE_CHECK(u32), Fragment, Input)
+    CASE(VertexIndex, TYPE_CHECK(u32), Vertex, Input)
+    CASE(WorkgroupId, VEC_CHECK(3, u32), Compute, Input)
+    CASE2(SampleMask, TYPE_CHECK(u32), Fragment, Input, Fragment, Output)
+    CASE2(Position, VEC_CHECK(4, f32), Vertex, Output, Fragment, Input)
     }
 
     auto result = builtins.add(builtin);

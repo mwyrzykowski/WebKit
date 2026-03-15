@@ -787,11 +787,45 @@ void FunctionDefinitionWriter::visit(AST::Structure& structDecl)
             }
 
             m_body.append(m_indent);
-            visit(member.type().inferredType());
-            m_body.append(' ', name);
-            for (auto &attribute : member.attributes()) {
-                m_body.append(' ');
-                visit(attribute);
+
+            // Check if this member has @builtin(clip_distances) attribute
+            // Metal requires: float name [[clip_distance]] [N];
+            bool isClipDistances = false;
+            for (auto& attribute : member.attributes()) {
+                if (auto* builtinAttr = dynamicDowncast<AST::BuiltinAttribute>(attribute)) {
+                    if (builtinAttr->builtin() == Builtin::ClipDistances) {
+                        isClipDistances = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isClipDistances) {
+                // For clip_distances, generate: float name [[clip_distance]] [N];
+                auto* arrayType = std::get_if<Types::Array>(member.type().inferredType());
+                ASSERT(arrayType);
+                visit(arrayType->element); // Generate float
+                m_body.append(' ', name);
+
+                // Generate attributes (e.g., [[clip_distance]])
+                for (auto &attribute : member.attributes()) {
+                    m_body.append(' ');
+                    visit(attribute);
+                }
+
+                // Generate array subscript [N]
+                m_body.append(" ["_s);
+                if (auto* size = std::get_if<unsigned>(&arrayType->size))
+                    m_body.append(*size);
+                m_body.append(']');
+            } else {
+                visit(member.type().inferredType());
+                m_body.append(' ', name);
+
+                for (auto &attribute : member.attributes()) {
+                    m_body.append(' ');
+                    visit(attribute);
+                }
             }
             m_body.append(";\n"_s);
 
@@ -805,13 +839,58 @@ void FunctionDefinitionWriter::visit(AST::Structure& structDecl)
             {
                 IndentationScope scope(m_indent);
                 char prefix = ':';
+
+                // First pass: initialize non-clip_distances members in initializer list
                 for (auto& member : structDecl.members()) {
+                    // Check if this is a clip_distances member
+                    bool isClipDistances = false;
+                    for (auto& attribute : member.attributes()) {
+                        if (auto* builtinAttr = dynamicDowncast<AST::BuiltinAttribute>(attribute)) {
+                            if (builtinAttr->builtin() == Builtin::ClipDistances) {
+                                isClipDistances = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isClipDistances)
+                        continue; // Skip C-style arrays in member initializer list
+
                     auto& name = member.name();
                     m_body.append(m_indent, prefix, ' ', name, "(other."_s, name, ")\n"_s);
                     prefix = ',';
                 }
             }
-            m_body.append(m_indent, "{ }\n"_s);
+            m_body.append(m_indent, "{\n"_s);
+            {
+                IndentationScope scope(m_indent);
+
+                // Second pass: copy clip_distances arrays in constructor body
+                for (auto& member : structDecl.members()) {
+                    bool isClipDistances = false;
+                    for (auto& attribute : member.attributes()) {
+                        if (auto* builtinAttr = dynamicDowncast<AST::BuiltinAttribute>(attribute)) {
+                            if (builtinAttr->builtin() == Builtin::ClipDistances) {
+                                isClipDistances = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isClipDistances) {
+                        auto& name = member.name();
+                        auto* arrayType = std::get_if<Types::Array>(member.type().inferredType());
+                        ASSERT(arrayType);
+
+                        // Generate: for (unsigned i = 0; i < N; ++i) field5[i] = other.field5[i];
+                        m_body.append(m_indent, "for (unsigned __i = 0; __i < "_s);
+                        if (auto* size = std::get_if<unsigned>(&arrayType->size))
+                            m_body.append(*size);
+                        m_body.append("; ++__i) "_s, name, "[__i] = other."_s, name, "[__i];\n"_s);
+                    }
+                }
+            }
+            m_body.append(m_indent, "}\n"_s);
         } else if (structDecl.role() == AST::StructureRole::FragmentOutputWrapper || structDecl.role() == AST::StructureRole::VertexOutputWrapper) {
             ASSERT(structDecl.members().size() == 1);
             auto& member = structDecl.members()[0];
@@ -1010,6 +1089,9 @@ void FunctionDefinitionWriter::visit(AST::BuiltinAttribute& builtin)
         return;
 
     switch (builtin.builtin()) {
+    case Builtin::ClipDistances:
+        m_body.append("[[clip_distance]]"_s);
+        break;
     case Builtin::FragDepth:
         m_body.append("[[depth(any)]]"_s);
         break;

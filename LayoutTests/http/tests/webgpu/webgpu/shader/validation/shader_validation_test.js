@@ -8,7 +8,8 @@ UniqueFeaturesOrLimitsGPUTest } from
 const kEnables = {
   f16: 'shader-f16',
   subgroups: 'subgroups',
-  clip_distances: 'clip-distances'
+  clip_distances: 'clip-distances',
+  chromium_experimental_primitive_id: 'chromium-experimental-primitive-id'
 };
 
 /**
@@ -61,23 +62,17 @@ export class ShaderValidationTest extends AllFeaturesMaxLimitsGPUTest {
     if (options?.autoSkipIfFeatureNotAvailable !== false) {
       skipIfCodeNeedsFeatureAndDeviceDoesNotHaveFeature(this, code);
     }
+    let shaderModule;
+    this.expectGPUError(
+      'validation',
+      () => {
+        shaderModule = this.device.createShaderModule({ code });
+      },
+      expectedResult !== true
+    );
 
-    // WEBKIT PATCH: Combine async checks into single sequential operation to avoid race condition
-    // in error message ordering. See https://bugs.webkit.org/show_bug.cgi?id=308026
-    this.eventualAsyncExpectation(async (niceStack) => {
-      let shaderModule;
-      if (expectedResult !== true) {
-        this.device.pushErrorScope('validation');
-      }
-      shaderModule = this.device.createShaderModule({ code });
-
-      if (expectedResult !== true) {
-        const gpuError = await this.device.popErrorScope();
-        if (!(gpuError instanceof GPUValidationError)) {
-          niceStack.message = `Expected validation error`;
-          this.rec.expectationFailed(niceStack);
-        }
-      }
+    const error = new Error();
+    this.eventualAsyncExpectation(async () => {
       const compilationInfo = await shaderModule.getCompilationInfo();
 
       // MAINTENANCE_TODO: Pretty-print error messages with source context.
@@ -88,7 +83,6 @@ export class ShaderValidationTest extends AllFeaturesMaxLimitsGPUTest {
       '\n\n---- shader ----\n' +
       code;
 
-      const error = new Error();
       if (compilationInfo.messages.some((m) => m.type === 'error')) {
         if (expectedResult) {
           error.message = `Unexpected compilationInfo 'error' message.\n` + messagesLog;

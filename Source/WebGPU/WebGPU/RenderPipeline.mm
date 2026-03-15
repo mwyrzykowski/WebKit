@@ -1365,19 +1365,34 @@ static uint32_t NODELETE componentsForDataType(MTLDataType dataType)
     }
 }
 
-static NSString* errorValidatingInterstageShaderInterfaces(WebGPU::Device &device, const WGPURenderPipelineDescriptor& descriptor, const ShaderModule::VertexOutputs* vertexOutputs, const ShaderModule::FragmentInputs* fragmentInputs, const ShaderModule::FragmentOutputs* fragmentOutputs, const ShaderModule* fragmentModule, auto* fragmentDescriptor)
+static NSString* errorValidatingInterstageShaderInterfaces(WebGPU::Device &device, const WGPURenderPipelineDescriptor& descriptor, const ShaderModule::VertexOutputs* vertexOutputs, uint32_t vertexClipDistancesCount, const ShaderModule::FragmentInputs* fragmentInputs, const ShaderModule::FragmentOutputs* fragmentOutputs, const ShaderModule* fragmentModule, auto* fragmentDescriptor)
 {
     if (!vertexOutputs)
         return @"vertex shader has no outputs";
 
-    auto maxVertexShaderOutputComponents = device.limits().maxInterStageShaderComponents;
+    auto maxVertexShaderOutputComponents = device.limits().maxInterStageShaderVariables * 4;
     if (descriptor.primitive.topology == WGPUPrimitiveTopology_PointList) {
         if (!maxVertexShaderOutputComponents)
             return @"maxVertexShaderOutputComponents is zero";
-        --maxVertexShaderOutputComponents;
+        maxVertexShaderOutputComponents -= 4;
+    }
+
+    // Per spec: if clip_distances is declared, decrement maxVertexShaderOutputComponents by clipDistancesSize
+    if (vertexClipDistancesCount) {
+        if (maxVertexShaderOutputComponents < vertexClipDistancesCount)
+            return @"clip_distances requires more components than available";
+        maxVertexShaderOutputComponents -= ((vertexClipDistancesCount + 3) / 4) * 4;
     }
 
     auto maxInterStageShaderVariables = device.limits().maxInterStageShaderVariables;
+
+    // Per spec: if clip_distances is declared, decrement maxVertexShaderOutputLocation by ceil(clipDistancesSize / 4)
+    if (vertexClipDistancesCount) {
+        auto clipDistancesVec4Count = (vertexClipDistancesCount + 3) / 4;
+        if (maxInterStageShaderVariables < clipDistancesVec4Count)
+            return @"clip_distances requires more location slots than available";
+        maxInterStageShaderVariables -= clipDistancesVec4Count;
+    }
     uint32_t vertexScalarComponents = 0;
     for (auto& [location, structMember] : *vertexOutputs) {
         if (location >= maxInterStageShaderVariables)
@@ -1390,7 +1405,7 @@ static NSString* errorValidatingInterstageShaderInterfaces(WebGPU::Device &devic
         return @"vertexScalarComponents > maxVertexShaderOutputComponents";
 
     if (fragmentModule) {
-        auto maxFragmentShaderInputComponents = device.limits().maxInterStageShaderComponents;
+        auto maxFragmentShaderInputComponents = device.limits().maxInterStageShaderVariables * 4;
         auto decrement = ^(uint32_t& unsignedValue) {
             return unsignedValue-- ? true : false;
         };
@@ -1486,6 +1501,7 @@ std::pair<Ref<RenderPipeline>, NSString*> Device::createRenderPipeline(const WGP
 
     const ShaderModule::VertexStageIn* vertexStageIn = nullptr;
     const ShaderModule::VertexOutputs* vertexOutputs = nullptr;
+    uint32_t vertexClipDistancesCount = 0;
     BufferBindingSizesForPipeline minimumBufferSizes;
     uint32_t vertexShaderBindingCount = 0;
     String vertexShaderSource, fragmentShaderSource;
@@ -1517,6 +1533,7 @@ std::pair<Ref<RenderPipeline>, NSString*> Device::createRenderPipeline(const WGP
             return returnInvalidRenderPipeline(*this, isAsync, "Vertex function could not be created"_s);
         mtlRenderPipelineDescriptor.vertexFunction = vertexFunction;
         vertexOutputs = vertexModule->vertexReturnTypeForEntryPoint(vertexEntryPoint);
+        vertexClipDistancesCount = vertexModule->clipDistancesCount(vertexEntryPoint);
     }
 
     bool usesFragDepth = false;
@@ -1547,7 +1564,7 @@ std::pair<Ref<RenderPipeline>, NSString*> Device::createRenderPipeline(const WGP
         colorAttachmentCount = fragmentDescriptor.targetCount;
     }
 
-    if (NSString* error = errorValidatingInterstageShaderInterfaces(*this, descriptor, vertexOutputs, fragmentInputs, fragmentReturnTypes, fragmentModule.get(), descriptor.fragment))
+    if (NSString* error = errorValidatingInterstageShaderInterfaces(*this, descriptor, vertexOutputs, vertexClipDistancesCount, fragmentInputs, fragmentReturnTypes, fragmentModule.get(), descriptor.fragment))
         return returnInvalidRenderPipeline(*this, isAsync, error);
 
     if (descriptor.fragment) {

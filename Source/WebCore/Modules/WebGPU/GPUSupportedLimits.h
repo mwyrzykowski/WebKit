@@ -58,7 +58,6 @@ public:
     uint64_t NODELETE maxBufferSize() const;
     uint32_t NODELETE maxVertexAttributes() const;
     uint32_t NODELETE maxVertexBufferArrayStride() const;
-    uint32_t NODELETE maxInterStageShaderComponents() const;
     uint32_t NODELETE maxInterStageShaderVariables() const;
     uint32_t NODELETE maxColorAttachments() const;
     uint32_t NODELETE maxColorAttachmentBytesPerSample() const;
@@ -68,6 +67,10 @@ public:
     uint32_t NODELETE maxComputeWorkgroupSizeY() const;
     uint32_t NODELETE maxComputeWorkgroupSizeZ() const;
     uint32_t NODELETE maxComputeWorkgroupsPerDimension() const;
+    uint32_t maxStorageBuffersInFragmentStage() const;
+    uint32_t maxStorageTexturesInFragmentStage() const;
+    uint32_t maxStorageBuffersInVertexStage() const;
+    uint32_t maxStorageTexturesInVertexStage() const;
 
     WebGPU::SupportedLimits& backing() { return m_backing; }
     const WebGPU::SupportedLimits& backing() const { return m_backing; }
