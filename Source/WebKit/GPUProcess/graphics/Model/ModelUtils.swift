@@ -89,16 +89,27 @@ extension _Proto_LowLevelMeshResource_v1.Descriptor {
 }
 
 extension _Proto_LowLevelMeshResource_v1 {
+    // FIXME: (rdar://164559261) understand/document/remove unsafety
+    private func safeCopyBytes(from sourceData: Data, to destinationBuffer: MutableRawSpan, count: Int? = nil, errorContext: @autoclosure () -> String) {
+        unsafe destinationBuffer.withUnsafeMutableBytes { ptr in
+            let bytesToCopy = count ?? ptr.count
+            guard ptr.count >= bytesToCopy else {
+                fatalError("Destination buffer is too small: \(errorContext)")
+            }
+            guard sourceData.count >= bytesToCopy else {
+                fatalError("Source data is too small: \(errorContext)")
+            }
+            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+            // swift-format-ignore: NeverForceUnwrap
+            unsafe sourceData.copyBytes(to: ptr.baseAddress!.assumingMemoryBound(to: UInt8.self), count: bytesToCopy)
+        }
+    }
+
     func replaceVertexData(_ vertexData: [Data]) {
         for (vertexBufferIndex, vertexData) in vertexData.enumerated() {
             let bufferSizeInByte = vertexData.bytes.byteCount
             self.replaceVertices(at: vertexBufferIndex) { vertexBytes in
-                // FIXME: (rdar://164559261) understand/document/remove unsafety
-                unsafe vertexBytes.withUnsafeMutableBytes { ptr in
-                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                    // swift-format-ignore: NeverForceUnwrap
-                    unsafe vertexData.copyBytes(to: ptr.baseAddress!.assumingMemoryBound(to: UInt8.self), count: bufferSizeInByte)
-                }
+                self.safeCopyBytes(from: vertexData, to: vertexBytes, count: bufferSizeInByte, errorContext: "vertex data at index \(vertexBufferIndex)")
             }
         }
     }
@@ -106,12 +117,7 @@ extension _Proto_LowLevelMeshResource_v1 {
     func replaceIndexData(_ indexData: Data?) {
         if let indexData = indexData {
             self.replaceIndices { indicesBytes in
-                // FIXME: (rdar://164559261) understand/document/remove unsafety
-                unsafe indicesBytes.withUnsafeMutableBytes { ptr in
-                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                    // swift-format-ignore: NeverForceUnwrap
-                    unsafe indexData.copyBytes(to: ptr.baseAddress!.assumingMemoryBound(to: UInt8.self), count: ptr.count)
-                }
+                self.safeCopyBytes(from: indexData, to: indicesBytes, errorContext: "index data")
             }
         }
     }
