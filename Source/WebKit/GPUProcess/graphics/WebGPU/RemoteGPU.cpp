@@ -198,7 +198,6 @@ void RemoteGPU::requestAdapter(const WebGPU::RequestAdapterOptions& options, Web
             limits->maxBufferSize(),
             limits->maxVertexAttributes(),
             limits->maxVertexBufferArrayStride(),
-            limits->maxInterStageShaderComponents(),
             limits->maxInterStageShaderVariables(),
             limits->maxColorAttachments(),
             limits->maxColorAttachmentBytesPerSample(),

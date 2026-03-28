@@ -89,7 +89,6 @@ static Ref<SupportedLimits> supportedLimits(WGPUAdapter adapter)
         limits.limits.maxBufferSize,
         limits.limits.maxVertexAttributes,
         limits.limits.maxVertexBufferArrayStride,
-        limits.limits.maxInterStageShaderComponents,
         limits.limits.maxInterStageShaderVariables,
         limits.limits.maxColorAttachments,
         limits.limits.maxColorAttachmentBytesPerSample,
@@ -224,7 +223,6 @@ void AdapterImpl::requestDevice(const DeviceDescriptor& descriptor, CompletionHa
         SET_MAX_VALUE(maxBufferSize)
         SET_MAX_VALUE(maxVertexAttributes)
         SET_MAX_VALUE(maxVertexBufferArrayStride)
-        SET_MAX_VALUE(maxInterStageShaderComponents)
         SET_MAX_VALUE(maxInterStageShaderVariables)
         SET_MAX_VALUE(maxColorAttachments)
         SET_MAX_VALUE(maxColorAttachmentBytesPerSample)
@@ -283,7 +281,6 @@ void AdapterImpl::requestDevice(const DeviceDescriptor& descriptor, CompletionHa
         limits.maxBufferSize,
         limits.maxVertexAttributes,
         limits.maxVertexBufferArrayStride,
-        limits.maxInterStageShaderComponents,
         limits.maxInterStageShaderVariables,
         limits.maxColorAttachments,
         limits.maxColorAttachmentBytesPerSample,

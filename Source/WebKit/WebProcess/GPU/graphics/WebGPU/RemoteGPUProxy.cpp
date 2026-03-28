@@ -203,7 +203,6 @@ void RemoteGPUProxy::requestAdapter(const WebCore::WebGPU::RequestAdapterOptions
         response->limits.maxBufferSize,
         response->limits.maxVertexAttributes,
         response->limits.maxVertexBufferArrayStride,
-        response->limits.maxInterStageShaderComponents,
         response->limits.maxInterStageShaderVariables,
         response->limits.maxColorAttachments,
         response->limits.maxColorAttachmentBytesPerSample,

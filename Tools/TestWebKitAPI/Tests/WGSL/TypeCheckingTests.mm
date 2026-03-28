@@ -34,7 +34,13 @@ namespace TestWGSLAPI {
 
 inline void expectTypeError(const String& wgsl, const String& errorMessage)
 {
-    auto result = WGSL::staticCheck(wgsl, std::nullopt, { 8 });
+    auto result = WGSL::staticCheck(wgsl, std::nullopt, {
+        .maxBuffersPlusVertexBuffersForVertexStage = 8,
+        .maxBuffersForFragmentStage = 8,
+        .maxBuffersForComputeStage = 8,
+        .maximumCombinedWorkgroupVariablesSize = 16384,
+        .supportedFeatures = { "shader-f16"_s, "clip-distances"_s, "primitive-index"_s }
+    });
     EXPECT_TRUE(std::holds_alternative<WGSL::FailedCheck>(result));
     auto error = std::get<WGSL::FailedCheck>(result);
     EXPECT_EQ(error.errors.size(), 1u);

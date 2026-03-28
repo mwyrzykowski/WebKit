@@ -104,6 +104,7 @@ public:
     bool usesSampleMaskInInput(const String&) const;
     bool usesSampleMaskInOutput(const String&) const;
     bool usesFragDepth(const String&) const;
+    uint32_t clipDistancesCount(const String&) const;
 
 private:
     ShaderModule(Variant<WGSL::SuccessfulCheck, WGSL::FailedCheck>&&, HashMap<String, Ref<PipelineLayout>>&&, HashMap<String, WGSL::Reflection::EntryPointInformation>&&, id<MTLLibrary>, Device&);
@@ -139,6 +140,7 @@ private:
         bool usesSampleMaskInInput { false };
         bool usesSampleMaskInOutput { false };
         bool usesFragDepth { false };
+        uint32_t clipDistancesCount { 0 }; // Number of clip distances (0 if not used)
     };
     const ShaderModuleState* shaderModuleState(const String&) const;
     ShaderModuleState& populateShaderModuleState(const String&);

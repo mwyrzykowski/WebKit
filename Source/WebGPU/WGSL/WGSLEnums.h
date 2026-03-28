@@ -116,6 +116,7 @@ namespace WGSL {
     value(SubgroupUniformity, subgroup_uniformity) \
 
 #define ENUM_Builtin(value) \
+    value(ClipDistances, clip_distances) \
     value(FragDepth, frag_depth) \
     value(FrontFacing, front_facing) \
     value(GlobalInvocationId, global_invocation_id) \
@@ -130,7 +131,8 @@ namespace WGSL {
     value(WorkgroupId, workgroup_id) \
 
 #define ENUM_Extension(value) \
-    value(F16, f16, 1 << 0) \
+    value(ClipDistances, clip_distances, 1 << 0) \
+    value(F16, f16, 1 << 1) \
 
 #define ENUM_LanguageFeature(value) \
     value(Packed4x8IntegerDotProduct, packed_4x8_integer_dot_product, 1 << 0) \

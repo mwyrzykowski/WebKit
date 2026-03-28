@@ -119,6 +119,7 @@ static Vector<WGPUFeatureName> baseFeatures(id<MTLDevice> device, const Hardware
     features.append(WGPUFeatureName_Float32Renderable);
     features.append(WGPUFeatureName_Float32Blendable);
 
+    features.append(WGPUFeatureName_ClipDistances);
     features.append(WGPUFeatureName_DepthClipControl);
     features.append(WGPUFeatureName_Depth32FloatStencil8);
 
@@ -332,8 +333,7 @@ static HardwareCapabilities apple6(id<MTLDevice> device)
             .maxBufferSize = maxBufferSize(device),
             .maxVertexAttributes =    30,
             .maxVertexBufferArrayStride =    multipleOf4(largeReasonableLimit()),
-            .maxInterStageShaderComponents =    124,
-            .maxInterStageShaderVariables = 124,
+            .maxInterStageShaderVariables = 31,
             .maxColorAttachments = 8,
             .maxColorAttachmentBytesPerSample = 64,
             .maxComputeWorkgroupStorageSize =    32 * KB,
@@ -392,8 +392,7 @@ static HardwareCapabilities apple7(id<MTLDevice> device)
             .maxBufferSize = maxBufferSize(device),
             .maxVertexAttributes =    30,
             .maxVertexBufferArrayStride =    multipleOf4(largeReasonableLimit()),
-            .maxInterStageShaderComponents =    124,
-            .maxInterStageShaderVariables =    124,
+            .maxInterStageShaderVariables =    31,
             .maxColorAttachments = 8,
             .maxColorAttachmentBytesPerSample = 64,
             .maxComputeWorkgroupStorageSize =    32 * KB,
@@ -452,8 +451,7 @@ static HardwareCapabilities mac2(id<MTLDevice> device)
             .maxBufferSize =    maxBufferSize(device),
             .maxVertexAttributes =    30,
             .maxVertexBufferArrayStride =    multipleOf4(largeReasonableLimit()),
-            .maxInterStageShaderComponents =    64,
-            .maxInterStageShaderVariables =    32,
+            .maxInterStageShaderVariables =    31,
             .maxColorAttachments =    8,
             .maxColorAttachmentBytesPerSample = 64,
             .maxComputeWorkgroupStorageSize =    32 * KB,
@@ -511,7 +509,6 @@ static WGPULimits mergeLimits(const WGPULimits& previous, const WGPULimits& next
         .maxBufferSize = mergeMaximum(previous.maxBufferSize, next.maxBufferSize),
         .maxVertexAttributes = mergeMaximum(previous.maxVertexAttributes, next.maxVertexAttributes),
         .maxVertexBufferArrayStride = mergeMaximum(previous.maxVertexBufferArrayStride, next.maxVertexBufferArrayStride),
-        .maxInterStageShaderComponents = mergeMaximum(previous.maxInterStageShaderComponents, next.maxInterStageShaderComponents),
         .maxInterStageShaderVariables = mergeMaximum(previous.maxInterStageShaderVariables, next.maxInterStageShaderVariables),
         .maxColorAttachments = mergeMaximum(previous.maxColorAttachments, next.maxColorAttachments),
         .maxColorAttachmentBytesPerSample = mergeMaximum(previous.maxColorAttachmentBytesPerSample, next.maxColorAttachmentBytesPerSample),
@@ -656,8 +653,6 @@ bool anyLimitIsBetterThan(const WGPULimits& target, const WGPULimits& reference)
         return true;
     if (target.maxVertexBufferArrayStride > reference.maxVertexBufferArrayStride)
         return true;
-    if (target.maxInterStageShaderComponents > reference.maxInterStageShaderComponents)
-        return true;
     if (target.maxInterStageShaderVariables > reference.maxInterStageShaderVariables)
         return true;
     if (target.maxColorAttachments > reference.maxColorAttachments)
@@ -725,7 +720,6 @@ WGPULimits defaultLimits()
         .maxBufferSize = defaultMaxBufferSize,
         .maxVertexAttributes =    16,
         .maxVertexBufferArrayStride =    2048,
-        .maxInterStageShaderComponents =    64,
         .maxInterStageShaderVariables = 16,
         .maxColorAttachments = 8,
         .maxColorAttachmentBytesPerSample = 32,
