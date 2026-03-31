@@ -526,15 +526,6 @@ String WebsiteDataStore::defaultJavaScriptConfigurationDirectory(const String& b
     return tempDirectoryFileSystemRepresentation("JavaScriptCoreDebug"_s, ShouldCreateDirectory::No);
 }
 
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-String WebsiteDataStore::defaultModelElementCacheDirectory(const String& baseDirectory)
-{
-    if (!baseDirectory.isEmpty())
-        return FileSystem::pathByAppendingComponent(baseDirectory, "ModelElement"_s);
-
-    return tempDirectoryFileSystemRepresentation("ModelElement"_s, ShouldCreateDirectory::No);
-}
-#endif
 
 #if ENABLE(CONTENT_EXTENSIONS)
 String WebsiteDataStore::defaultResourceMonitorThrottlerDirectory(const String& baseDirectory)

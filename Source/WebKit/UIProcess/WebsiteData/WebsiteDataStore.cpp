@@ -455,10 +455,6 @@ static void resolveDirectories(WebsiteDataStoreConfiguration::Directories& direc
     if (!directories.generalStorageDirectory.isEmpty())
         directories.generalStorageDirectory = resolveAndCreateReadWriteDirectoryForSandboxExtension(directories.generalStorageDirectory);
 
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-    if (!directories.modelElementCacheDirectory.isEmpty())
-        directories.modelElementCacheDirectory = resolveAndCreateReadWriteDirectoryForSandboxExtension(directories.modelElementCacheDirectory);
-#endif
 
     if (!directories.cookieStorageFile.isEmpty()) {
         auto resolvedCookieDirectory = resolveAndCreateReadWriteDirectoryForSandboxExtension(FileSystem::parentPath(directories.cookieStorageFile));
@@ -530,9 +526,6 @@ void WebsiteDataStore::handleResolvedDirectoriesAsynchronously(const WebsiteData
         allCacheDirectories = {
             directories.mediaCacheDirectory.isolatedCopy()
             , directories.networkCacheDirectory.isolatedCopy()
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-            , directories.modelElementCacheDirectory.isolatedCopy()
-#endif
         };
     }
 

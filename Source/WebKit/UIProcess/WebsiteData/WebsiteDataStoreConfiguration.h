@@ -115,10 +115,6 @@ public:
     const String& localStorageDirectory() const LIFETIME_BOUND { return m_directories.localStorageDirectory; }
     void setLocalStorageDirectory(String&& directory) { m_directories.localStorageDirectory = WTF::move(directory); }
 
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-    const String& modelElementCacheDirectory() const LIFETIME_BOUND { return m_directories.modelElementCacheDirectory; }
-    void setModelElementCacheDirectory(String&& directory) { m_directories.modelElementCacheDirectory = WTF::move(directory); }
-#endif
 
     const String& boundInterfaceIdentifier() const LIFETIME_BOUND { return m_boundInterfaceIdentifier; }
     void setBoundInterfaceIdentifier(String&& identifier) { m_boundInterfaceIdentifier = WTF::move(identifier); }
@@ -284,9 +280,6 @@ public:
         String searchFieldHistoryDirectory;
         String serviceWorkerRegistrationDirectory;
         String webSQLDatabaseDirectory;
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-        String modelElementCacheDirectory;
-#endif
 #if ENABLE(CONTENT_EXTENSIONS)
         String resourceMonitorThrottlerDirectory;
 #endif

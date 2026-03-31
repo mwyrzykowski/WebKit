@@ -39,10 +39,6 @@
 #import <pal/spi/cocoa/QuartzCoreSPI.h>
 #import <wtf/MachSendRightAnnotated.h>
 
-#if ENABLE(ARKIT_INLINE_PREVIEW_IOS)
-#import "WKModelView.h"
-#endif
-
 #if ENABLE(MODEL_PROCESS)
 #import "ModelPresentationManagerProxy.h"
 #import "WKPageHostedModelView.h"
@@ -166,8 +162,6 @@ RefPtr<RemoteLayerTreeNode> RemoteLayerTreeHost::makeNode(const RemoteLayerTreeT
                     if (auto* model = std::get_if<Ref<Model>>(&properties.additionalData)) {
 #if ENABLE(SEPARATED_MODEL)
                 return makeWithView(adoptNS([[WKSeparatedModelView alloc] initWithModel:*model]));
-#elif ENABLE(ARKIT_INLINE_PREVIEW_IOS)
-                return makeWithView(adoptNS([[WKModelView alloc] initWithModel:*model layerID:*properties.layerID page:*m_drawingArea->page()]));
 #else
                 UNUSED_PARAM(model);
 #endif

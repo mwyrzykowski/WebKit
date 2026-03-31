@@ -1,5 +1,4 @@
 Modules/WebGPU/GPUQueue.cpp
-[ Mac ] Modules/model-element/scenekit/SceneKitModelPlayer.mm
 [ iOS ] Modules/system-preview/ARKitBadgeSystemImage.mm
 [ Mac ] accessibility/cocoa/AXCoreObjectCocoa.mm
 [ Mac ] accessibility/cocoa/AXTextMarkerCocoa.mm

@@ -368,10 +368,6 @@ public:
 
     virtual bool isParentProcessAFullWebBrowser() const { return false; }
 
-#if ENABLE(ARKIT_INLINE_PREVIEW_MAC)
-    virtual void modelInlinePreviewUUIDs(CompletionHandler<void(Vector<String>)>&&) const { }
-#endif
-
     virtual void dispatchLoadEventToOwnerElementInAnotherProcess() = 0;
 
 #if ENABLE(WINDOW_PROXY_PROPERTY_ACCESS_NOTIFICATION)

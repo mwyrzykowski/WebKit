@@ -98,7 +98,6 @@ list(APPEND PAL_PUBLIC_HEADERS
     spi/cocoa/QuartzCoreSPI.h
     spi/cocoa/RevealSPI.h
     spi/cocoa/SQLite3SPI.h
-    spi/cocoa/SceneKitSPI.h
     spi/cocoa/SecKeyProxySPI.h
     spi/cocoa/ServersSPI.h
     spi/cocoa/SpeechSPI.h
@@ -148,7 +147,6 @@ list(APPEND PAL_PUBLIC_HEADERS
     spi/mac/NSWindowSPI.h
     spi/mac/PIPSPI.h
     spi/mac/QuickLookMacSPI.h
-    spi/mac/SystemPreviewSPI.h
     spi/mac/TelephonyUtilitiesSPI.h
 
     system/cocoa/SleepDisablerCocoa.h

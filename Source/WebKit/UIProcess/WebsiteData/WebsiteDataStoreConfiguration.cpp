@@ -98,9 +98,6 @@ void WebsiteDataStoreConfiguration::initializePaths()
     setNetworkCacheDirectory(WebsiteDataStore::defaultNetworkCacheDirectory(m_baseCacheDirectory));
     setMediaCacheDirectory(WebsiteDataStore::defaultMediaCacheDirectory(m_baseCacheDirectory));
     setHSTSStorageDirectory(WebsiteDataStore::defaultHSTSStorageDirectory(m_baseCacheDirectory));
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-    setModelElementCacheDirectory(WebsiteDataStore::defaultModelElementCacheDirectory());
-#endif
 
     setAlternativeServicesDirectory(WebsiteDataStore::defaultAlternativeServicesDirectory(m_baseDataDirectory));
     setIndexedDBDatabaseDirectory(WebsiteDataStore::defaultIndexedDBDatabaseDirectory(m_baseDataDirectory));
@@ -211,9 +208,6 @@ WebsiteDataStoreConfiguration::Directories WebsiteDataStoreConfiguration::Direct
         crossThreadCopy(searchFieldHistoryDirectory),
         crossThreadCopy(serviceWorkerRegistrationDirectory),
         crossThreadCopy(webSQLDatabaseDirectory),
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-        crossThreadCopy(modelElementCacheDirectory),
-#endif
 #if ENABLE(CONTENT_EXTENSIONS)
         crossThreadCopy(resourceMonitorThrottlerDirectory),
 #endif
@@ -243,9 +237,6 @@ WebsiteDataStoreConfiguration::Directories WebsiteDataStoreConfiguration::Direct
         crossThreadCopy(WTF::move(searchFieldHistoryDirectory)),
         crossThreadCopy(WTF::move(serviceWorkerRegistrationDirectory)),
         crossThreadCopy(WTF::move(webSQLDatabaseDirectory)),
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-        crossThreadCopy(WTF::move(modelElementCacheDirectory)),
-#endif
 #if ENABLE(CONTENT_EXTENSIONS)
         crossThreadCopy(WTF::move(resourceMonitorThrottlerDirectory)),
 #endif

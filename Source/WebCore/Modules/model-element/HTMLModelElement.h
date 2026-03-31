@@ -189,10 +189,6 @@ public:
 
     void sizeMayHaveChanged();
 
-#if ENABLE(ARKIT_INLINE_PREVIEW_MAC)
-    WEBCORE_EXPORT String inlinePreviewUUIDForTesting() const;
-#endif
-
     size_t NODELETE memoryCost() const;
 #if ENABLE(RESOURCE_USAGE)
     size_t NODELETE externalMemoryCost() const;

@@ -49,7 +49,14 @@
 #import <wtf/WeakObjCPtr.h>
 #import <wtf/cocoa/SpanCocoa.h>
 
-#import <pal/ios/QuickLookSoftLink.h>
+#if PLATFORM(VISION)
+#if USE(APPLE_INTERNAL_SDK)
+#import <AssetViewer/ASVLaunchPreview.h>
+#else
+@interface ASVLaunchPreview : NSObject
+@end
+#endif
+#endif
 
 #import <pal/ios/QuickLookSoftLink.h>
 

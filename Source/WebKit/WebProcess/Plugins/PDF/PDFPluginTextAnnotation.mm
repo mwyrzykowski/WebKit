@@ -69,7 +69,7 @@ static const String cssAlignmentValueForNSTextAlignment(NSTextAlignment alignmen
 
 Ref<PDFPluginTextAnnotation> PDFPluginTextAnnotation::create(PDFAnnotation *annotation, PDFPluginBase* plugin)
 {
-    ASSERT(PDFAnnotationTypeHelpers::annotationIsWidgetOfType(annotation, WidgetType::Text));
+    ASSERT(PDFAnnotationTypeHelpers::annotationIsWidgetOfType(annotation, PDFAnnotationTypeHelpers::WidgetType::Text));
     return adoptRef(*new PDFPluginTextAnnotation(annotation, plugin));
 }
 

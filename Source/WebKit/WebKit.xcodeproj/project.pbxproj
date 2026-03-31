@@ -1623,12 +1623,9 @@
 		7114EA442EBCB3FD00190912 /* RemoteAnimationUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 7114EA422EBCB35600190912 /* RemoteAnimationUtilities.h */; };
 		711725A9228D564300018514 /* WebsiteLegacyOverflowScrollingTouchPolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = 711725A8228D563A00018514 /* WebsiteLegacyOverflowScrollingTouchPolicy.h */; };
 		7121A3CF2B73728B00C8F7A4 /* CAFrameRateRangeUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 7121A3CE2B73727B00C8F7A4 /* CAFrameRateRangeUtilities.h */; };
-		7134A3DA2603B92500624BD3 /* WKModelInteractionGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 7134A3D92603B80E00624BD3 /* WKModelInteractionGestureRecognizer.h */; };
-		7137BA8025F1542000914EE3 /* ModelElementController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7137BA7F25F1540C00914EE3 /* ModelElementController.h */; };
 		71722EB22EA919E9004218E6 /* RemoteProgressBasedTimelineRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 71722EAF2EA919E9004218E6 /* RemoteProgressBasedTimelineRegistry.h */; };
 		71983F112EA6398D00594BCE /* RemoteMonotonicTimelineRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 71983F0F2EA6397000594BCE /* RemoteMonotonicTimelineRegistry.h */; };
 		71A676A622C62325007D6295 /* WKTouchActionGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A676A422C62318007D6295 /* WKTouchActionGestureRecognizer.h */; };
-		71BAA73325FFD09800D7CD5D /* WKModelView.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BAA73125FFCCBA00D7CD5D /* WKModelView.h */; };
 		71C9EC9F2CF9FB6400B8AF06 /* RemoteAnimationTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 71C9EC9D2CF9F93600B8AF06 /* RemoteAnimationTimeline.h */; };
 		71C9ECA02CF9FB6B00B8AF06 /* RemoteMonotonicTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 71C9EC992CF9F93600B8AF06 /* RemoteMonotonicTimeline.h */; };
 		71C9ECA12CF9FB7100B8AF06 /* RemoteProgressBasedTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 71C9EC9B2CF9F93600B8AF06 /* RemoteProgressBasedTimeline.h */; };
@@ -6877,32 +6874,20 @@
 		7114EA432EBCB35600190912 /* RemoteAnimationUtilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteAnimationUtilities.cpp; sourceTree = "<group>"; };
 		711725A8228D563A00018514 /* WebsiteLegacyOverflowScrollingTouchPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebsiteLegacyOverflowScrollingTouchPolicy.h; sourceTree = "<group>"; };
 		7121A3CE2B73727B00C8F7A4 /* CAFrameRateRangeUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CAFrameRateRangeUtilities.h; sourceTree = "<group>"; };
-		7134A3D82603B80E00624BD3 /* WKModelInteractionGestureRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKModelInteractionGestureRecognizer.mm; sourceTree = "<group>"; };
-		7134A3D92603B80E00624BD3 /* WKModelInteractionGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKModelInteractionGestureRecognizer.h; sourceTree = "<group>"; };
 		71371D1E2B1F89C00092C32D /* RemoteAnimationStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteAnimationStack.h; sourceTree = "<group>"; };
 		71371D1F2B1F89C10092C32D /* RemoteAnimationStack.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteAnimationStack.mm; sourceTree = "<group>"; };
-		7137BA7D25F153E900914EE3 /* ModelElementControllerCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ModelElementControllerCocoa.mm; sourceTree = "<group>"; };
-		7137BA7E25F1540B00914EE3 /* ModelElementController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModelElementController.cpp; sourceTree = "<group>"; };
-		7137BA7F25F1540C00914EE3 /* ModelElementController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelElementController.h; sourceTree = "<group>"; };
 		71722EAF2EA919E9004218E6 /* RemoteProgressBasedTimelineRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteProgressBasedTimelineRegistry.h; sourceTree = "<group>"; };
 		71722EB02EA919E9004218E6 /* RemoteProgressBasedTimelineRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteProgressBasedTimelineRegistry.cpp; sourceTree = "<group>"; };
-		7177AD5B2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARKitInlinePreviewModelPlayer.mm; sourceTree = "<group>"; };
-		7177AD5C2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARKitInlinePreviewModelPlayer.h; sourceTree = "<group>"; };
-		7177AD662743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARKitInlinePreviewModelPlayerIOS.mm; sourceTree = "<group>"; };
-		7177AD672743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARKitInlinePreviewModelPlayerIOS.h; sourceTree = "<group>"; };
 		71983F0F2EA6397000594BCE /* RemoteMonotonicTimelineRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteMonotonicTimelineRegistry.h; sourceTree = "<group>"; };
 		71983F102EA6397000594BCE /* RemoteMonotonicTimelineRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteMonotonicTimelineRegistry.cpp; sourceTree = "<group>"; };
 		71A676A422C62318007D6295 /* WKTouchActionGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKTouchActionGestureRecognizer.h; sourceTree = "<group>"; };
 		71A676A522C62318007D6295 /* WKTouchActionGestureRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKTouchActionGestureRecognizer.mm; sourceTree = "<group>"; };
-		71BAA73125FFCCBA00D7CD5D /* WKModelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKModelView.h; sourceTree = "<group>"; };
-		71BAA73225FFCCBA00D7CD5D /* WKModelView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKModelView.mm; sourceTree = "<group>"; };
 		71C9EC992CF9F93600B8AF06 /* RemoteMonotonicTimeline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteMonotonicTimeline.h; sourceTree = "<group>"; };
 		71C9EC9A2CF9F93600B8AF06 /* RemoteMonotonicTimeline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteMonotonicTimeline.cpp; sourceTree = "<group>"; };
 		71C9EC9B2CF9F93600B8AF06 /* RemoteProgressBasedTimeline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteProgressBasedTimeline.h; sourceTree = "<group>"; };
 		71C9EC9C2CF9F93600B8AF06 /* RemoteProgressBasedTimeline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteProgressBasedTimeline.cpp; sourceTree = "<group>"; };
 		71C9EC9D2CF9F93600B8AF06 /* RemoteAnimationTimeline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteAnimationTimeline.h; sourceTree = "<group>"; };
 		71C9EC9E2CF9F93600B8AF06 /* RemoteAnimationTimeline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteAnimationTimeline.cpp; sourceTree = "<group>"; };
-		71E9650F2745682E00ADCF43 /* ModelIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModelIdentifier.h; sourceTree = "<group>"; };
 		71F62F722D076DEE00B591D2 /* RemoteAnimation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteAnimation.h; sourceTree = "<group>"; };
 		71F62F732D076DEE00B591D2 /* RemoteAnimation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteAnimation.cpp; sourceTree = "<group>"; };
 		71FB810A2260627A00323677 /* WebsiteSimulatedMouseEventsDispatchPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebsiteSimulatedMouseEventsDispatchPolicy.h; sourceTree = "<group>"; };
@@ -7973,8 +7958,6 @@
 		BC20528011C94284008F3375 /* WKBundlePage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WKBundlePage.cpp; sourceTree = "<group>"; };
 		BC2652121182608100243E12 /* DrawingAreaProxy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawingAreaProxy.cpp; sourceTree = "<group>"; };
 		BC2652131182608100243E12 /* DrawingAreaProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawingAreaProxy.h; sourceTree = "<group>"; };
-		BC2B410C2732EF9600A2D191 /* ARKitInlinePreviewModelPlayerMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARKitInlinePreviewModelPlayerMac.h; sourceTree = "<group>"; };
-		BC2B410D2732EF9600A2D191 /* ARKitInlinePreviewModelPlayerMac.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARKitInlinePreviewModelPlayerMac.mm; sourceTree = "<group>"; };
 		BC2B411A2732F66E00A2D191 /* WebModelPlayerProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebModelPlayerProvider.h; sourceTree = "<group>"; };
 		BC2B411B2732F66E00A2D191 /* WebModelPlayerProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WebModelPlayerProvider.cpp; sourceTree = "<group>"; };
 		BC2D021612AC41CB00E732A3 /* SameDocumentNavigationType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SameDocumentNavigationType.h; sourceTree = "<group>"; };
@@ -10309,7 +10292,6 @@
 				49917DB0252E30750050313F /* MediaPlaybackState.h */,
 				2D9BECF82B309E6E00D0AE99 /* MediaPlaybackState.serialization.in */,
 				869055832912C6B000B5ECD3 /* Model.serialization.in */,
-				71E9650F2745682E00ADCF43 /* ModelIdentifier.h */,
 				2DA8153328A46A0000CF811C /* ModelProcessConnectionParameters.h */,
 				541A3D0A2B5F2BA3009CE0D6 /* ModelProcessConnectionParameters.serialization.in */,
 				7203449A26A6C44C000A5F54 /* MonotonicObjectIdentifier.h */,
@@ -10738,7 +10720,6 @@
 				9342588F2555DCA50059EEDD /* MediaPermissionUtilities.mm */,
 				411286EF21C8A90C003A8550 /* MediaUtilities.h */,
 				411286F021C8A90D003A8550 /* MediaUtilities.mm */,
-				7137BA7D25F153E900914EE3 /* ModelElementControllerCocoa.mm */,
 				1ABC3DF41899E437004F0626 /* NavigationState.h */,
 				1ABC3DF31899E437004F0626 /* NavigationState.mm */,
 				EEEEBCBC2EE35A8B000FF6AG /* NSGlassEffectView+Extras.swift */,
@@ -12480,10 +12461,6 @@
 				F4BA33F125757E89000A3CE8 /* WKImageAnalysisGestureRecognizer.mm */,
 				2DD5E127210ADC7A00DB6012 /* WKKeyboardScrollingAnimator.h */,
 				2DD5E126210ADC7A00DB6012 /* WKKeyboardScrollingAnimator.mm */,
-				7134A3D92603B80E00624BD3 /* WKModelInteractionGestureRecognizer.h */,
-				7134A3D82603B80E00624BD3 /* WKModelInteractionGestureRecognizer.mm */,
-				71BAA73125FFCCBA00D7CD5D /* WKModelView.h */,
-				71BAA73225FFCCBA00D7CD5D /* WKModelView.mm */,
 				950F287E252414E900B74F1C /* WKMouseDeviceObserver.h */,
 				07FEBC9C2E036C6D004A6D5D /* WKMouseDeviceObserver.mm */,
 				F4C627E62A7AC17400F546BF /* WKMouseInteraction.h */,
@@ -14912,8 +14889,6 @@
 		7177AD652743F66C002F103B /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				7177AD672743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.h */,
-				7177AD662743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.mm */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -15954,8 +15929,6 @@
 				0F9FA7DB26CEFADA00872684 /* MediaKeySystemPermissionRequestProxy.cpp */,
 				9ACC07B425C8160B00DC6386 /* MediaKeySystemPermissionRequestProxy.h */,
 				93425898255B534B0059EEDD /* MediaPermissionUtilities.h */,
-				7137BA7E25F1540B00914EE3 /* ModelElementController.cpp */,
-				7137BA7F25F1540C00914EE3 /* ModelElementController.h */,
 				1C5A104E287BB1E90034FDA4 /* OverrideLanguages.cpp */,
 				1C5A104F287BB1E90034FDA4 /* OverrideLanguages.h */,
 				D2FB53952E13020F00AF9D5C /* PageClient.cpp */,
@@ -16622,8 +16595,6 @@
 			children = (
 				7177AD652743F66C002F103B /* ios */,
 				BC2B410B2732EF7500A2D191 /* mac */,
-				7177AD5C2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.h */,
-				7177AD5B2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.mm */,
 				0D653B272F34371D0022454D /* Mesh.h */,
 				0D653B262F3434B90022454D /* ModelInlineConverters.h */,
 				2DA8152F28A462B400CF811C /* ModelProcessConnection.cpp */,
@@ -16649,8 +16620,6 @@
 		BC2B410B2732EF7500A2D191 /* mac */ = {
 			isa = PBXGroup;
 			children = (
-				BC2B410C2732EF9600A2D191 /* ARKitInlinePreviewModelPlayerMac.h */,
-				BC2B410D2732EF9600A2D191 /* ARKitInlinePreviewModelPlayerMac.mm */,
 			);
 			path = mac;
 			sourceTree = "<group>";
@@ -18362,7 +18331,6 @@
 				EBA8D3B327A5E33F00CB7900 /* MockPushServiceConnection.h in Headers */,
 				07E065192F19E05C00ECDA2E /* ModelConnectionToWebProcess.h in Headers */,
 				0D9649182E7489AF000F9CDA /* ModelDowncastConvertToBackingContext.h in Headers */,
-				7137BA8025F1542000914EE3 /* ModelElementController.h in Headers */,
 				07E0651A2F19E06000ECDA2E /* ModelProcess.h in Headers */,
 				07E0651D2F19E07100ECDA2E /* ModelProcessConnection.h in Headers */,
 				07E065122F19DDD600ECDA2E /* ModelProcessConnectionInfo.h in Headers */,
@@ -19326,8 +19294,6 @@
 				1AB40EE61BF677E300BA81BE /* WKMenuItemIdentifiersPrivate.h in Headers */,
 				5CABDC8622C40FDE001EDE8E /* WKMessageListener.h in Headers */,
 				411A8DDB20DDD1AC0060D34F /* WKMockMediaDevice.h in Headers */,
-				7134A3DA2603B92500624BD3 /* WKModelInteractionGestureRecognizer.h in Headers */,
-				71BAA73325FFD09800D7CD5D /* WKModelView.h in Headers */,
 				950F2880252414EA00B74F1C /* WKMouseDeviceObserver.h in Headers */,
 				F4C627E72A7AC17B00F546BF /* WKMouseInteraction.h in Headers */,
 				BC4075FE124FF0270068F20A /* WKMutableArray.h in Headers */,

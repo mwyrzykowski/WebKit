@@ -28,7 +28,6 @@
 
 #if ENABLE(MODEL_PROCESS)
 
-#import "ModelIdentifier.h"
 #import "WebPage.h"
 #import "WebPageProxyMessages.h"
 #import "WebProcess.h"

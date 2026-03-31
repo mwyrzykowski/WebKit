@@ -614,9 +614,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     Modules/model-element/dummy/DummyModelPlayerProvider.h
 
-    Modules/model-element/scenekit/SceneKitModelLoaderClient.h
-    Modules/model-element/scenekit/SceneKitModelPlayer.h
-
     Modules/notifications/Notification.h
     Modules/notifications/NotificationClient.h
     Modules/notifications/NotificationController.h

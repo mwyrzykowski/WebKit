@@ -30,6 +30,7 @@
 
 #import <WebCore/ElementInlines.h>
 #import <WebCore/HTMLElement.h>
+#import <WebCore/LocalizedStrings.h>
 #import <WebCore/SVGNames.h>
 #import <WebCore/XMLNSNames.h>
 

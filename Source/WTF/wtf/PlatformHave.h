@@ -960,10 +960,6 @@
 #define HAVE_CORE_LOCATION 1
 #endif
 
-#if PLATFORM(MAC)
-#define HAVE_SCENEKIT !ENABLE_GPU_PROCESS_MODEL
-#endif
-
 #if PLATFORM(COCOA)
 #define HAVE_WEBGPU_IMPLEMENTATION 1
 // FIXME: PlatformHave.h should not depend or defined ENABLE macros.

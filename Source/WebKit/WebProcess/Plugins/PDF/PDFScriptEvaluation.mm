@@ -33,6 +33,7 @@
 #import <pal/spi/cg/CoreGraphicsSPI.h>
 #import <wtf/NeverDestroyed.h>
 #import <wtf/OptionSet.h>
+#import <wtf/cf/VectorCF.h>
 #import <wtf/text/ASCIILiteral.h>
 #import <wtf/text/StringView.h>
 #import <wtf/text/WTFString.h>

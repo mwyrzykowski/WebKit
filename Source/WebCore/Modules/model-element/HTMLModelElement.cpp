@@ -1657,18 +1657,6 @@ bool HTMLModelElement::modelContainerSizeIsEmpty() const
 #endif
 }
 
-#if ENABLE(ARKIT_INLINE_PREVIEW_MAC)
-
-String HTMLModelElement::inlinePreviewUUIDForTesting() const
-{
-    RefPtr modelPlayer = m_modelPlayer;
-    if (!modelPlayer)
-        return emptyString();
-    return modelPlayer->inlinePreviewUUIDForTesting();
-}
-
-#endif
-
 void HTMLModelElement::collectPresentationalHintsForAttribute(const QualifiedName& name, const AtomString& value, MutableStyleProperties& style)
 {
     if (name == widthAttr) {

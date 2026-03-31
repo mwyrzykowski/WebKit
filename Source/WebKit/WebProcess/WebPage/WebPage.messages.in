@@ -816,11 +816,6 @@ messages -> WebPage WantsAsyncDispatchMessage {
 
     NavigateServiceWorkerClient(WebCore::ScriptExecutionContextIdentifier documentIdentifier, URL url) -> (enum:uint8_t WebCore::ScheduleLocationChangeResult result)
 
-#if ENABLE(ARKIT_INLINE_PREVIEW_IOS)
-    ModelInlinePreviewDidLoad(WebCore::PlatformLayerIdentifier layerID)
-    ModelInlinePreviewDidFailToLoad(WebCore::PlatformLayerIdentifier layerID, WebCore::ResourceError error)
-#endif
-
 #if HAVE(UIKIT_RESIZABLE_WINDOWS)
     SetIsWindowResizingEnabled(bool hasResizableWindows)
 #endif

@@ -141,6 +141,7 @@ struct DataDetectorElementInfo;
 struct ExceptionData;
 struct ShareDataWithParsedURL;
 struct TextAnimationData;
+struct TextEffectData;
 struct TextRecognitionResult;
 
 #if HAVE(TRANSLATION_UI_SERVICES) && ENABLE(CONTEXT_MENUS)

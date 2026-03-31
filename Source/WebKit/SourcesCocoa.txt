@@ -456,7 +456,6 @@ UIProcess/Cocoa/LegacyDownloadClient.mm @nonARC
 UIProcess/Cocoa/LegacySessionStateCoding.cpp
 UIProcess/Cocoa/MediaUtilities.mm @nonARC
 UIProcess/Cocoa/MediaPermissionUtilities.mm @nonARC
-UIProcess/Cocoa/ModelElementControllerCocoa.mm @nonARC
 UIProcess/Cocoa/NavigationState.mm @nonARC
 UIProcess/Cocoa/PageClientImplCocoa.mm @nonARC
 UIProcess/Cocoa/PlatformWritingToolsUtilities.mm @nonARC
@@ -607,8 +606,6 @@ UIProcess/ios/WKGeolocationProviderIOS.mm @nonARC
 UIProcess/ios/WKHighlightLongPressGestureRecognizer.mm @nonARC
 UIProcess/ios/WKImageAnalysisGestureRecognizer.mm @nonARC
 UIProcess/ios/WKKeyboardScrollingAnimator.mm @nonARC
-UIProcess/ios/WKModelInteractionGestureRecognizer.mm @nonARC
-UIProcess/ios/WKModelView.mm @nonARC
 UIProcess/ios/WKMouseDeviceObserver.mm @nonARC
 UIProcess/ios/WKMouseInteraction.mm @nonARC
 UIProcess/ios/WKPageHostedModelView.mm @nonARC
@@ -841,10 +838,6 @@ WebProcess/Inspector/mac/RemoteWebInspectorUIMac.mm @nonARC
 WebProcess/Inspector/mac/WebInspectorUIMac.mm @nonARC
 
 WebProcess/MediaCache/WebMediaKeyStorageManager.cpp
-
-WebProcess/Model/ARKitInlinePreviewModelPlayer.mm @nonARC
-WebProcess/Model/ios/ARKitInlinePreviewModelPlayerIOS.mm @nonARC
-WebProcess/Model/mac/ARKitInlinePreviewModelPlayerMac.mm @nonARC
 
 WebProcess/Plugins/PDF/PDFAnnotationTypeHelpers.mm @nonARC
 WebProcess/Plugins/PDF/PDFIncrementalLoader.mm @nonARC

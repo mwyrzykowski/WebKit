@@ -40,6 +40,7 @@
 #import <WebCore/Document.h>
 #import <WebCore/FrameTree.h>
 #import <WebCore/LocalFrame.h>
+#import <WebCore/LocalFrameInlines.h>
 #import <WebCore/LocalFrameView.h>
 #import <WebCore/Page.h>
 #import <WebCore/RemoteFrame.h>

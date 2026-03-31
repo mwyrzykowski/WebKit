@@ -8580,18 +8580,6 @@ UpgradeKnownHostsToHTTPSEnabled:
     WebKit:
       default: true
 
-UseARKitForModel:
-  type: bool
-  status: internal
-  humanReadableName: "Use ARKit for <model>"
-  humanReadableDescription: "Use ARKit for <model>"
-  webcoreBinding: none
-  exposed: [ WebKit ]
-  condition: ENABLE(ARKIT_INLINE_PREVIEW)
-  defaultValue:
-    WebKit:
-      default: true
-
 UseAVCaptureDeviceRotationCoordinatorAPI:
   type: bool
   status: internal
@@ -8798,18 +8786,6 @@ UsePreHTML5ParserQuirks:
     WebKit:
       default: false
     WebCore:
-      default: false
-
-UseSceneKitForModel:
-  type: bool
-  status: unstable
-  humanReadableName: "Use SceneKit for <model>"
-  humanReadableDescription: "Use SceneKit for <model>"
-  webcoreBinding: none
-  exposed: [ WebKit ]
-  condition: HAVE(SCENEKIT)
-  defaultValue:
-    WebKit:
       default: false
 
 UseSystemAppearance:
