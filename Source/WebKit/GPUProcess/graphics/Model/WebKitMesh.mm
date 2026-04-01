@@ -30,9 +30,13 @@
 
 #import <WebCore/IOSurface.h>
 #import <WebCore/ProcessIdentity.h>
+#import <wtf/BlockPtr.h>
 #import <wtf/CheckedArithmetic.h>
+#import <wtf/CompletionHandler.h>
 #import <wtf/MathExtras.h>
+#import <wtf/RunLoop.h>
 #import <wtf/TZoneMallocInlines.h>
+#import <wtf/cocoa/VectorCocoa.h>
 #import <wtf/spi/cocoa/IOSurfaceSPI.h>
 #import <wtf/threads/BinarySemaphore.h>
 
@@ -41,6 +45,11 @@
 namespace WebModel {
 
 #if ENABLE(GPU_PROCESS_MODEL)
+
+static WKBridgeTypedResourceId *convert(const TypedResourceId& update)
+{
+    return [WebKit::allocWKBridgeTypedResourceIdInstance() initWithValue:[[NSUUID alloc] initWithUUIDString:update.value.createNSString().get()] path:update.path.createNSString().get() hashValue:update.hashValue];
+}
 
 // Helper conversion functions from WebGPU types to Metal types
 static WKBridgeVertexSemantic toMetal(VertexSemantic semantic)
@@ -535,6 +544,18 @@ static NSArray<WKBridgeMeshPart *> *convert(const Vector<MeshPart>& parts)
     return result;
 }
 
+static NSArray<WKBridgeTypedResourceId *> *convert(const Vector<TypedResourceId>& parts)
+{
+    if (!parts.size())
+        return nil;
+
+    NSMutableArray<WKBridgeTypedResourceId *> *result = [NSMutableArray array];
+    for (const auto& p : parts)
+        [result addObject:convert(p)];
+
+    return result;
+}
+
 template<typename T>
 static NSData* convert(const Vector<T>& data)
 {
@@ -594,18 +615,6 @@ static WKBridgeMeshDescriptor *convert(const MeshDescriptor& descriptor)
         vertexLayouts:convert(descriptor.vertexLayouts)
         indexCapacity:descriptor.indexCapacity
         indexType:toMetal(descriptor.indexType)];
-}
-
-static NSArray<NSString *> *convert(const Vector<String>& v)
-{
-    if (!v.size())
-        return nil;
-
-    NSMutableArray<NSString *> *result = [NSMutableArray array];
-    for (const auto& s : v)
-        [result addObject:s.createNSString().get()];
-
-    return result;
 }
 
 static WKBridgeSkinningData *convert(const std::optional<SkinningData>& data)
@@ -998,30 +1007,32 @@ bool WebMesh::isValid() const
 
 WebMesh::~WebMesh() = default;
 
-void WebMesh::render() const
+void WebMesh::render(uint32_t textureIndex, Function<void(bool)>&& completionHandler) const
 {
 #if ENABLE(GPU_PROCESS_MODEL)
     processUpdates();
     if (!m_meshDataExists)
         return;
 
-    auto texture = ^{
-        ++m_currentTexture;
-        if (m_currentTexture >= [m_textures count])
-            m_currentTexture = 0;
-
-        return [m_textures count] ? [m_textures objectAtIndex:m_currentTexture] : nil;
+    auto texture = ^(uint32_t textureIndex) {
+        return [m_textures count] > textureIndex ? [m_textures objectAtIndex:textureIndex] : nil;
     };
 
-    if (id<MTLTexture> modelBacking = texture())
-        [m_receiver renderWithTexture:modelBacking];
+    if (id<MTLTexture> modelBacking = texture(textureIndex)) {
+        id<MTLCommandBuffer> commandBuffer = [m_receiver commandBuffer];
+        [commandBuffer addCompletedHandler:makeBlockPtr([completionHandler = WTF::move(completionHandler)] (id<MTLCommandBuffer> mtlCommandBuffer) mutable {
+            completionHandler(mtlCommandBuffer.status == MTLCommandBufferStatusCompleted);
+        }).get()];
+        [m_receiver renderWithTexture:modelBacking commandBuffer:commandBuffer];
+    } else
+        completionHandler(false);
 #endif
 }
 
-void WebMesh::update(const WebModel::UpdateMeshDescriptor& input)
-{
 #if ENABLE(GPU_PROCESS_MODEL)
-    WKBridgeUpdateMesh *descriptor = [WebKit::allocWKBridgeUpdateMeshInstance() initWithIdentifier:input.identifier.createNSString().get()
+static WKBridgeUpdateMesh *convert(const WebModel::UpdateMeshDescriptor& input)
+{
+    return [WebKit::allocWKBridgeUpdateMeshInstance() initWithIdentifier:convert(input.identifier)
         updateType:static_cast<WKBridgeDataUpdateType>(input.updateType)
         descriptor:WebModel::convert(input.descriptor)
         parts:WebModel::convert(input.parts)
@@ -1029,65 +1040,83 @@ void WebMesh::update(const WebModel::UpdateMeshDescriptor& input)
         vertexData:WebModel::convert(input.vertexData)
         instanceTransforms:WebModel::convert(input.instanceTransforms)
         instanceTransformsCount:input.instanceTransforms.size()
-        materialPrims:WebModel::convert(input.materialPrims)
+        assignedMaterials:WebModel::convert(input.assignedMaterials)
         deformationData:WebModel::convert(input.deformationData)];
+}
+#endif
 
-    if (!descriptor)
-        return;
-
+void WebMesh::update(Vector<WebModel::UpdateMeshDescriptor>&& inputArray)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
     if (!m_batchedUpdates)
         m_batchedUpdates = [NSMutableDictionary dictionary];
 
-    [m_batchedUpdates setObject:descriptor forKey:descriptor.identifier];
+    for (auto& input : inputArray) {
+        WKBridgeUpdateMesh *descriptor = convert(input);
+        RELEASE_ASSERT(descriptor);
+        [m_batchedUpdates setObject:descriptor forKey:@(descriptor.identifier.cachedHashValue)];
+    }
 #else
-    UNUSED_PARAM(input);
+    UNUSED_PARAM(inputArray);
 #endif
 }
 
 void WebMesh::processUpdates() const
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    for (WKBridgeUpdateMesh *descriptor in [m_batchedUpdates allValues]) {
-        BinarySemaphore completion;
-        RELEASE_ASSERT(m_receiver);
-        [m_receiver updateMesh:descriptor completionHandler:[&] mutable {
-            completion.signal();
-        }];
-        completion.wait();
-        m_meshDataExists = true;
-    }
+    if (![m_batchedUpdates count])
+        return;
+
+    BinarySemaphore completion;
+    RELEASE_ASSERT(m_receiver);
+    [m_receiver updateMesh:[m_batchedUpdates allValues] completionHandler:[&] mutable {
+        completion.signal();
+    }];
+    completion.wait();
+    m_meshDataExists = true;
     [m_batchedUpdates removeAllObjects];
 #endif
 }
 
-void WebMesh::updateTexture(const WebModel::UpdateTextureDescriptor& input)
+#if ENABLE(GPU_PROCESS_MODEL)
+static WKBridgeUpdateTexture *convert(const WebModel::UpdateTextureDescriptor& input)
+{
+    return [WebKit::allocWKBridgeUpdateTextureInstance() initWithImageAsset:WebModel::convert(input.imageAsset) identifier:convert(input.identifier) hashString:input.hashString.createNSString().get()];
+}
+#endif
+
+void WebMesh::updateTexture(Vector<WebModel::UpdateTextureDescriptor>&& inputArray)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    WKBridgeUpdateTexture *descriptor = [WebKit::allocWKBridgeUpdateTextureInstance() initWithImageAsset:WebModel::convert(input.imageAsset) identifier:input.identifier.createNSString().get() hashString:input.hashString.createNSString().get()];
-
-    if (!descriptor)
-        return;
-
     RELEASE_ASSERT(m_receiver);
-    [m_receiver updateTexture:descriptor];
+    [m_receiver updateTexture:createNSArray(inputArray, [](const WebModel::UpdateTextureDescriptor& desc) {
+        return convert(desc);
+    })];
+#else
+    UNUSED_PARAM(inputArray);
 #endif
 }
 
-void WebMesh::updateMaterial(const WebModel::UpdateMaterialDescriptor& originalDescriptor)
+#if ENABLE(GPU_PROCESS_MODEL)
+static WKBridgeUpdateMaterial *convert(const WebModel::UpdateMaterialDescriptor& input)
+{
+    return [WebKit::allocWKBridgeUpdateMaterialInstance() initWithMaterialGraph:WebModel::convert(input.materialGraph) identifier:convert(input.identifier)];
+}
+#endif
+
+void WebMesh::updateMaterial(Vector<WebModel::UpdateMaterialDescriptor>&& inputArray)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    WKBridgeUpdateMaterial *descriptor = [WebKit::allocWKBridgeUpdateMaterialInstance() initWithMaterialGraph:WebModel::convert(originalDescriptor.materialGraph) identifier:originalDescriptor.identifier.createNSString().get()];
-    if (!descriptor)
-        return;
-
     RELEASE_ASSERT(m_receiver);
     BinarySemaphore completion;
-    [m_receiver updateMaterial:descriptor completionHandler:[&] mutable {
+    [m_receiver updateMaterial:createNSArray(inputArray, [](const WebModel::UpdateMaterialDescriptor& desc) {
+        return convert(desc);
+    }) completionHandler:[&] mutable {
         completion.signal();
     }];
     completion.wait();
 #else
-    UNUSED_PARAM(originalDescriptor);
+    UNUSED_PARAM(inputArray);
 #endif
 }
 
@@ -1144,7 +1173,6 @@ void WebMesh::updateRenderBuffers(const WebModel::ResizeMeshDescriptor& descript
         return buffer->surface();
     });
     m_textures = createMetalTextures(MTLCreateSystemDefaultDevice(), ioSurfaces, descriptor.width, descriptor.height);
-    m_currentTexture = 0;
 #else
     UNUSED_PARAM(descriptor);
 #endif

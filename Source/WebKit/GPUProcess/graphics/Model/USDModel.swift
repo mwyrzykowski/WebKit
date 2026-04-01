@@ -27,16 +27,14 @@ import WebKit
 import simd
 
 #if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
-@_weakLinked @_spi(UsdLoaderAPI) import _USDKit_RealityKit
+@_spi(UsdLoaderAPI) import _USDKit_RealityKit
 @_spi(RealityCoreRendererAPI) import RealityKit
-@_weakLinked @_spi(RealityCoreTextureProcessingAPI) import RealityCoreTextureProcessing
-@_weakLinked import USDKit
-@_weakLinked @_spi(SwiftAPI) import DirectResource
-@_weakLinked import USDKit
-@_weakLinked import _USDKit_RealityKit
+@_spi(RealityCoreTextureProcessingAPI) import RealityCoreTextureProcessing
+import USDKit
+@_spi(SwiftAPI) import DirectResource
 import RealityKit
-@_weakLinked @_spi(SGPrivate) import ShaderGraph
-@_weakLinked import RealityCoreDeformation
+@_spi(SGPrivate) import ShaderGraph
+import RealityCoreDeformation
 
 extension _USDKit_RealityKit._Proto_MeshDataUpdate_v1 {
     @_silgen_name("$s18_USDKit_RealityKit24_Proto_MeshDataUpdate_v1V18instanceTransformsSaySo13simd_float4x4aGvg")
@@ -71,6 +69,34 @@ extension MTLCaptureDescriptor {
         let dateString = dateFormatter.string(from: now)
 
         outputURL = URL.temporaryDirectory.appending(path: "capture_\(dateString).gputrace").standardizedFileURL
+    }
+}
+
+actor FrameUpdateQueue {
+    private var isProcessing = false
+    private var pendingContinuation: CheckedContinuation<Bool, Never>?
+
+    // Check if there is already a frame update being processed and wait until it finishes, replacing any previous pending update
+    func acquireUpdateSlot() async -> Bool {
+        guard isProcessing else {
+            isProcessing = true
+            return true
+        }
+
+        // Discard any prior pending render and become the latest pending render
+        return await withCheckedContinuation { continuation in
+            pendingContinuation?.resume(returning: false)
+            pendingContinuation = continuation
+        }
+    }
+
+    // If we successfully acquired the update slot above we must release it
+    func releaseUpdateSlot() {
+        let next = pendingContinuation
+        pendingContinuation = nil
+        if next == nil { isProcessing = false }
+
+        next?.resume(returning: true)
     }
 }
 
@@ -173,7 +199,8 @@ private func makeTextureFromImageAsset(
     generateMips: Bool,
     memoryOwner: task_id_token_t,
     overridePixelFormat: Bool,
-    swizzle: MTLTextureSwizzleChannels = .init(red: .red, green: .green, blue: .blue, alpha: .alpha)
+    swizzle: MTLTextureSwizzleChannels = .init(red: .red, green: .green, blue: .blue, alpha: .alpha),
+    existingTexture: _Proto_LowLevelTextureResource_v1? = nil
 ) -> _Proto_LowLevelTextureResource_v1? {
     guard
         let mtlTexture = makeMTLTextureFromImageAsset(
@@ -189,7 +216,7 @@ private func makeTextureFromImageAsset(
     }
 
     let descriptor = _Proto_LowLevelTextureResource_v1.Descriptor.from(mtlTexture, swizzle: swizzle)
-    if let textureResource = try? renderContext.makeTextureResource(descriptor: descriptor) {
+    if let textureResource = existingTexture ?? (try? renderContext.makeTextureResource(descriptor: descriptor)) {
         guard let commandBuffer = commandQueue.makeCommandBuffer() else {
             fatalError("Could not create command buffer")
         }
@@ -212,10 +239,56 @@ private func makeTextureFromImageAsset(
     return nil
 }
 
+private func makeTextureFromImageAsset(
+    _ imageAsset: WKBridgeImageAsset,
+    device: any MTLDevice,
+    renderContext: any _Proto_LowLevelRenderContext_v1,
+    commandQueue: any MTLCommandQueue,
+    generateMips: Bool,
+    memoryOwner: task_id_token_t,
+    overridePixelFormat: Bool,
+    swizzle: MTLTextureSwizzleChannels = .init(red: .red, green: .green, blue: .blue, alpha: .alpha)
+) -> _Proto_LowLevelTextureResource_v1? {
+    makeTextureFromImageAsset(
+        imageAsset,
+        device: device,
+        renderContext: renderContext,
+        commandQueue: commandQueue,
+        generateMips: generateMips,
+        memoryOwner: memoryOwner,
+        overridePixelFormat: overridePixelFormat,
+        swizzle: swizzle,
+        existingTexture: nil
+    )
+}
+
+private func makeTextureFromImageAsset(
+    _ imageAsset: WKBridgeImageAsset,
+    device: any MTLDevice,
+    renderContext: any _Proto_LowLevelRenderContext_v1,
+    commandQueue: any MTLCommandQueue,
+    generateMips: Bool,
+    memoryOwner: task_id_token_t,
+    overridePixelFormat: Bool,
+    existingTexture: _Proto_LowLevelTextureResource_v1?
+) -> _Proto_LowLevelTextureResource_v1? {
+    makeTextureFromImageAsset(
+        imageAsset,
+        device: device,
+        renderContext: renderContext,
+        commandQueue: commandQueue,
+        generateMips: generateMips,
+        memoryOwner: memoryOwner,
+        overridePixelFormat: overridePixelFormat,
+        swizzle: .init(red: .red, green: .green, blue: .blue, alpha: .alpha),
+        existingTexture: existingTexture
+    )
+}
+
 private func makeParameters(
     for function: (any _Proto_LowLevelMaterialResource_v1.Function)?,
     renderContext: any _Proto_LowLevelRenderContext_v1,
-    textureResources: [String: _Proto_LowLevelTextureResource_v1],
+    textureHashesAndResources: [WKBridgeTypedResourceId: (String, _Proto_LowLevelTextureResource_v1)],
     fallbackTexture: _Proto_LowLevelTextureResource_v1
 ) throws -> _Proto_LowLevelArgumentTable_v1? {
     guard let function else { return nil }
@@ -224,9 +297,14 @@ private func makeParameters(
 
     var optTextures: [_Proto_LowLevelTextureResource_v1?] = argumentTableDescriptor.textures.map({ _ in nil })
     for parameter in parameterMapping?.textures ?? [] {
-        optTextures[parameter.textureIndex] = textureResources[parameter.name] ?? fallbackTexture
+        if let textureHashAndResource = textureHashesAndResources.values.first(where: { $0.0 == parameter.name }) {
+            optTextures[parameter.textureIndex] = textureHashAndResource.1
+        } else {
+            // use fallback texture if no texture if found
+            logInfo("Cannot find texture \(parameter.name), use fallback texture instead")
+            optTextures[parameter.textureIndex] = fallbackTexture
+        }
     }
-    // swift-format-ignore: NeverForceUnwrap
     let textures = optTextures.map({ $0! })
 
     let buffers: [_Proto_LowLevelBufferSpan_v1] = try argumentTableDescriptor.buffers.map { bufferRequirements in
@@ -312,6 +390,12 @@ extension WKBridgeUSDConfiguration {
     }
 }
 
+struct DeformationContext {
+    let deformation: _Proto_Deformation_v1
+    var description: _Proto_LowLevelDeformationDescription_v1
+    var dirty: Bool
+}
+
 @objc
 @implementation
 extension WKBridgeReceiver {
@@ -340,31 +424,24 @@ extension WKBridgeReceiver {
         get { appRenderer.renderTargetDescriptor }
     }
     @nonobjc
-    fileprivate var meshInstancePlainArray: [_Proto_LowLevelMeshInstance_v1?]
-    @nonobjc
-    fileprivate var meshInstances: _Proto_LowLevelMeshInstanceArray_v1
+    fileprivate var meshInstancePool: MeshInstancePool
 
     @nonobjc
-    fileprivate var meshResources: [_Proto_ResourceId: _Proto_LowLevelMeshResource_v1] = [:]
+    fileprivate var meshResources: [WKBridgeTypedResourceId: _Proto_LowLevelMeshResource_v1] = [:]
     @nonobjc
-    fileprivate var meshResourceToMaterials: [_Proto_ResourceId: [_Proto_ResourceId]] = [:]
+    fileprivate var meshResourceToMaterials: [WKBridgeTypedResourceId: [WKBridgeTypedResourceId]] = [:]
     @nonobjc
-    fileprivate var meshToMeshInstances: [_Proto_ResourceId: [_Proto_LowLevelMeshInstance_v1]] = [:]
+    fileprivate var meshToMeshInstances: [WKBridgeTypedResourceId: [_Proto_LowLevelMeshInstance_v1]] = [:]
     @nonobjc
-    fileprivate var meshTransforms: [_Proto_ResourceId: [simd_float4x4]] = [:]
+    fileprivate var meshTransforms: [WKBridgeTypedResourceId: [simd_float4x4]] = [:]
     @nonobjc
     fileprivate var rotationAngle: Float = 0
 
     @nonobjc
     fileprivate let deformationSystem: _Proto_LowLevelDeformationSystem_v1
 
-    struct DeformationContext {
-        let deformation: _Proto_Deformation_v1
-        var description: _Proto_LowLevelDeformationDescription_v1
-        var dirty: Bool
-    }
     @nonobjc
-    fileprivate var meshResourceToDeformationContext: [_Proto_ResourceId: DeformationContext] = [:]
+    fileprivate var meshResourceToDeformationContext: [WKBridgeTypedResourceId: DeformationContext] = [:]
 
     struct Material {
         let resource: _Proto_LowLevelMaterialResource_v1
@@ -375,10 +452,10 @@ extension WKBridgeReceiver {
         #endif
     }
     @nonobjc
-    fileprivate var materialsAndParams: [_Proto_ResourceId: Material] = [:]
+    fileprivate var materialsAndParams: [WKBridgeTypedResourceId: Material] = [:]
 
     @nonobjc
-    fileprivate var textureResources: [String: _Proto_LowLevelTextureResource_v1] = [:]
+    fileprivate var textureHashesAndResources: [WKBridgeTypedResourceId: (String, _Proto_LowLevelTextureResource_v1)] = [:]
 
     @nonobjc
     fileprivate var modelTransform: simd_float4x4
@@ -394,6 +471,17 @@ extension WKBridgeReceiver {
     @nonobjc
     fileprivate let fallbackTexture: _Proto_LowLevelTextureResource_v1
 
+    struct DeferredMeshUpdate {
+        enum UpdateType {
+            // First time mesh update, should add mesh instances to the scene
+            case newMesh
+        }
+
+        let identifier: WKBridgeTypedResourceId
+        let type: UpdateType
+        var updatedInstances: [_Proto_LowLevelMeshInstance_v1]
+    }
+
     init(
         configuration: WKBridgeUSDConfiguration,
         diffuseAsset: WKBridgeImageAsset,
@@ -407,8 +495,8 @@ extension WKBridgeReceiver {
         self.commandQueue = configuration.commandQueue
         self.deformationSystem = try _Proto_LowLevelDeformationSystem_v1.make(configuration.device, configuration.commandQueue).get()
         modelTransform = matrix_identity_float4x4
-        self.meshInstancePlainArray = []
         let meshInstances = try configuration.renderContext.makeMeshInstanceArray(renderTargets: [configuration.renderTarget], count: 16)
+        self.meshInstancePool = MeshInstancePool(renderContext: configuration.renderContext, meshInstances: meshInstances)
         let lightingFunction = configuration.renderContext.makePhysicallyBasedLightingFunction()
         guard
             let diffuseTexture = makeTextureFromImageAsset(
@@ -438,7 +526,6 @@ extension WKBridgeReceiver {
         else {
             fatalError("Could not create specularTexture")
         }
-        self.meshInstances = meshInstances
         self.lightingFunction = lightingFunction
         guard let lightingFunctionArgumentTableDescriptor = lightingFunction.argumentTableDescriptor else {
             fatalError("Could not create lighting function")
@@ -458,8 +545,15 @@ extension WKBridgeReceiver {
         )
     }
 
-    @objc(renderWithTexture:)
-    func render(with texture: any MTLTexture) {
+    @objc
+    func commandBuffer() -> (any MTLCommandBuffer)? {
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+        // swift-format-ignore: NeverForceUnwrap
+        commandQueue.makeCommandBuffer()!
+    }
+
+    @objc(renderWithTexture:commandBuffer:)
+    func render(with texture: any MTLTexture, commandBuffer: any MTLCommandBuffer) {
         for (identifier, meshes) in meshToMeshInstances {
             let originalTransforms = meshTransforms[identifier]
             // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
@@ -475,17 +569,19 @@ extension WKBridgeReceiver {
 
         // animate
         if !meshResourceToDeformationContext.isEmpty {
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
             let commandBuffer = self.commandQueue.makeCommandBuffer()!
 
             for (identifier, deformationContext) in meshResourceToDeformationContext where deformationContext.dirty {
-                deformationContext.deformation.execute(deformation: deformationContext.description, commandBuffer: commandBuffer) {
-                    (commandBuffer: any MTLCommandBuffer) in
-                }
-                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                // swift-format-ignore: NeverForceUnwrap
+                let result = deformationContext.deformation.execute(
+                    deformation: deformationContext.description,
+                    commandBuffer: commandBuffer
+                ) { (commandBuffer: any MTLCommandBuffer) in }
                 meshResourceToDeformationContext[identifier]!.dirty = false
+
+                if case .failure(let error) = result {
+                    print(error)
+                    fatalError("Failed to execute deformation work")
+                }
             }
 
             commandBuffer.enqueue()
@@ -506,9 +602,9 @@ extension WKBridgeReceiver {
         }
 
         do {
-            try appRenderer.render(meshInstances: meshInstances, texture: texture)
+            try appRenderer.render(meshInstances: meshInstancePool.meshInstances, texture: texture, commandBuffer: commandBuffer)
         } catch {
-            logError("failed to start gpu capture \(error)")
+            logError("failed to render \(error)")
         }
 
         let captureManager = MTLCaptureManager.shared()
@@ -518,237 +614,241 @@ extension WKBridgeReceiver {
     }
 
     @objc(updateTexture:)
-    func updateTexture(_ data: WKBridgeUpdateTexture) {
-        guard let asset = data.imageAsset else {
-            logError("Image asset was nil")
-            return
-        }
+    func updateTexture(_ datas: [WKBridgeUpdateTexture]) {
+        for textureData in datas {
+            guard let asset = textureData.imageAsset else {
+                fatalError("Image asset was nil")
+            }
 
-        let textureHash = data.hashString
-        if textureResources[textureHash] != nil {
-            logError("Texture already exists")
-            return
-        }
+            let existingTexture = textureHashesAndResources[textureData.identifier]?.1
+            let needsNewTexture: Bool
+            if let existingTexture {
+                if let descriptor = textureData.imageAsset {
+                    needsNewTexture = existingTexture.descriptor != _Proto_LowLevelTextureResource_v1.Descriptor(from: descriptor)
+                } else {
+                    needsNewTexture = false
+                }
+            } else {
+                needsNewTexture = true
+            }
 
-        let commandQueue = appRenderer.commandQueue
-        if let textureResource = makeTextureFromImageAsset(
-            asset,
-            device: device,
-            renderContext: renderContext,
-            commandQueue: commandQueue,
-            generateMips: true,
-            memoryOwner: self.memoryOwner,
-            overridePixelFormat: false
-        ) {
-            textureResources[textureHash] = textureResource
+            let commandQueue = appRenderer.commandQueue
+            if let textureResource = makeTextureFromImageAsset(
+                asset,
+                device: device,
+                renderContext: renderContext,
+                commandQueue: commandQueue,
+                generateMips: true,
+                memoryOwner: self.memoryOwner,
+                overridePixelFormat: false,
+                existingTexture: needsNewTexture ? nil : existingTexture
+            ) {
+                textureHashesAndResources[textureData.identifier] = (textureData.hashString, textureResource)
+            }
         }
     }
 
     @objc(updateMaterial:completionHandler:)
-    func updateMaterial(_ data: WKBridgeUpdateMaterial) async {
-        logInfo("updateMaterial (pre-dispatch) \(data.identifier)")
+    func updateMaterial(_ updates: [WKBridgeUpdateMaterial]) async {
         do {
-            let identifier = data.identifier
-            logInfo("updateMaterial \(identifier)")
+            for data in updates {
+                logInfo("updateMaterial (pre-dispatch) \(data.identifier)")
 
-            #if canImport(RealityCoreRenderer, _version: 12)
-            guard let shaderGraph = ShaderGraph._Proto_ShaderNodeGraph.fromWKDescriptor(data.materialGraph) else {
-                logError("No materialGraph data provided for material \(identifier)")
-                return
-            }
+                let identifier = data.identifier
+                logInfo("updateMaterial \(identifier)")
 
-            let shaderGraphOutput = try await renderContext.makeShaderGraphFunctions(shaderGraph: shaderGraph)
-            #else
-            let shaderGraphOutput = try await renderContext.makeShaderGraphFunctions(nil)
-            #endif
+                #if canImport(RealityCoreRenderer, _version: 12)
+                guard let shaderGraph = ShaderGraph._Proto_ShaderNodeGraph.fromWKDescriptor(data.materialGraph) else {
+                    fatalError("No materialGraph data provided for material \(identifier)")
+                }
 
-            let geometryArguments = try makeParameters(
-                for: shaderGraphOutput.geometryModifier,
-                renderContext: renderContext,
-                textureResources: textureResources,
-                fallbackTexture: self.fallbackTexture
-            )
-            let surfaceArguments = try makeParameters(
-                for: shaderGraphOutput.surfaceShader,
-                renderContext: renderContext,
-                textureResources: textureResources,
-                fallbackTexture: self.fallbackTexture
-            )
+                let shaderGraphOutput = try await renderContext.makeShaderGraphFunctions(shaderGraph: shaderGraph)
+                #else
+                let shaderGraphOutput = try await renderContext.makeShaderGraphFunctions(nil)
+                #endif
 
-            let geometryModifier = shaderGraphOutput.geometryModifier ?? renderContext.makeDefaultGeometryModifier()
-            let surfaceShader = shaderGraphOutput.surfaceShader
-            let materialResource = try await renderContext.makeMaterialResource(
-                descriptor: .init(
-                    geometry: geometryModifier,
-                    surface: surfaceShader,
-                    lighting: lightingFunction
+                let geometryArguments = try makeParameters(
+                    for: shaderGraphOutput.geometryModifier,
+                    renderContext: renderContext,
+                    textureHashesAndResources: textureHashesAndResources,
+                    fallbackTexture: self.fallbackTexture
                 )
-            )
-            #if canImport(RealityCoreRenderer, _version: 12)
-            materialsAndParams[identifier] = .init(
-                resource: materialResource,
-                geometryArguments: geometryArguments,
-                surfaceArguments: surfaceArguments,
-                blending: shaderGraphOutput.blending
-            )
-            #else
-            materialsAndParams[identifier] = .init(
-                resource: materialResource,
-                geometryArguments: geometryArguments,
-                surfaceArguments: surfaceArguments
-            )
-            #endif
+                let surfaceArguments = try makeParameters(
+                    for: shaderGraphOutput.surfaceShader,
+                    renderContext: renderContext,
+                    textureHashesAndResources: textureHashesAndResources,
+                    fallbackTexture: self.fallbackTexture
+                )
+
+                let geometryModifier = shaderGraphOutput.geometryModifier ?? renderContext.makeDefaultGeometryModifier()
+                let surfaceShader = shaderGraphOutput.surfaceShader
+                let materialResource = try await renderContext.makeMaterialResource(
+                    descriptor: .init(
+                        geometry: geometryModifier,
+                        surface: surfaceShader,
+                        lighting: lightingFunction
+                    )
+                )
+                #if canImport(RealityCoreRenderer, _version: 12)
+                materialsAndParams[identifier] = .init(
+                    resource: materialResource,
+                    geometryArguments: geometryArguments,
+                    surfaceArguments: surfaceArguments,
+                    blending: shaderGraphOutput.blending
+                )
+                #else
+                materialsAndParams[identifier] = .init(
+                    resource: materialResource,
+                    geometryArguments: geometryArguments,
+                    surfaceArguments: surfaceArguments
+                )
+                #endif
+            }
         } catch {
             logError("updateMaterial failed \(error)")
         }
     }
 
     @objc(updateMesh:completionHandler:)
-    func updateMesh(_ data: WKBridgeUpdateMesh) async {
-        let identifier = data.identifier
-        logInfo("(update mesh) \(identifier) Material ids \(data.materialPrims)")
-
+    func updateMesh(_ updates: [WKBridgeUpdateMesh]) async {
         do {
-            let identifier = data.identifier
+            var deferredMeshUpdates: [DeferredMeshUpdate] = []
 
-            let meshResource: _Proto_LowLevelMeshResource_v1
-            if data.updateType == .initial || data.descriptor != nil {
-                // swift-format-ignore: NeverForceUnwrap
-                let meshDescriptor = data.descriptor!
-                let descriptor = _Proto_LowLevelMeshResource_v1.Descriptor.fromLlmDescriptor(meshDescriptor)
-                meshResource = try renderContext.makeMeshResource(descriptor: descriptor)
-                meshResource.replaceData(indexData: data.indexData, vertexData: data.vertexData)
-                meshResources[identifier] = meshResource
-            } else {
-                guard let cachedMeshResource = meshResources[identifier] else {
-                    fatalError("Mesh resource should already be created from previous update")
+            for meshData in updates {
+                let identifier = meshData.identifier
+
+                let meshResource: _Proto_LowLevelMeshResource_v1
+                if meshData.updateType == .initial || meshData.descriptor != nil {
+                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                    // swift-format-ignore: NeverForceUnwrap
+                    let meshDescriptor = meshData.descriptor!
+                    let descriptor = _Proto_LowLevelMeshResource_v1.Descriptor.fromLlmDescriptor(meshDescriptor)
+                    meshResource = try renderContext.makeMeshResource(descriptor: descriptor)
+                    meshResource.replaceData(indexData: meshData.indexData, vertexData: meshData.vertexData)
+                    meshResources[identifier] = meshResource
+                } else {
+                    guard let cachedMeshResource = meshResources[identifier] else {
+                        fatalError("Mesh resource should already be created from previous update")
+                    }
+
+                    if meshData.indexData != nil || !meshData.vertexData.isEmpty {
+                        cachedMeshResource.replaceData(indexData: meshData.indexData, vertexData: meshData.vertexData)
+                    }
+                    meshResource = cachedMeshResource
                 }
 
-                if data.indexData != nil || !data.vertexData.isEmpty {
-                    cachedMeshResource.replaceData(indexData: data.indexData, vertexData: data.vertexData)
+                if let deformationData = meshData.deformationData {
+                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                    // swift-format-ignore: NeverForceUnwrap
+                    let commandBuffer = commandQueue.makeCommandBuffer()!
+                    // TODO: delta update
+                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                    // swift-format-ignore: NeverForceUnwrap
+                    configureDeformation(
+                        identifier: identifier,
+                        deformationData: deformationData,
+                        commandBuffer: commandBuffer,
+                        device: device,
+                        meshResource: meshResources[identifier]!,
+                        meshResourceToDeformationContext: &meshResourceToDeformationContext,
+                        deformationSystem: deformationSystem,
+                        memoryOwner: self.memoryOwner
+                    )
+                    commandBuffer.enqueue()
+                    commandBuffer.commit()
                 }
-                meshResource = cachedMeshResource
-            }
 
-            if let deformationData = data.deformationData {
-                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                // swift-format-ignore: NeverForceUnwrap
-                let commandBuffer = self.commandQueue.makeCommandBuffer()!
-                // TODO: delta update
-                configureDeformation(identifier: identifier, deformationData: deformationData, commandBuffer: commandBuffer)
-                commandBuffer.enqueue()
-                commandBuffer.commit()
-            }
+                if meshData.instanceTransformsCount > 0 {
+                    if meshToMeshInstances[identifier] == nil {
+                        meshToMeshInstances[identifier] = []
+                        meshTransforms[identifier] = []
 
-            if data.instanceTransformsCount > 0 {
-                // Make new instances
-                if meshToMeshInstances[identifier] == nil {
-                    meshToMeshInstances[identifier] = []
-                    meshTransforms[identifier] = []
+                        var deferredMeshUpdate = DeferredMeshUpdate(identifier: identifier, type: .newMesh, updatedInstances: [])
 
-                    for (partIndex, _) in data.parts.enumerated() {
-                        let materialIdentifier = data.materialPrims[partIndex]
-                        guard let material = materialsAndParams[materialIdentifier] else {
-                            fatalError("Failed to get material instance \(materialIdentifier)")
+                        for (partIndex, part) in meshData.parts.enumerated() {
+                            if part.materialIndex >= meshData.assignedMaterials.count {
+                                fatalError(
+                                    "index out of range: material index \(part.materialIndex) while only \(meshData.assignedMaterials.count) were found"
+                                )
+                            }
+                            let materialIdentifier = meshData.assignedMaterials[part.materialIndex]
+                            guard let material = materialsAndParams[materialIdentifier] else {
+                                fatalError("Failed to get material instance \(materialIdentifier)")
+                            }
+
+                            let pipeline = try await renderContext.makeRenderPipelineState(
+                                descriptor: .init(
+                                    mesh: meshResource.descriptor,
+                                    material: material.resource,
+                                    renderTargets: [renderTarget],
+                                    blending: material.blending == .transparent ? .sourceOver : nil
+                                )
+                            )
+
+                            let meshPart = try renderContext.makeMeshPart(
+                                resource: meshResource,
+                                indexOffset: meshData.parts[partIndex].indexOffset,
+                                indexCount: meshData.parts[partIndex].indexCount,
+                                primitive: meshData.parts[partIndex].topology,
+                                windingOrder: .counterClockwise,
+                                boundsMin: -.one,
+                                boundsMax: .one
+                            )
+
+                            for instanceTransform in meshData.instanceTransforms {
+                                let position = instanceTransform.transformPosition(.zero)
+                                let meshInstance = try renderContext.makeMeshInstance(
+                                    meshPart: meshPart,
+                                    pipeline: pipeline,
+                                    geometryArguments: material.geometryArguments,
+                                    surfaceArguments: material.surfaceArguments,
+                                    lightingArguments: lightingArguments,
+                                    transform: .single(instanceTransform),
+                                    sortCategory: material.blending == .transparent ? .transparent(sortPosition: position) : .opaque
+                                )
+
+                                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                                // swift-format-ignore: NeverForceUnwrap
+                                meshToMeshInstances[identifier]!.append(meshInstance)
+                                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                                // swift-format-ignore: NeverForceUnwrap
+                                meshTransforms[identifier]!.append(instanceTransform)
+                                deferredMeshUpdate.updatedInstances.append(meshInstance)
+                            }
                         }
 
-                        #if canImport(RealityCoreRenderer, _version: 12)
-                        let pipeline = try await renderContext.makeRenderPipelineState(
-                            descriptor: .init(
-                                mesh: meshResource.descriptor,
-                                material: material.resource,
-                                renderTargets: [renderTarget],
-                                blending: material.blending == .transparent ? .sourceOver : nil
-                            )
-                        )
-                        #else
-                        let pipeline = try await renderContext.makeRenderPipelineState(
-                            descriptor: .descriptor(
-                                mesh: meshResource.descriptor,
-                                material: material.resource,
-                                renderTargets: [renderTarget]
-                            )
-                        )
-                        #endif
-
-                        let meshPart = try renderContext.makeMeshPart(
-                            resource: meshResource,
-                            indexOffset: data.parts[partIndex].indexOffset,
-                            indexCount: data.parts[partIndex].indexCount,
-                            primitive: data.parts[partIndex].topology,
-                            windingOrder: .counterClockwise,
-                            boundsMin: -.one,
-                            boundsMax: .one
-                        )
-
-                        for instanceTransform in data.instanceTransforms {
-                            #if canImport(RealityCoreRenderer, _version: 12)
-                            let position = instanceTransform.transformPosition(.zero)
-                            let meshInstance = try renderContext.makeMeshInstance(
-                                meshPart: meshPart,
-                                pipeline: pipeline,
-                                geometryArguments: material.geometryArguments,
-                                surfaceArguments: material.surfaceArguments,
-                                lightingArguments: lightingArguments,
-                                transform: .single(instanceTransform),
-                                category: material.blending == .transparent ? .transparent(sortPosition: position) : .opaque
-                            )
-                            #else
-                            let meshInstance = try renderContext.makeMeshInstance(
-                                meshPart: meshPart,
-                                pipeline: pipeline,
-                                geometryArguments: material.geometryArguments,
-                                surfaceArguments: material.surfaceArguments,
-                                lightingArguments: lightingArguments,
-                                transform: .single(instanceTransform),
-                                category: .opaque
-                            )
-                            #endif
-
-                            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                            // swift-format-ignore: NeverForceUnwrap
-                            meshToMeshInstances[identifier]!.append(meshInstance)
-                            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                            // swift-format-ignore: NeverForceUnwrap
-                            meshTransforms[identifier]!.append(instanceTransform)
-
-                            let meshInstanceIndex = meshInstancePlainArray.count
-                            meshInstancePlainArray.append(meshInstance)
-                            if meshInstances.count < meshInstancePlainArray.count {
-                                let meshInstances = try renderContext.makeMeshInstanceArray(
-                                    renderTargets: [renderTarget],
-                                    count: meshInstances.count * 2
-                                )
-                                for index in meshInstancePlainArray.indices {
-                                    try meshInstances.setMeshInstance(meshInstancePlainArray[index], index: index)
-                                }
-                                self.meshInstances = meshInstances
-                            } else {
-                                try meshInstances.setMeshInstance(meshInstance, index: meshInstanceIndex)
+                        deferredMeshUpdates.append(deferredMeshUpdate)
+                    } else {
+                        // Update transforms otherwise
+                        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                        // swift-format-ignore: NeverForceUnwrap
+                        let partCount = meshToMeshInstances[identifier]!.count / meshData.instanceTransforms.count
+                        for (instanceIndex, instanceTransform) in meshData.instanceTransforms.enumerated() {
+                            for partIndex in 0..<partCount {
+                                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                                // swift-format-ignore: NeverForceUnwrap
+                                meshTransforms[identifier]![instanceIndex * partCount + partIndex] = instanceTransform
                             }
                         }
                     }
-                } else {
-                    // Update transforms otherwise
+                }
 
-                    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                    // swift-format-ignore: NeverForceUnwrap
-                    let partCount = meshToMeshInstances[identifier]!.count / data.instanceTransforms.count
-                    for (instanceIndex, instanceTransform) in data.instanceTransforms.enumerated() {
-                        for partIndex in 0..<partCount {
-                            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-                            // swift-format-ignore: NeverForceUnwrap
-                            meshTransforms[identifier]![instanceIndex * data.parts.count + partIndex] = instanceTransform
-                        }
-                    }
+                if !meshData.assignedMaterials.isEmpty {
+                    meshResourceToMaterials[identifier] = meshData.assignedMaterials
                 }
             }
 
-            if !data.materialPrims.isEmpty {
-                meshResourceToMaterials[identifier] = data.materialPrims
+            // Process all deferred mesh updates at once to avoid mesh popping
+            for deferredUpdate in deferredMeshUpdates {
+                switch deferredUpdate.type {
+                case .newMesh:
+                    for newMeshInstance in deferredUpdate.updatedInstances {
+                        try meshInstancePool.add(newMeshInstance)
+                    }
+                }
             }
         } catch {
-            logError(error.localizedDescription)
+            logError("updateMesh \(error)")
         }
     }
 
@@ -769,7 +869,6 @@ extension WKBridgeReceiver {
 
     @objc
     func setPlaying(_ play: Bool) {
-        // resourceContext.setEnableModelRotation(play)
     }
 
     @objc
@@ -860,6 +959,16 @@ private func convert(_ m: _Proto_DataUpdateType_v1) -> WKBridgeDataUpdateType {
     return .delta
 }
 
+private func convert<T>(_ ids: [_Proto_TypedResourceId<T>]) -> [WKBridgeTypedResourceId] {
+    ids.map { id in
+        WKBridgeTypedResourceId(
+            value: id.value,
+            path: id.path,
+            hashValue: id.hashValue
+        )
+    }
+}
+
 private func webUpdateTextureRequestFromUpdateTextureRequest(_ request: _Proto_TextureDataUpdate_v1) -> WKBridgeUpdateTexture {
     // FIXME: remove placeholder code
     // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
@@ -868,7 +977,7 @@ private func webUpdateTextureRequestFromUpdateTextureRequest(_ request: _Proto_T
     let data = request.data
     return WKBridgeUpdateTexture(
         imageAsset: .init(descriptor, data: data),
-        identifier: request.identifier,
+        identifier: .init(value: request.id.value, path: request.id.path, hashValue: request.id.hashValue),
         hashString: request.hashString
     )
 }
@@ -882,7 +991,7 @@ private func webUpdateMeshRequestFromUpdateMeshRequest(
     }
 
     return WKBridgeUpdateMesh(
-        identifier: request.identifier,
+        identifier: .init(value: request.id.value, path: request.id.path, hashValue: request.id.hashValue),
         updateType: convert(request.updateType),
         descriptor: descriptor,
         parts: webPartsFromParts(request.parts),
@@ -890,7 +999,7 @@ private func webUpdateMeshRequestFromUpdateMeshRequest(
         vertexData: request.vertexData,
         instanceTransforms: toData(request.instanceTransformsCompat()),
         instanceTransformsCount: request.instanceTransformsCompat().count,
-        materialPrims: request.materialPrims,
+        assignedMaterials: convert(request.assignedMaterials),
         deformationData: .init(request.deformationData)
     )
 }
@@ -1254,7 +1363,7 @@ func webUpdateMaterialRequestFromUpdateMaterialRequest(
     let bridgeMaterialGraph = toWebMaterialGraph(request.shaderGraph)
     return WKBridgeUpdateMaterial(
         materialGraph: bridgeMaterialGraph,
-        identifier: request.identifier
+        identifier: .init(value: request.id.value, path: request.id.path, hashValue: request.id.hashValue)
     )
     #else
     let bridgeMaterialGraph = toWebMaterialGraph(nil)
@@ -1703,14 +1812,11 @@ private func fromWKBridgeConstant(_ constant: WKBridgeConstantContainer) -> _Pro
     }
 }
 
-final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
-    fileprivate let usdLoader: _Proto_UsdStageSession_v1
+final class USDModelLoader {
+    fileprivate let usdStageSession: _Proto_UsdStageSession_v1
     fileprivate var stage: UsdStage?
     fileprivate var data: Data?
     private let objcLoader: WKBridgeModelLoader
-
-    @nonobjc
-    private let dispatchSerialQueue: DispatchSerialQueue
 
     @nonobjc
     fileprivate var time: TimeInterval = 0
@@ -1724,56 +1830,19 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     @nonobjc
     fileprivate var loop: Bool = false
 
+    @nonobjc
+    let frameUpdateQueue: FrameUpdateQueue = .init()
+
     init(objcInstance: WKBridgeModelLoader) {
         objcLoader = objcInstance
-        usdLoader = _Proto_UsdStageSession_v1.noMetalSession(gpuFamily: MTLGPUFamily.apple7)
-        dispatchSerialQueue = DispatchSerialQueue(label: "USDModelWebProcess", qos: .userInteractive)
-        usdLoader.delegate = self
-    }
-
-    func iblTextureUpdated(data: consuming sending _Proto_TextureDataUpdate_v1) {
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=299480 - [Model element] Support `environmentMap` attribute in GPU process model element
-    }
-
-    func iblTextureDestroyed(identifier: _Proto_ResourceId) {
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
-    }
-
-    func meshUpdated(data: consuming sending _Proto_MeshDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateMesh(webRequest: webUpdateMeshRequestFromUpdateMeshRequest(data))
-        }
-    }
-
-    func meshDestroyed(identifier: String) {
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
-    }
-
-    func materialUpdated(data: consuming sending _Proto_MaterialDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateMaterial(webRequest: webUpdateMaterialRequestFromUpdateMaterialRequest(data))
-        }
-    }
-
-    func materialDestroyed(identifier: String) {
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
-    }
-
-    func textureUpdated(data: consuming sending _Proto_TextureDataUpdate_v1) {
-        self.dispatchSerialQueue.async {
-            self.objcLoader.updateTexture(webRequest: webUpdateTextureRequestFromUpdateTextureRequest(data))
-        }
-    }
-
-    func textureDestroyed(identifier: String) {
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=303906
+        usdStageSession = _Proto_UsdStageSession_v1.noMetalSessionWithSynchronizedUpdate(gpuFamily: MTLGPUFamily.apple7)
     }
 
     func loadModel(from url: Foundation.URL) {
         do {
             let stage = try UsdStage(contentsOf: url)
             self.setupTimes(from: stage)
-            self.usdLoader.loadStage(stage)
+            self.usdStageSession.loadStage(stage)
         } catch {
             fatalError(error.localizedDescription)
         }
@@ -1789,7 +1858,7 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
                 return
             }
             self.setupTimes(from: stage)
-            self.usdLoader.loadStage(stage)
+            self.usdStageSession.loadStage(stage)
         } catch {
             fatalError(error.localizedDescription)
         }
@@ -1816,7 +1885,11 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
     func loadModel(from data: Data) {
     }
 
-    func update(deltaTime: TimeInterval) {
+    func update(deltaTime: TimeInterval) async {
+        // Fetch all pending prim updates for this frame in one synchronous call,
+        // replacing the delegate callback pattern used in UsdSample.
+        let frameUpdate = usdStageSession.updateAndFetchFrameData(time: time * timeCodePerSecond)
+
         let newTime = currentTime() + deltaTime
         let adjustedTime: TimeInterval
         if loop {
@@ -1830,7 +1903,76 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
             adjustedTime = max(0, min(newTime, duration()))
         }
         time = startTime + adjustedTime
-        usdLoader.update(time: time * timeCodePerSecond)
+
+        if frameUpdate.isEmpty {
+            return
+        }
+
+        // Extract arrays from the ~Copyable FrameUpdate before capturing in the Task.
+        let meshUpdates = frameUpdate.meshUpdates
+        let materialUpdates = frameUpdate.materialUpdates
+        let textureUpdates = frameUpdate.textureUpdates
+        let meshRemovals = frameUpdate.meshRemovals
+        let materialRemovals = frameUpdate.materialRemovals
+        let textureRemovals = frameUpdate.textureRemovals
+
+        if let errors = frameUpdate.errors {
+            processErrors(errors)
+        }
+
+        // Process in dependency order: textures → materials → meshes.
+        // Each phase completes before the next begins so that:
+        //   - textureHashesAndResources is fully populated before makeParameters reads it inside material Tasks
+        //   - materialsAndParams has Task entries for all new materials before mesh processing looks them up
+
+        // Acquire an update slot before processing frame update to avoid racing between different updates
+        // If there's already a frame update being processed, discard the current update
+        guard await frameUpdateQueue.acquireUpdateSlot() else {
+            return
+        }
+
+        do {
+            try processRemovals(meshRemovals: meshRemovals, materialRemovals: materialRemovals, textureRemovals: textureRemovals)
+            try processTextureUpdates(textureUpdates)
+            processMaterialUpdates(materialUpdates)
+            try await processMeshUpdates(meshUpdates)
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+
+        await frameUpdateQueue.releaseUpdateSlot()
+    }
+
+    private func processErrors(_ errors: _Proto_UsdStageSession_v1.FrameUpdate.Errors) {
+        for (id, error) in errors.meshErrors {
+            print("mesh error with id \(id): \(error.localizedDescription)")
+        }
+        for (id, error) in errors.materialErrors {
+            print("material error with id \(id): \(error.localizedDescription)")
+        }
+        for (id, error) in errors.textureErrors {
+            print("texture error with id \(id): \(error.localizedDescription)")
+        }
+    }
+
+    private func processRemovals(
+        meshRemovals: [_Proto_MeshId],
+        materialRemovals: [_Proto_MaterialId],
+        textureRemovals: [_Proto_TextureId]
+    ) throws {
+        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=311113
+    }
+
+    private func processTextureUpdates(_ updates: [_Proto_TextureDataUpdate_v1]) throws {
+        self.objcLoader.updateTexture(webRequest: updates.map { webUpdateTextureRequestFromUpdateTextureRequest($0) })
+    }
+
+    private func processMaterialUpdates(_ updates: [_Proto_MaterialDataUpdate_v1]) {
+        self.objcLoader.updateMaterial(webRequest: updates.map { webUpdateMaterialRequestFromUpdateMaterialRequest($0) })
+    }
+
+    private func processMeshUpdates(_ updates: [_Proto_MeshDataUpdate_v1]) async throws {
+        self.objcLoader.updateMesh(webRequest: updates.map { webUpdateMeshRequestFromUpdateMeshRequest($0) })
     }
 }
 
@@ -1840,11 +1982,11 @@ extension WKBridgeModelLoader {
     @nonobjc
     var loader: USDModelLoader?
     @nonobjc
-    var modelUpdated: ((WKBridgeUpdateMesh) -> (Void))?
+    var modelUpdated: (([WKBridgeUpdateMesh]) -> (Void))?
     @nonobjc
-    var textureUpdatedCallback: ((WKBridgeUpdateTexture) -> (Void))?
+    var textureUpdatedCallback: (([WKBridgeUpdateTexture]) -> (Void))?
     @nonobjc
-    var materialUpdatedCallback: ((WKBridgeUpdateMaterial) -> (Void))?
+    var materialUpdatedCallback: (([WKBridgeUpdateMaterial]) -> (Void))?
 
     @nonobjc
     fileprivate var retainedRequests: Set<NSObject> = []
@@ -1861,9 +2003,9 @@ extension WKBridgeModelLoader {
         materialUpdatedCallback:
     )
     func setCallbacksWithModelUpdatedCallback(
-        _ modelUpdatedCallback: @escaping ((WKBridgeUpdateMesh) -> (Void)),
-        textureUpdatedCallback: @escaping ((WKBridgeUpdateTexture) -> (Void)),
-        materialUpdatedCallback: @escaping ((WKBridgeUpdateMaterial) -> (Void))
+        _ modelUpdatedCallback: @escaping (([WKBridgeUpdateMesh]) -> (Void)),
+        textureUpdatedCallback: @escaping (([WKBridgeUpdateTexture]) -> (Void)),
+        materialUpdatedCallback: @escaping (([WKBridgeUpdateMaterial]) -> (Void))
     ) {
         self.modelUpdated = modelUpdatedCallback
         self.textureUpdatedCallback = textureUpdatedCallback
@@ -1880,9 +2022,9 @@ extension WKBridgeModelLoader {
         self.loader?.loadModel(data: data)
     }
 
-    @objc
-    func update(_ deltaTime: Double) {
-        self.loader?.update(deltaTime: deltaTime)
+    @objc(update:completionHandler:)
+    func update(_ deltaTime: Double) async {
+        await self.loader?.update(deltaTime: deltaTime)
     }
 
     @objc
@@ -1916,23 +2058,32 @@ extension WKBridgeModelLoader {
         loader?.setCurrentTime(newTime)
     }
 
-    fileprivate func updateMesh(webRequest: WKBridgeUpdateMesh) {
+    fileprivate func updateMesh(webRequest: [WKBridgeUpdateMesh]) {
+        if webRequest.isEmpty {
+            return
+        }
         if let modelUpdated {
-            retainedRequests.insert(webRequest)
+            retainedRequests.insert(webRequest as NSArray)
             modelUpdated(webRequest)
         }
     }
 
-    fileprivate func updateTexture(webRequest: WKBridgeUpdateTexture) {
+    fileprivate func updateTexture(webRequest: [WKBridgeUpdateTexture]) {
+        if webRequest.isEmpty {
+            return
+        }
         if let textureUpdatedCallback {
-            retainedRequests.insert(webRequest)
+            retainedRequests.insert(webRequest as NSArray)
             textureUpdatedCallback(webRequest)
         }
     }
 
-    fileprivate func updateMaterial(webRequest: WKBridgeUpdateMaterial) {
+    fileprivate func updateMaterial(webRequest: [WKBridgeUpdateMaterial]) {
+        if webRequest.isEmpty {
+            return
+        }
         if let materialUpdatedCallback {
-            retainedRequests.insert(webRequest)
+            retainedRequests.insert(webRequest as NSArray)
             materialUpdatedCallback(webRequest)
         }
     }
@@ -1990,133 +2141,305 @@ private func makeFallBackTextureResource(
     return fallbackTexture
 }
 
-extension WKBridgeReceiver {
-    internal func configureDeformation(
-        identifier: _Proto_ResourceId,
-        deformationData: WKBridgeDeformationData,
-        commandBuffer: any MTLCommandBuffer
-    ) {
-        var deformers: [any _Proto_LowLevelDeformerDescription_v1] = []
+func configureDeformation(
+    identifier: WKBridgeTypedResourceId,
+    deformationData: WKBridgeDeformationData,
+    commandBuffer: any MTLCommandBuffer,
+    device: any MTLDevice,
+    meshResource: _Proto_LowLevelMeshResource_v1,
+    meshResourceToDeformationContext: inout [WKBridgeTypedResourceId: DeformationContext],
+    deformationSystem: _Proto_LowLevelDeformationSystem_v1,
+    memoryOwner: task_id_token_t
+) {
+    meshResourceToDeformationContext[identifier] = buildDeformationContext(
+        meshResource: meshResource,
+        deformationData: deformationData,
+        commandBuffer: commandBuffer,
+        device: device,
+        deformationSystem: deformationSystem,
+        existingContext: meshResourceToDeformationContext[identifier],
+        identifierDescription: identifier.description,
+        memoryOwner: memoryOwner
+    )
+}
 
-        if let skinningData = deformationData.skinningData {
-            let skinningDeformer = skinningData.makeDeformerDescription(device: self.device, memoryOwner: self.memoryOwner)
-            deformers.append(skinningDeformer)
+func buildDeformationContext(
+    meshResource: _Proto_LowLevelMeshResource_v1,
+    deformationData: WKBridgeDeformationData,
+    commandBuffer: any MTLCommandBuffer,
+    device: any MTLDevice,
+    deformationSystem: _Proto_LowLevelDeformationSystem_v1,
+    existingContext: DeformationContext?,
+    identifierDescription: String,
+    memoryOwner: task_id_token_t
+) -> DeformationContext {
+    var deformers: [any _Proto_LowLevelDeformerDescription_v1] = []
+
+    if let skinningData = deformationData.skinningData {
+        let skinningDeformer = skinningData.makeDeformerDescription(device: device, memoryOwner: memoryOwner)
+        deformers.append(skinningDeformer)
+    }
+
+    if let blendShapeData = deformationData.blendShapeData {
+        do {
+            let blendShapeDeformer = try blendShapeData.makeDeformerDescription(device: device, memoryOwner: memoryOwner)
+            deformers.append(blendShapeDeformer)
+        } catch {
+            print("Error creating blend shape deformer for \(identifierDescription): \(error.localizedDescription)")
+        }
+    }
+
+    // TODO: add tangent frame data to input
+    if let renormalizationData = deformationData.renormalizationData {
+        do {
+            let renormalization = try renormalizationData.makeDeformerDescription(device: device, memoryOwner: memoryOwner)
+            deformers.append(renormalization)
+        } catch {
+            print("Error creating renormalization deformer for \(identifierDescription): \(error.localizedDescription)")
+        }
+    }
+
+    assert(!deformers.isEmpty)
+
+    let inputMeshDescription: _Proto_LowLevelDeformationDescription_v1.MeshDescription?
+    if let existingContext {
+        inputMeshDescription = existingContext.description.input
+    } else {
+        inputMeshDescription = makeInputMeshDescriptionForDeformation(
+            meshResource: meshResource,
+            deformationData: deformationData,
+            commandBuffer: commandBuffer,
+            device: device
+        )
+    }
+
+    let outputMeshDescription = makeOutputMeshDescriptionForDeformation(
+        meshResource: meshResource,
+        deformationData: deformationData,
+        commandBuffer: commandBuffer,
+        device: device
+    )
+
+    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+    // swift-format-ignore: NeverForceUnwrap
+    let deformationDescription =
+        try? _Proto_LowLevelDeformationDescription_v1.make(
+            input: inputMeshDescription!,
+            deformers: deformers,
+            output: outputMeshDescription!
+        )
+        .get()
+
+    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+    // swift-format-ignore: NeverForceUnwrap
+    let deformation = try? deformationSystem.make(description: deformationDescription!).get()
+    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+    // swift-format-ignore: NeverForceUnwrap
+    return DeformationContext(deformation: deformation!, description: deformationDescription!, dirty: true)
+}
+
+struct DeformationMeshDescriptionData {
+    var vertexAttributes: [_Proto_LowLevelDeformationDescription_v1.VertexAttribute] = []
+    var vertexLayouts: [_Proto_LowLevelDeformationDescription_v1.VertexLayout] = []
+    var mtlBuffers: [any MTLBuffer] = []
+}
+
+extension _Proto_LowLevelMeshResource_v1.VertexSemantic {
+    func toDeformationVertexSemantic() -> _Proto_LowLevelDeformationDescription_v1.MeshSemantic? {
+        switch self {
+        case .position:
+            return .position
+        case .normal:
+            return .normal
+        case .tangent:
+            return .tangent
+        case .bitangent:
+            return .bitangent
+        case .uv0:
+            return .uv0
+        case .uv1:
+            return .uv1
+        case .uv2:
+            return .uv2
+        case .uv3:
+            return .uv3
+        case .uv4:
+            return .uv4
+        case .uv5:
+            return .uv5
+        case .uv6:
+            return .uv6
+        case .uv7:
+            return .uv7
+        default:
+            return nil
+        }
+    }
+}
+
+func makeMeshDescriptionForDeformation(
+    meshResource: _Proto_LowLevelMeshResource_v1,
+    deformationData: WKBridgeDeformationData,
+    commandBuffer: any MTLCommandBuffer,
+    isInput: Bool,
+    device: any MTLDevice
+) -> DeformationMeshDescriptionData {
+    var deformationMeshDescriptionData = DeformationMeshDescriptionData()
+
+    // Table to map mesh resource buffer index to deformation buffer index
+    // They can be different because deformation may not require all vertex buffers
+    // e.g. if position data is in mesh resource buffer 1, its deformation buffer index could be 0
+    // if that's the only attribute data require by deformation
+    var meshResourceBufferIndexToDeformationBufferIndex: [Int: Int] = [:]
+    // Similar usage as the buffer index table. See comment above
+    var meshResourceLayoutIndexToDeformationLayoutIndex: [Int: Int] = [:]
+
+    var inputAttributeSemantics: [_Proto_LowLevelMeshResource_v1.VertexSemantic] = [.position]
+    if deformationData.renormalizationData != nil {
+        inputAttributeSemantics.append(contentsOf: [.normal, .tangent, .bitangent])
+    }
+
+    for attribute in meshResource.descriptor.vertexAttributes where inputAttributeSemantics.contains(attribute.semantic) {
+        guard let deformationMeshSemantic = attribute.semantic.toDeformationVertexSemantic() else {
+            fatalError("Invalid semantic for deformation input: \(attribute.semantic)")
         }
 
-        if let blendShapeData = deformationData.blendShapeData {
-            do {
-                let blendShapeDeformer = try blendShapeData.makeDeformerDescription(device: self.device, memoryOwner: self.memoryOwner)
-                deformers.append(blendShapeDeformer)
-            } catch {
-                logError("Error creating blend shape deformer for \(identifier): \(error.localizedDescription)")
+        let layoutIndex = attribute.layoutIndex
+        let layout = meshResource.descriptor.vertexLayouts[layoutIndex]
+        let bufferIndex = layout.bufferIndex
+
+        var deformationBufferIndex = deformationMeshDescriptionData.mtlBuffers.count
+        if let cachedDeformationBufferIndex = meshResourceBufferIndexToDeformationBufferIndex[bufferIndex] {
+            deformationBufferIndex = cachedDeformationBufferIndex
+        } else {
+            meshResourceBufferIndexToDeformationBufferIndex[bufferIndex] = deformationBufferIndex
+
+            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+            // swift-format-ignore: NeverForceUnwrap
+            let vertexBuffer = meshResource.readVertices(at: bufferIndex, using: commandBuffer)!
+            if isInput {
+                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                // swift-format-ignore: NeverForceUnwrap
+                let mtlBuffer = device.makeBuffer(length: vertexBuffer.length, options: .storageModeShared)!
+                // Copy data from vertexPositionsBuffer to inputPositionsBuffer
+                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                // swift-format-ignore: NeverForceUnwrap
+                let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
+                blitEncoder.copy(from: vertexBuffer, sourceOffset: 0, to: mtlBuffer, destinationOffset: 0, size: vertexBuffer.length)
+                deformationMeshDescriptionData.mtlBuffers.append(mtlBuffer)
+                blitEncoder.endEncoding()
+            } else {
+                deformationMeshDescriptionData.mtlBuffers.append(vertexBuffer)
             }
         }
 
-        // TODO: add tangent frame data to input
-        // if let renormalizationData = deformationData.renormalizationData {
-        //     do {
-        //         let renormalization = try renormalizationData.makeDeformerDescription(device: self.device, memoryOwner: self.memoryOwner)
-        //         deformers.append(renormalization)
-        //     } catch {
-        //         logError("Error creating renormalization deformer for \(identifier): \(error.localizedDescription)")
-        //     }
-        // }
-
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-        // swift-format-ignore: NeverForceUnwrap
-        let meshResource = meshResources[identifier]!
-
-        var inputMeshDescription: _Proto_LowLevelDeformationDescription_v1.MeshDescription?
-        if self.meshResourceToDeformationContext[identifier] == nil {
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
-            let vertexPositionsBuffer = meshResource.readVertices(at: 1, using: commandBuffer)!
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
-            let inputPositionsBuffer = unsafe device.makeBuffer(length: vertexPositionsBuffer.length, options: .storageModeShared)!
-            inputPositionsBuffer.__setOwnerWithIdentity(self.memoryOwner)
-
-            // Copy data from vertexPositionsBuffer to inputPositionsBuffer
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
-            let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
-            blitEncoder.copy(
-                from: vertexPositionsBuffer,
-                sourceOffset: 0,
-                to: inputPositionsBuffer,
-                destinationOffset: 0,
-                size: vertexPositionsBuffer.length
-            )
-            blitEncoder.endEncoding()
-
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
-            let inputPositions = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
-                inputPositionsBuffer,
-                offset: 0,
-                occupiedLength: inputPositionsBuffer.length,
-                elementType: .float3
-            )!
-            inputMeshDescription = _Proto_LowLevelDeformationDescription_v1.MeshDescription(descriptions: [
-                _Proto_LowLevelDeformationDescription_v1.SemanticBuffer(.position, inputPositions)
-            ])
+        var deformationLayoutIndex = deformationMeshDescriptionData.vertexLayouts.count
+        if let cachedDeformationLayoutIndex = meshResourceLayoutIndexToDeformationLayoutIndex[layoutIndex] {
+            deformationLayoutIndex = cachedDeformationLayoutIndex
         } else {
-            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-            // swift-format-ignore: NeverForceUnwrap
-            inputMeshDescription = self.meshResourceToDeformationContext[identifier]!.description.input
+            meshResourceLayoutIndexToDeformationLayoutIndex[layoutIndex] = deformationLayoutIndex
+            deformationMeshDescriptionData.vertexLayouts.append(
+                .init(bufferIndex: deformationBufferIndex, bufferOffset: layout.bufferOffset, bufferStride: layout.bufferStride)
+            )
         }
 
-        guard let inputMeshDescription else {
-            logError("inputMeshDescription is unexpectedly nil")
-            return
-        }
+        // Hardcode elementType for now the inputs could only be position or tangent
+        // frame data which are all .float3
+        // TODO: fix this when uv is required for deformation
+        deformationMeshDescriptionData.vertexAttributes.append(
+            .init(elementType: .float3, offset: attribute.offset, layoutIndex: deformationLayoutIndex, semantic: deformationMeshSemantic)
+        )
+    }
 
+    return deformationMeshDescriptionData
+}
+
+func makeInputMeshDescriptionForDeformation(
+    meshResource: _Proto_LowLevelMeshResource_v1,
+    deformationData: WKBridgeDeformationData,
+    commandBuffer: any MTLCommandBuffer,
+    device: any MTLDevice
+) -> _Proto_LowLevelDeformationDescription_v1.MeshDescription? {
+    var inputMeshDescriptionData = makeMeshDescriptionForDeformation(
+        meshResource: meshResource,
+        deformationData: deformationData,
+        commandBuffer: commandBuffer,
+        isInput: true,
+        device: device
+    )
+
+    if let renormalizationData = deformationData.renormalizationData {
+        let vertexIndices = renormalizationData.vertexIndicesPerTriangle
         // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
         // swift-format-ignore: NeverForceUnwrap
-        let outputPositionsBuffer = meshResource.replaceVertices(at: 1, using: commandBuffer)!
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-        // swift-format-ignore: NeverForceUnwrap
-        let outputPositions = _Proto_LowLevelDeformationDescription_v1.Buffer.make(
-            outputPositionsBuffer,
-            offset: 0,
-            occupiedLength: outputPositionsBuffer.length,
-            elementType: .float3
+        let inputIndexBuffer = unsafe device.makeBuffer(
+            bytes: vertexIndices,
+            length: vertexIndices.count * MemoryLayout<UInt32>.stride,
+            options: .storageModeShared
         )!
 
-        let outputMeshDescription = _Proto_LowLevelDeformationDescription_v1.MeshDescription(descriptions: [
-            _Proto_LowLevelDeformationDescription_v1.SemanticBuffer(.position, outputPositions)
-        ])
-
-        guard
-            let deformationDescription =
-                try? _Proto_LowLevelDeformationDescription_v1.make(
-                    input: inputMeshDescription,
-                    deformers: deformers,
-                    output: outputMeshDescription
-                )
-                .get()
-        else {
-            logError("_Proto_LowLevelDeformationDescription_v1.make failed unexpectedly")
-            return
-        }
-
-        // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
-        // swift-format-ignore: NeverForceUnwrap
-        guard let deformation = try? self.deformationSystem.make(description: deformationDescription).get() else {
-            logError("deformationSystem.make failed unexpectedly")
-            return
-        }
-
-        self.meshResourceToDeformationContext[identifier] = .init(
-            deformation: deformation,
-            description: deformationDescription,
-            dirty: true
+        inputMeshDescriptionData.vertexAttributes.append(
+            .init(elementType: .uint, offset: 0, layoutIndex: inputMeshDescriptionData.vertexLayouts.count, semantic: .index)
         )
+        inputMeshDescriptionData.vertexLayouts.append(
+            .init(bufferIndex: inputMeshDescriptionData.mtlBuffers.count, bufferOffset: 0, bufferStride: MemoryLayout<UInt32>.stride)
+        )
+
+        inputMeshDescriptionData.mtlBuffers.append(inputIndexBuffer)
+    }
+
+    let result = _Proto_LowLevelDeformationDescription_v1.MeshDescription.make(
+        buffers: inputMeshDescriptionData.mtlBuffers,
+        attributes: inputMeshDescriptionData.vertexAttributes,
+        layouts: inputMeshDescriptionData.vertexLayouts,
+        vertexCount: meshResource.descriptor.vertexCapacity,
+        indexCount: meshResource.descriptor.indexCapacity
+    )
+
+    switch result {
+    case .success(let meshDescription):
+        return meshDescription
+    case .failure(let error):
+        print(error)
+        return nil
+    }
+}
+
+func makeOutputMeshDescriptionForDeformation(
+    meshResource: _Proto_LowLevelMeshResource_v1,
+    deformationData: WKBridgeDeformationData,
+    commandBuffer: any MTLCommandBuffer,
+    device: any MTLDevice
+) -> _Proto_LowLevelDeformationDescription_v1.MeshDescription? {
+    let outputMeshDescriptionData = makeMeshDescriptionForDeformation(
+        meshResource: meshResource,
+        deformationData: deformationData,
+        commandBuffer: commandBuffer,
+        isInput: false,
+        device: device
+    )
+
+    let result = _Proto_LowLevelDeformationDescription_v1.MeshDescription.make(
+        buffers: outputMeshDescriptionData.mtlBuffers,
+        attributes: outputMeshDescriptionData.vertexAttributes,
+        layouts: outputMeshDescriptionData.vertexLayouts,
+        vertexCount: meshResource.descriptor.vertexCapacity
+    )
+
+    switch result {
+    case .success(let meshDescription):
+        return meshDescription
+    case .failure(let error):
+        print(error)
+        return nil
     }
 }
 
 extension WKBridgeSkinningData {
-    fileprivate func makeDeformerDescription(device: any MTLDevice, memoryOwner: mach_port_t) -> any _Proto_LowLevelDeformerDescription_v1 {
+    fileprivate func makeDeformerDescription(
+        device: any MTLDevice,
+        memoryOwner: task_id_token_t
+    ) -> any _Proto_LowLevelDeformerDescription_v1 {
         // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
         // swift-format-ignore: NeverForceUnwrap
         let jointTransformsBuffer = unsafe device.makeBuffer(
@@ -2339,20 +2662,25 @@ extension WKBridgeReceiver {
     ) throws {
     }
 
-    @objc(renderWithTexture:)
-    func render(with texture: any MTLTexture) {
+    @objc
+    func commandBuffer() -> (any MTLCommandBuffer)? {
+        nil
+    }
+
+    @objc(renderWithTexture:commandBuffer:)
+    func render(with texture: any MTLTexture, commandBuffer: any MTLCommandBuffer) {
     }
 
     @objc(updateTexture:)
-    func updateTexture(_ data: WKBridgeUpdateTexture) {
+    func updateTexture(_ data: [WKBridgeUpdateTexture]) {
     }
 
     @objc(updateMaterial:completionHandler:)
-    func updateMaterial(_ data: WKBridgeUpdateMaterial) async {
+    func updateMaterial(_ data: [WKBridgeUpdateMaterial]) async {
     }
 
     @objc(updateMesh:completionHandler:)
-    func updateMesh(_ data: WKBridgeUpdateMesh) async {
+    func updateMesh(_ data: [WKBridgeUpdateMesh]) async {
     }
 
     @objc(setTransform:)
@@ -2389,9 +2717,9 @@ extension WKBridgeModelLoader {
         materialUpdatedCallback:
     )
     func setCallbacksWithModelUpdatedCallback(
-        _ modelUpdatedCallback: @escaping ((WKBridgeUpdateMesh) -> (Void)),
-        textureUpdatedCallback: @escaping ((WKBridgeUpdateTexture) -> (Void)),
-        materialUpdatedCallback: @escaping ((WKBridgeUpdateMaterial) -> (Void))
+        _ modelUpdatedCallback: @escaping (([WKBridgeUpdateMesh]) -> (Void)),
+        textureUpdatedCallback: @escaping (([WKBridgeUpdateTexture]) -> (Void)),
+        materialUpdatedCallback: @escaping (([WKBridgeUpdateMaterial]) -> (Void))
     ) {
     }
 
@@ -2404,7 +2732,7 @@ extension WKBridgeModelLoader {
     }
 
     @objc
-    func update(_ deltaTime: Double) {
+    func update(_ deltaTime: Double) async {
     }
 
     @objc

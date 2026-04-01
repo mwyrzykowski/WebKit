@@ -121,32 +121,38 @@ RemoteMeshProxy::~RemoteMeshProxy()
 #endif
 }
 
-void RemoteMeshProxy::update(const WebModel::UpdateMeshDescriptor& descriptor)
+void RemoteMeshProxy::update(Vector<WebModel::UpdateMeshDescriptor>&& descriptorArray)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto [minCorner, maxCorner] = computeMinAndMaxCorners(descriptor.parts, descriptor.instanceTransforms);
-    auto boundingBoxChanged = minCorner.x <= maxCorner.x && minCorner.y <= maxCorner.y && minCorner.z <= maxCorner.z;
-    boundingBoxChanged = boundingBoxChanged && (!simd_equal(m_minCorner, minCorner) || !simd_equal(m_maxCorner, maxCorner));
-    if (boundingBoxChanged) {
-        m_minCorner = simd_min(m_minCorner, minCorner);
-        m_maxCorner = simd_max(m_maxCorner, maxCorner);
+    bool anyBoundingBoxChanged = false;
+    for (auto& descriptor : descriptorArray) {
+        auto [minCorner, maxCorner] = computeMinAndMaxCorners(descriptor.parts, descriptor.instanceTransforms);
+        auto boundingBoxChanged = minCorner.x <= maxCorner.x && minCorner.y <= maxCorner.y && minCorner.z <= maxCorner.z;
+        boundingBoxChanged = boundingBoxChanged && (!simd_equal(m_minCorner, minCorner) || !simd_equal(m_maxCorner, maxCorner));
+        if (boundingBoxChanged) {
+            m_minCorner = simd_min(m_minCorner, minCorner);
+            m_maxCorner = simd_max(m_maxCorner, maxCorner);
+        }
+        anyBoundingBoxChanged = anyBoundingBoxChanged || boundingBoxChanged;
     }
 
-    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::Update(descriptor), [](auto) mutable {
+    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::Update(WTF::move(descriptorArray)), [](auto) mutable {
     });
     UNUSED_VARIABLE(sendResult);
-    if (boundingBoxChanged)
+    if (anyBoundingBoxChanged)
         computeTransform();
 
 #else
-    UNUSED_PARAM(descriptor);
+    UNUSED_PARAM(descriptorArray);
 #endif
 }
 
-void RemoteMeshProxy::render()
+void RemoteMeshProxy::render(uint32_t textureIndex, Function<void(bool)>&& completionHandler)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto sendResult = send(Messages::RemoteMesh::Render());
+    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::Render(textureIndex), [completionHandler = WTF::move(completionHandler)](bool result) mutable {
+        completionHandler(result);
+    });
     UNUSED_PARAM(sendResult);
 #endif
 }
@@ -161,10 +167,10 @@ void RemoteMeshProxy::setLabelInternal(const String& label)
 #endif
 }
 
-void RemoteMeshProxy::updateTexture(const WebModel::UpdateTextureDescriptor& descriptor)
+void RemoteMeshProxy::updateTexture(Vector<WebModel::UpdateTextureDescriptor>&& descriptor)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::UpdateTexture(descriptor), [](auto) mutable {
+    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::UpdateTexture(WTF::move(descriptor)), [](auto) mutable {
     });
     UNUSED_VARIABLE(sendResult);
 #else
@@ -172,10 +178,10 @@ void RemoteMeshProxy::updateTexture(const WebModel::UpdateTextureDescriptor& des
 #endif
 }
 
-void RemoteMeshProxy::updateMaterial(const WebModel::UpdateMaterialDescriptor& descriptor)
+void RemoteMeshProxy::updateMaterial(Vector<WebModel::UpdateMaterialDescriptor>&& descriptor)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::UpdateMaterial(descriptor), [](auto) mutable {
+    auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::UpdateMaterial(WTF::move(descriptor)), [](auto) mutable {
     });
     UNUSED_VARIABLE(sendResult);
 #else

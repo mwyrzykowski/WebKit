@@ -78,4 +78,4 @@ SOFT_LINK_CLASS_FOR_HEADER(WebKit, WKBridgeValueString)
 SOFT_LINK_CLASS_FOR_HEADER(WebKit, WKBridgeConstantContainer)
 SOFT_LINK_CLASS_FOR_HEADER(WebKit, WKBridgeNode)
 SOFT_LINK_CLASS_FOR_HEADER(WebKit, WKBridgeMaterialGraph)
-
+SOFT_LINK_CLASS_FOR_HEADER(WebKit, WKBridgeTypedResourceId)

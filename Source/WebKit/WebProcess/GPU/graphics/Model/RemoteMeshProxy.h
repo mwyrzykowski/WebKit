@@ -88,16 +88,16 @@ private:
         return protect(root().streamClientConnection())->sendWithAsyncReply(WTF::move(message), WTF::move(completionHandler), backing());
     }
 
-    void update(const WebModel::UpdateMeshDescriptor&) final;
-    void updateTexture(const WebModel::UpdateTextureDescriptor&) final;
-    void updateMaterial(const WebModel::UpdateMaterialDescriptor&) final;
+    void update(Vector<WebModel::UpdateMeshDescriptor>&&) final;
+    void updateTexture(Vector<WebModel::UpdateTextureDescriptor>&&) final;
+    void updateMaterial(Vector<WebModel::UpdateMaterialDescriptor>&&) final;
 #if PLATFORM(COCOA)
     std::pair<simd_float4, simd_float4> getCenterAndExtents() const final;
     void sizeDidChange(unsigned, unsigned, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
 #endif
     void play(bool) final;
 
-    void render() final;
+    void render(uint32_t textureIndex, Function<void(bool)>&&) final;
     void setLabelInternal(const String&) final;
     void setEntityTransform(const WebModel::Float4x4&) final;
     void NODELETE setEntityTransformInternal(const WebModel::Float4x4&);

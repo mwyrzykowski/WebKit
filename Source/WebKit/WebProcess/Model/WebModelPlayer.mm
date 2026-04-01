@@ -49,6 +49,7 @@
 #import <WebCore/PlatformCALayer.h>
 #import <WebCore/PlatformCALayerDelegatedContents.h>
 #import <wtf/RetainPtr.h>
+#import <wtf/threads/BinarySemaphore.h>
 
 #import "WebKitSwiftSoftLink.h"
 
@@ -305,11 +306,13 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
 
     m_modelLoader = adoptNS([allocWKBridgeModelLoaderInstance() init]);
     Ref protectedThis = Ref { *this };
-    [m_modelLoader setCallbacksWithModelUpdatedCallback:^(WKBridgeUpdateMesh *updateRequest) {
+    [m_modelLoader setCallbacksWithModelUpdatedCallback:^(NSArray<WKBridgeUpdateMesh *> *updateRequest) {
         ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<WebModelPlayer> protectedThis) {
             RefPtr model = protectedThis->m_currentModel;
             if (model) {
-                model->update(toCpp(updateRequest));
+                model->update(makeVector(updateRequest, [](WKBridgeUpdateMesh *update) {
+                    return std::optional { toCpp(update) };
+                }));
                 protectedThis->setStageMode(protectedThis->m_stageMode);
             }
 
@@ -336,17 +339,21 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
                 }
             }
         });
-    } textureUpdatedCallback:^(WKBridgeUpdateTexture *updateTexture) {
+    } textureUpdatedCallback:^(NSArray<WKBridgeUpdateTexture *> *updateTexture) {
         ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<WebModelPlayer> protectedThis) {
             if (protectedThis->m_currentModel)
-                protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
+                protectedThis->m_currentModel->updateTexture(makeVector(updateTexture, [](WKBridgeUpdateTexture *update) {
+                    return std::optional { toCpp(update) };
+                }));
 
             [protectedThis->m_modelLoader requestCompleted:updateTexture];
         });
-    } materialUpdatedCallback:^(WKBridgeUpdateMaterial *updateMaterial) {
+    } materialUpdatedCallback:^(NSArray<WKBridgeUpdateMaterial *> *updateMaterial) {
         ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<WebModelPlayer> protectedThis) {
             if (protectedThis->m_currentModel)
-                protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
+                protectedThis->m_currentModel->updateMaterial(makeVector(updateMaterial, [](WKBridgeUpdateMaterial *update) {
+                    return std::optional { toCpp(update) };
+                }));
 
             [protectedThis->m_modelLoader requestCompleted:updateMaterial];
         });
@@ -582,17 +589,30 @@ void WebModelPlayer::update()
 
     auto timeDelta = paused() ? 0.f : (m_playbackRate * elapsedTime);
 
-    [m_modelLoader update:timeDelta];
+    BinarySemaphore completion;
+    [m_modelLoader update:timeDelta completionHandler:[&completion] mutable {
+        completion.signal();
+    }];
+    if (!completion.waitFor(500_ms))
+        return;
 
     if (!m_isLooping && !paused() && [m_modelLoader currentTime] >= [m_modelLoader duration])
         m_pauseState = PauseState::Paused;
 
     if (m_didFinishLoading) {
-        if (RefPtr currentModel = m_currentModel)
-            currentModel->render();
+        if (RefPtr currentModel = m_currentModel) {
+            currentModel->render(m_currentTexture, [protectedThis = Ref { *this }] (bool result) mutable {
+                if (result) {
+                    protectedThis->m_completedFrames = std::min<uint32_t>(protectedThis->m_completedFrames + 1, protectedThis->m_displayBuffers.size());
+                    if (++protectedThis->m_currentTexture >= protectedThis->m_completedFrames)
+                        protectedThis->m_currentTexture = 0;
+                }
+            });
+        }
 
-        if (++m_currentTexture >= m_displayBuffers.size())
-            m_currentTexture = 0;
+        if (!m_completedFrames)
+            return;
+
         if (auto* machSendRight = displayBuffer(); machSendRight && contentsDisplayDelegate())
             RefPtr { m_contentsDisplayDelegate }->setDisplayBuffer(*machSendRight);
     }
@@ -726,6 +746,7 @@ void WebModelPlayer::visibilityStateDidChange()
         m_modelLoader = nil;
         m_displayBuffers.clear();
         m_environmentMap = std::nullopt;
+        m_completedFrames = 0;
     }
 }
 

@@ -67,16 +67,23 @@ header: <WebKit/Float3.h>
 };
 
 header: <WebKit/ModelTypes.h>
+[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::TypedResourceId {
+    String value;
+    String path;
+    int64_t hashValue;
+};
+
+header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::UpdateTextureDescriptor {
     WebModel::ImageAsset imageAsset;
-    String identifier;
+    WebModel::TypedResourceId identifier;
     String hashString;
 };
 
 header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::UpdateMaterialDescriptor {
     WebModel::MaterialGraph materialGraph;
-    String identifier;
+    WebModel::TypedResourceId identifier;
 };
 
 header: <WebKit/ModelTypes.h>
@@ -128,7 +135,7 @@ header: <WebKit/ModelTypes.h>
 
 header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::UpdateMeshDescriptor {
-    String identifier;
+    WebModel::TypedResourceId identifier;
     uint8_t updateType;
     WebModel::MeshDescriptor descriptor;
     Vector<WebModel::MeshPart> parts;
@@ -136,7 +143,7 @@ header: <WebKit/ModelTypes.h>
     Vector<Vector<uint8_t>> vertexData;
     WebModel::Float4x4 transform;
     Vector<WebModel::Float4x4> instanceTransforms;
-    Vector<String> materialPrims;
+    Vector<WebModel::TypedResourceId> assignedMaterials;
     std::optional<WebModel::DeformationData> deformationData;
 };
 

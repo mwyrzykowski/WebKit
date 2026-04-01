@@ -227,8 +227,10 @@ RefPtr<WebKit::Mesh> RemoteGPUProxy::createModelBacking(unsigned width, unsigned
     auto identifier = WebModelIdentifier::generate();
 
     auto sendResult = sendSync(Messages::RemoteGPU::CreateModelBacking(width, height, diffuseTexture, specularTexture, identifier));
-    if (!sendResult.succeeded())
+    if (!sendResult.succeeded()) {
         callback({ });
+        return nullptr;
+    }
 
     auto [response] = sendResult.takeReply();
     callback(WTF::move(response));

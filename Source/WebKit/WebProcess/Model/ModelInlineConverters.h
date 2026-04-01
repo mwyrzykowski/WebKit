@@ -498,15 +498,6 @@ static Vector<Vector<uint8_t>> toCpp(NSArray<NSData *> *dataVector)
     return result;
 }
 
-static Vector<String> toCpp(NSArray<NSString *> *stringVector)
-{
-    Vector<String> result;
-    for (NSString *s in stringVector)
-        result.append(s);
-
-    return result;
-}
-
 template<typename T>
 static Vector<T> toCpp(NSData *data)
 {
@@ -574,20 +565,15 @@ static std::optional<WebModel::DeformationData> toCpp(WKBridgeDeformationData* d
     };
 }
 
-static WebModel::UpdateMeshDescriptor toCpp(WKBridgeUpdateMesh *update)
+static WebModel::TypedResourceId toCpp(WKBridgeTypedResourceId *update)
 {
-    return WebModel::UpdateMeshDescriptor {
-        .identifier = update.identifier,
-        .updateType = static_cast<uint8_t>(update.updateType),
-        .descriptor = toCpp(update.descriptor),
-        .parts = toCpp(update.parts),
-        .indexData = makeVector(update.indexData),
-        .vertexData = toCpp(update.vertexData),
-        .instanceTransforms = toCpp<WebModel::Float4x4>(update.instanceTransformsData),
-        .materialPrims = toCpp(update.materialPrims),
-        .deformationData = toCpp(update.deformationData)
+    return WebModel::TypedResourceId {
+        .value = update.value,
+        .path = update.path,
+        .hashValue = update.cachedHashValue
     };
 }
+
 
 static WebModel::NodeType toCpp(WKBridgeNodeType nodeType)
 {
@@ -838,6 +824,21 @@ static Vector<U> toCpp(NSArray<T *> *nsArray)
     return result;
 }
 
+static WebModel::UpdateMeshDescriptor toCpp(WKBridgeUpdateMesh *update)
+{
+    return WebModel::UpdateMeshDescriptor {
+        .identifier = toCpp(update.identifier),
+        .updateType = static_cast<uint8_t>(update.updateType),
+        .descriptor = toCpp(update.descriptor),
+        .parts = toCpp(update.parts),
+        .indexData = makeVector(update.indexData),
+        .vertexData = toCpp(update.vertexData),
+        .instanceTransforms = toCpp<WebModel::Float4x4>(update.instanceTransformsData),
+        .assignedMaterials = toCpp<WKBridgeTypedResourceId, WebModel::TypedResourceId>(update.assignedMaterials),
+        .deformationData = toCpp(update.deformationData)
+    };
+}
+
 static WebModel::MaterialGraph toCpp(WKBridgeMaterialGraph *materialGraph)
 {
     return WebModel::MaterialGraph {
@@ -881,7 +882,7 @@ static WebModel::UpdateTextureDescriptor toCpp(WKBridgeUpdateTexture *update)
 {
     return WebModel::UpdateTextureDescriptor {
         .imageAsset = convert(update.imageAsset),
-        .identifier = update.identifier,
+        .identifier = toCpp(update.identifier),
         .hashString = update.hashString
     };
 }
@@ -890,7 +891,7 @@ static WebModel::UpdateMaterialDescriptor toCpp(WKBridgeUpdateMaterial *update)
 {
     return WebModel::UpdateMaterialDescriptor {
         .materialGraph = toCpp(update.materialGraph),
-        .identifier = update.identifier
+        .identifier = toCpp(update.identifier)
     };
 }
 

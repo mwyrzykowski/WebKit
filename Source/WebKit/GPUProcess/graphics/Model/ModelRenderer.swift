@@ -24,8 +24,8 @@
 #if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
 
 import QuartzCore
-@_weakLinked import USDKit
-@_weakLinked @_spi(UsdLoaderAPI) import _USDKit_RealityKit
+import USDKit
+@_spi(UsdLoaderAPI) import _USDKit_RealityKit
 @_spi(RealityCoreRendererAPI) @_spi(Private) import RealityKit
 import simd
 
@@ -91,11 +91,21 @@ class Renderer {
         self.renderer = renderer
     }
 
+    func newCommandBuffer() -> any MTLCommandBuffer {
+        guard let renderCommandBuffer = commandQueue.makeCommandBuffer() else {
+            fatalError("Failed to make command buffer")
+        }
+
+        return renderCommandBuffer
+    }
+
     func render(
         meshInstances: _Proto_LowLevelMeshInstanceArray_v1,
-        texture: any MTLTexture
+        texture: any MTLTexture,
+        commandBuffer: any MTLCommandBuffer
     ) throws {
         guard let renderer else {
+            commandBuffer.commit()
             return
         }
 
@@ -116,12 +126,9 @@ class Renderer {
         renderer.output.color = .init(texture: texture)
         renderer.meshInstances = meshInstances
 
-        guard let renderCommandBuffer = commandQueue.makeCommandBuffer() else {
-            fatalError("Failed to make command buffer")
-        }
-        renderCommandBuffer.label = "Render Camera"
-        try renderer.render(for: renderCommandBuffer)
-        renderCommandBuffer.commit()
+        commandBuffer.label = "Render Camera"
+        try renderer.render(for: commandBuffer)
+        commandBuffer.commit()
     }
 
     internal func setFOV(_ fovYRadians: Float) {

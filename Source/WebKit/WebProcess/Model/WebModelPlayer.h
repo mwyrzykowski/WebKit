@@ -149,6 +149,7 @@ private:
     std::optional<WebCore::ModelPlayerAnimationState> m_cachedAnimationState;
     std::optional<std::unique_ptr<WebCore::ModelPlayerTransformState>> m_cachedTransformState;
     float m_playbackRate { 1.0f };
+    uint32_t m_completedFrames { 0 };
     bool m_isLooping { false };
 };
 

@@ -63,10 +63,10 @@ public:
     ~WebMesh();
 
     bool NODELETE isValid() const;
-    void NODELETE render() const;
-    void NODELETE update(const WebModel::UpdateMeshDescriptor&);
-    void NODELETE updateTexture(const WebModel::UpdateTextureDescriptor&);
-    void NODELETE updateMaterial(const WebModel::UpdateMaterialDescriptor&);
+    void NODELETE render(uint32_t textureIndex, Function<void(bool)>&&) const;
+    void NODELETE update(Vector<WebModel::UpdateMeshDescriptor>&&);
+    void NODELETE updateTexture(Vector<WebModel::UpdateTextureDescriptor>&&);
+    void NODELETE updateMaterial(Vector<WebModel::UpdateMaterialDescriptor>&&);
     void NODELETE setTransform(const simd_float4x4&);
     void NODELETE setFOV(float);
     void NODELETE setBackgroundColor(const simd_float3&);
@@ -85,7 +85,6 @@ private:
     RetainPtr<WKBridgeReceiver> m_receiver;
     RetainPtr<NSUUID> m_meshIdentifier;
     RetainPtr<NSMutableDictionary> m_batchedUpdates;
-    mutable uint32_t m_currentTexture { 0 };
     mutable bool m_meshDataExists { false };
     std::optional<simd_float4x4> m_transform;
 #endif

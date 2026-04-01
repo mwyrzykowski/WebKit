@@ -25,12 +25,12 @@ import Metal
 import WebKit
 
 #if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
-@_weakLinked @_spi(UsdLoaderAPI) import _USDKit_RealityKit
+@_spi(UsdLoaderAPI) import _USDKit_RealityKit
 @_spi(RealityCoreRendererAPI) import RealityKit
-@_weakLinked import USDKit
-@_weakLinked @_spi(SwiftAPI) import DirectResource
-@_weakLinked import _USDKit_RealityKit
-@_weakLinked import ShaderGraph
+import USDKit
+@_spi(SwiftAPI) import DirectResource
+import _USDKit_RealityKit
+import ShaderGraph
 #endif
 
 @objc
@@ -209,8 +209,41 @@ extension WKBridgeDeformationData {
 
 @objc
 @implementation
+extension WKBridgeTypedResourceId {
+    let value: String
+    let path: String
+    let cachedHashValue: Int
+
+    init(
+        value: UUID,
+        path: String,
+        hashValue: Int
+    ) {
+        self.value = value.uuidString
+        self.path = path
+        self.cachedHashValue = hashValue
+    }
+
+    public override var hash: Int {
+        cachedHashValue
+    }
+
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? WKBridgeTypedResourceId else {
+            return false
+        }
+        return self.cachedHashValue == other.cachedHashValue
+    }
+
+    public override var description: String {
+        path + "@" + value
+    }
+}
+
+@objc
+@implementation
 extension WKBridgeUpdateMesh {
-    let identifier: String
+    let identifier: WKBridgeTypedResourceId
     let updateType: WKBridgeDataUpdateType
     let descriptor: WKBridgeMeshDescriptor?
     let parts: [WKBridgeMeshPart]
@@ -218,11 +251,11 @@ extension WKBridgeUpdateMesh {
     let vertexData: [Data]
     let instanceTransformsData: Data? // [float4x4]
     let instanceTransformsCount: Int
-    let materialPrims: [String]
+    let assignedMaterials: [WKBridgeTypedResourceId]
     let deformationData: WKBridgeDeformationData?
 
     init(
-        identifier: String,
+        identifier: WKBridgeTypedResourceId,
         updateType: WKBridgeDataUpdateType,
         descriptor: WKBridgeMeshDescriptor?,
         parts: [WKBridgeMeshPart],
@@ -230,7 +263,7 @@ extension WKBridgeUpdateMesh {
         vertexData: [Data],
         instanceTransforms: Data?,
         instanceTransformsCount: Int,
-        materialPrims: [String],
+        assignedMaterials: [WKBridgeTypedResourceId],
         deformationData: WKBridgeDeformationData?
     ) {
         self.identifier = identifier
@@ -241,7 +274,7 @@ extension WKBridgeUpdateMesh {
         self.vertexData = vertexData
         self.instanceTransformsData = instanceTransforms
         self.instanceTransformsCount = instanceTransformsCount
-        self.materialPrims = materialPrims
+        self.assignedMaterials = assignedMaterials
         self.deformationData = deformationData
     }
 }
@@ -369,12 +402,12 @@ extension WKBridgeImageAsset {
 @implementation
 extension WKBridgeUpdateTexture {
     let imageAsset: WKBridgeImageAsset?
-    let identifier: String
+    let identifier: WKBridgeTypedResourceId
     let hashString: String
 
     init(
         imageAsset: WKBridgeImageAsset?,
-        identifier: String,
+        identifier: WKBridgeTypedResourceId,
         hashString: String
     ) {
         self.imageAsset = imageAsset
@@ -387,11 +420,11 @@ extension WKBridgeUpdateTexture {
 @implementation
 extension WKBridgeUpdateMaterial {
     let materialGraph: WKBridgeMaterialGraph?
-    let identifier: String
+    let identifier: WKBridgeTypedResourceId
 
     init(
         materialGraph: WKBridgeMaterialGraph?,
-        identifier: String,
+        identifier: WKBridgeTypedResourceId,
     ) {
         self.materialGraph = materialGraph
         self.identifier = identifier
