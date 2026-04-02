@@ -278,7 +278,7 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         .bytesPerPixel = 2,
         .textureType = WebCore::WebGPU::TextureViewDimension::Cube,
         .pixelFormat = WebCore::WebGPU::TextureFormat::R16float,
-        .mipmapLevelCount = 0,
+        .mipmapLevelCount = 1,
         .arrayLength = 6,
         .textureUsage = WebCore::WebGPU::TextureUsage::TextureBinding,
         .swizzle = { }
@@ -291,7 +291,7 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         .bytesPerPixel = 2,
         .textureType = WebCore::WebGPU::TextureViewDimension::Cube,
         .pixelFormat = WebCore::WebGPU::TextureFormat::R16float,
-        .mipmapLevelCount = 0,
+        .mipmapLevelCount = 9,
         .arrayLength = 6,
         .textureUsage = WebCore::WebGPU::TextureUsage::TextureBinding,
         .swizzle = { }
