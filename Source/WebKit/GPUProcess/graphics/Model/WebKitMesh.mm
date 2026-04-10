@@ -566,6 +566,15 @@ static NSData* convert(const Vector<T>& data)
 }
 
 template<typename T>
+static NSData* convertNonZeroSize(const Vector<T>& data)
+{
+    if (!data.size())
+        RELEASE_ASSERT_NOT_REACHED("data.size() should never be zero");
+
+    return [[NSData alloc] initWithBytes:data.span().data() length:data.sizeInBytes()];
+}
+
+template<typename T>
 static NSArray<NSData*> *convert(const Vector<Vector<T>>& data)
 {
     if (!data.size())
@@ -1102,7 +1111,7 @@ void WebMesh::updateTexture(Vector<WebModel::UpdateTextureDescriptor>&& inputArr
 #if ENABLE(GPU_PROCESS_MODEL)
 static WKBridgeUpdateMaterial *convert(const WebModel::UpdateMaterialDescriptor& input)
 {
-    return [WebKit::allocWKBridgeUpdateMaterialInstance() initWithMaterialGraph:WebModel::convert(input.materialGraph) identifier:convert(input.identifier)];
+    return [WebKit::allocWKBridgeUpdateMaterialInstance() initWithMaterialGraph:WebModel::convert(input.materialGraph) identifier:convert(input.identifier) materialArchive:WebModel::convertNonZeroSize(input.materialArchive)];
 }
 #endif
 

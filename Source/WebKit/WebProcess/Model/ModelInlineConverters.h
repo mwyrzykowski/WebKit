@@ -891,7 +891,8 @@ static WebModel::UpdateMaterialDescriptor toCpp(WKBridgeUpdateMaterial *update)
 {
     return WebModel::UpdateMaterialDescriptor {
         .materialGraph = toCpp(update.materialGraph),
-        .identifier = toCpp(update.identifier)
+        .identifier = toCpp(update.identifier),
+        .materialArchive = toCpp<bool>(update.materialArchive)
     };
 }
 

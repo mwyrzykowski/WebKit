@@ -103,6 +103,9 @@ void RemoteMesh::updateTexture(Vector<WebModel::UpdateTextureDescriptor>&& descr
 
 void RemoteMesh::updateMaterial(Vector<WebModel::UpdateMaterialDescriptor>&& descriptor, CompletionHandler<void(bool)>&& completionHandler)
 {
+    for (auto& descriptor : descriptors)
+        MESSAGE_CHECK(descriptor.materialArchive.size());
+
     m_backing->updateMaterial(WTF::move(descriptor));
     completionHandler(true);
 }

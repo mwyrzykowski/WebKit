@@ -691,10 +691,13 @@ extension WKBridgeReceiver {
                 let identifier = data.identifier
                 logInfo("updateMaterial \(identifier)")
 
-                guard let shaderGraph = ShaderGraph._Proto_ShaderNodeGraph.fromWKDescriptor(data.materialGraph) else {
+                guard let shaderGraphIPC = ShaderGraph._Proto_ShaderNodeGraph.fromWKDescriptor(data.materialGraph) else {
                     fatalError("No materialGraph data provided for material \(identifier)")
                 }
 
+                // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
+                // swift-format-ignore: NeverForceUnwrap
+                let shaderGraph = try ShaderGraph._Proto_ShaderNodeGraph(from: data.materialArchive)
                 let shaderGraphOutput = try await renderContext.makeShaderGraphFunctions(shaderGraph: shaderGraph)
 
                 let geometryArguments = try makeParameters(
@@ -1385,7 +1388,8 @@ func webUpdateMaterialRequestFromUpdateMaterialRequest(
     let bridgeMaterialGraph = toWebMaterialGraph(request.shaderGraph)
     return WKBridgeUpdateMaterial(
         materialGraph: bridgeMaterialGraph,
-        identifier: .init(value: request.id.value, path: request.id.path, hashValue: request.id.hashValue)
+        identifier: .init(value: request.id.value, path: request.id.path, hashValue: request.id.hashValue),
+        materialArchive: request.materialSourceArchive ?? Data()
     )
 }
 

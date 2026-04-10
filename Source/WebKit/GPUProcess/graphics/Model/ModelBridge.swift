@@ -421,13 +421,16 @@ extension WKBridgeUpdateTexture {
 extension WKBridgeUpdateMaterial {
     let materialGraph: WKBridgeMaterialGraph?
     let identifier: WKBridgeTypedResourceId
+    let materialArchive: Data
 
     init(
         materialGraph: WKBridgeMaterialGraph?,
         identifier: WKBridgeTypedResourceId,
+        materialArchive: Data
     ) {
         self.materialGraph = materialGraph
         self.identifier = identifier
+        self.materialArchive = materialArchive
     }
 }
 

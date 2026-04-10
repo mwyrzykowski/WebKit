@@ -70,6 +70,7 @@ header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::UpdateMaterialDescriptor {
     WebModel::MaterialGraph materialGraph;
     WebModel::TypedResourceId identifier;
+    Vector<bool> materialArchive;
 };
 
 header: <WebKit/ModelTypes.h>

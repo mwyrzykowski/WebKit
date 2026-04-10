@@ -403,9 +403,10 @@ NS_SWIFT_SENDABLE
 
 @property (nonatomic, strong, readonly, nullable) WKBridgeMaterialGraph *materialGraph;
 @property (nonatomic, strong, readonly) WKBridgeTypedResourceId *identifier;
+@property (nonatomic, strong, readonly) NSData *materialArchive;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithMaterialGraph:(nullable WKBridgeMaterialGraph *)materialGraph identifier:(WKBridgeTypedResourceId *)identifier NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithMaterialGraph:(nullable WKBridgeMaterialGraph *)materialGraph identifier:(WKBridgeTypedResourceId *)identifier materialArchive:(NSData *)materialArchive NS_DESIGNATED_INITIALIZER;
 
 @end
 
