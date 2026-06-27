@@ -461,7 +461,16 @@ static simd_float4x4 buildRotation(float azimuth, float elevation)
 void RemoteMeshProxy::setRotation(float yaw, float pitch, float roll)
 {
     UNUSED_PARAM(roll);
-    m_transform = buildRotation(yaw, pitch);
+    simd_float4x4 userRotation = buildRotation(yaw, pitch);
+    m_transform = simd_mul(userRotation, static_cast<simd_float4x4>(m_baseRotation));
+    setStageMode(m_stageMode);
+}
+
+void RemoteMeshProxy::setBaseRotation(float yaw, float pitch, float roll)
+{
+    UNUSED_PARAM(roll);
+    m_baseRotation = buildRotation(yaw, pitch);
+    m_transform = m_baseRotation;
     setStageMode(m_stageMode);
 }
 #endif

@@ -120,6 +120,7 @@ private:
 #if ENABLE(GPU_PROCESS_MODEL)
     void computeTransform();
     void setRotation(float yaw, float pitch, float roll) final;
+    void setBaseRotation(float yaw, float pitch, float roll) final;
 #endif
     void setEnvironmentMap(WebModel::UpdateTextureDescriptor&&) final;
     void updateContentsHeadroom(float) final;
@@ -138,6 +139,7 @@ private:
     float m_viewportHeight { 0.f };
     WebCore::StageModeOperation m_stageMode { WebCore::StageModeOperation::None };
     bool m_entityTransformSetByScript { false };
+    WebModel::Float4x4 m_baseRotation { matrix_identity_float4x4 };
 #endif
 };
 

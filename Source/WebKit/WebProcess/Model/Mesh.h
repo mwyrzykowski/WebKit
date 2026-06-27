@@ -85,6 +85,7 @@ public:
     virtual void setViewportSize(float, float) { }
     virtual void setStageMode(WebCore::StageModeOperation) { }
     virtual void setRotation(float, float = 0.f, float = 0.f) { }
+    virtual void setBaseRotation(float, float = 0.f, float = 0.f) { }
     virtual void play(bool) = 0;
     virtual void setEnvironmentMap(WebModel::UpdateTextureDescriptor&&) = 0;
     virtual void updateContentsHeadroom(float) = 0;

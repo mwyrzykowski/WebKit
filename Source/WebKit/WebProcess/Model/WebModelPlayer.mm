@@ -270,6 +270,13 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size,
                 client->didFinishLoading(protectedThis.get());
                 auto [center, extents] = protectedThis->boundingBoxCenterAndExtents();
                 client->didUpdateBoundingBox(protectedThis.get(), center, extents);
+
+                // For models whose up axis is Z (e.g. many USD assets), rotate the model into the
+                // renderer's Y-up space so it appears upright on screen. This matches the rotation
+                // already applied to the reported bounding box in boundingBoxCenterAndExtents().
+                if ([protectedThis->m_modelLoader treatZAsUpAxis])
+                    model->setBaseRotation(0.f, -static_cast<float>(M_PI_2));
+
                 protectedThis->notifyEntityTransformUpdated();
 
                 if (auto environmentMap = protectedThis->m_environmentMap)
@@ -379,12 +386,16 @@ void WebModelPlayer::handleMouseDown(const WebCore::LayoutPoint& startingPoint, 
     if (!m_orbitSimulator) {
         m_orbitSimulator = adoptNS([[WKStageModeOrbitSimulator alloc] init]);
         // Seed from the current pose so a gesture after reload doesn't snap to default.
+        // The orbit simulator tracks user-space yaw/pitch, applied on top of the model's
+        // up-axis correction (a -π/2 pitch for Z-up models). Subtract that base pitch so
+        // the simulator starts at the user's effective (0, 0) when no orbit has occurred.
         if (auto transform = entityTransform()) {
             auto matrix = static_cast<simd_float4x4>(*transform);
             simd_float3 c0 = simd_normalize(simd_make_float3(matrix.columns[0]));
             simd_float3 c1 = simd_normalize(simd_make_float3(matrix.columns[1]));
             simd_float3 c2 = simd_normalize(simd_make_float3(matrix.columns[2]));
-            [m_orbitSimulator setCurrentYaw:std::atan2(-c2.x, c0.x) pitch:std::atan2(-c1.z, c1.y)];
+            float basePitch = [m_modelLoader treatZAsUpAxis] ? -static_cast<float>(M_PI_2) : 0.f;
+            [m_orbitSimulator setCurrentYaw:std::atan2(-c2.x, c0.x) pitch:std::atan2(-c1.z, c1.y) - basePitch];
         }
     }
     [m_orbitSimulator gestureDidBegin];
