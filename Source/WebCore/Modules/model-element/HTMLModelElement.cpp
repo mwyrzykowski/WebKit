@@ -808,9 +808,25 @@ void HTMLModelElement::reloadModelPlayer()
 #if ENABLE(MODEL_PROCESS) || ENABLE(GPU_PROCESS_MODEL)
     if (!m_modelPlayerProvider)
         m_modelPlayerProvider = document().page()->modelPlayerProvider();
+#if ENABLE(GPU_PROCESS_MODEL)
+    RefPtr<ModelPlayer> previousPlayer = modelPlayer;
+    bool routingToPending = previousPlayer && !previousPlayer->isPlaceholder();
+    if (routingToPending)
+        deletePendingModelPlayer();
+#endif
     if (RefPtr modelPlayerProvider = m_modelPlayerProvider) {
         modelPlayer = modelPlayerProvider->createModelPlayer(*this);
+#if ENABLE(GPU_PROCESS_MODEL)
+        if (modelPlayer && previousPlayer)
+            modelPlayer->adoptContentsDisplayDelegateFrom(*previousPlayer);
+
+        if (routingToPending)
+            m_pendingModelPlayer = modelPlayer.copyRef();
+        else
+            m_modelPlayer = modelPlayer.copyRef();
+#else
         m_modelPlayer = modelPlayer.copyRef();
+#endif
     }
     if (!modelPlayer) {
         RELEASE_LOG_ERROR(ModelElement, "%p - HTMLModelElement: Failed to create model player to reload with", this);

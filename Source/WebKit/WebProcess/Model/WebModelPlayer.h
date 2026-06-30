@@ -72,6 +72,7 @@ public:
 
     WebCore::ModelPlayerIdentifier identifier() const final;
     bool isPlaceholder() const final;
+    bool isWebModelPlayerInstance() const final { return true; }
     void scheduleUpdateIfNeeded();
 
 private:
@@ -83,6 +84,7 @@ private:
     void load(WebCore::Model&, WebCore::LayoutSize, bool) final;
     void sizeDidChange(WebCore::LayoutSize) final;
     void configureGraphicsLayer(WebCore::GraphicsLayer&, WebCore::ModelPlayerGraphicsLayerConfiguration&&) final;
+    void adoptContentsDisplayDelegateFrom(WebCore::ModelPlayer&) final;
     RefPtr<WebCore::ImageBuffer> snapshotCurrentFrame(const WebCore::FloatSize& deviceSize, const WebCore::DestinationColorSpace&) final;
     void enterFullscreen() final;
     void handleMouseDown(const WebCore::LayoutPoint&, MonotonicTime) final;
@@ -131,6 +133,7 @@ private:
     void updateClockTimeOnAnimationState();
     bool render();
     void scheduleDisplayUpdate();
+    void notifyClientDidFinishLoading();
 
     void setStageMode(WebCore::StageModeOperation) final;
     void notifyEntityTransformUpdated();
@@ -181,6 +184,7 @@ private:
     bool m_isUpdateScheduled { false };
     bool m_isUpdating { false };
     bool m_needsEntityTransformNotification { false };
+    bool m_pendingClientFinishLoadingNotification { false };
 
 #if HAVE(SUPPORT_HDR_DISPLAY) && ENABLE(PIXEL_FORMAT_RGBA16F)
     using ScreenPropertiesChangedObserver = Observer<void(WebCore::PlatformDisplayID)>;
