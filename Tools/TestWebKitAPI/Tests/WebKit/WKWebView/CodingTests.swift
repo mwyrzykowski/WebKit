@@ -29,6 +29,7 @@ private import WebKit_Private.WKPreferencesPrivate
 @MainActor
 struct CodingTests {
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkPreferences() throws {
         let a = WKPreferences()
 
@@ -54,6 +55,7 @@ struct CodingTests {
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkProcessPoolShared() throws {
         let a = try #require(WKProcessPool._shared())
         let b = try encodeAndDecode(a)
@@ -62,12 +64,14 @@ struct CodingTests {
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkProcessPool() throws {
         let pool = try encodeAndDecode(WKProcessPool())
         #expect(pool !== WKProcessPool._shared())
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkWebsiteDataStoreDefault() throws {
         let a = WKWebsiteDataStore.default()
         let b = try encodeAndDecode(a)
@@ -76,12 +80,14 @@ struct CodingTests {
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkWebsiteDataStoreNonPersistent() throws {
         let store = try encodeAndDecode(WKWebsiteDataStore.nonPersistent())
         #expect(!store.isPersistent)
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkWebViewConfiguration() throws {
         let a = WKWebViewConfiguration()
 
@@ -114,6 +120,7 @@ struct CodingTests {
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkWebView() throws {
         let a = WKWebView()
 
@@ -149,6 +156,7 @@ struct CodingTests {
     }
 
     @Test
+    @available(*, deprecated, message: "Intentionally uses deprecated API.")
     func wkWebViewSameConfiguration() throws {
         // First, encode two WKWebViews sharing the same configuration.
         let data = try {
@@ -176,6 +184,7 @@ struct CodingTests {
     }
 }
 
+@available(*, deprecated, message: "Intentionally uses deprecated API.")
 private func encodeAndDecode<T>(_ value: T) throws -> T where T: NSCoding, T: NSObject {
     if let secureCoding = value as? any NSSecureCoding {
         let data = try NSKeyedArchiver.archivedData(withRootObject: secureCoding, requiringSecureCoding: true)
