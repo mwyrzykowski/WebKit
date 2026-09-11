@@ -100,6 +100,7 @@ private:
     void collectDynamicOffsetGlobals(const PipelineLayout&);
     void usesOverride(AST::Variable&);
     void validateUsedGlobals(const UsedGlobals&) const;
+    std::optional<Error> errorValidatingTextureSamplerPairs(const CallGraph::EntryPoint&, const PipelineLayout&) const;
     Vector<unsigned> insertStructs(const UsedResources&);
     Result<Vector<unsigned>> insertStructs(PipelineLayout&, const UsedResources&);
     AST::StructureMember& createArgumentBufferEntry(unsigned binding, AST::Variable&);
@@ -1202,6 +1203,12 @@ std::optional<Error> RewriteGlobalVariables::visitEntryPoint(const CallGraph::En
         return maybeUsedGlobals.error();
     }
     auto usedGlobals = *maybeUsedGlobals;
+    if (!m_generatedLayout) {
+        if (auto error = errorValidatingTextureSamplerPairs(entryPoint, *it->value)) {
+            insertDynamicOffsetsBufferIfNeeded(entryPoint.function);
+            return error;
+        }
+    }
     auto maybeGroups = m_generatedLayout ? Result<Vector<unsigned>>(insertStructs(usedGlobals.resources)) : insertStructs(*it->value, usedGlobals.resources);
     if (!maybeGroups) {
         insertDynamicOffsetsBufferIfNeeded(entryPoint.function);
@@ -1748,7 +1755,7 @@ Vector<unsigned> RewriteGlobalVariables::insertStructs(const UsedResources& used
 
             auto* type = global.declaration->storeType();
             if (isPrimitive(type, Types::Primitive::TextureExternal))
-                metalId += 4;
+                metalId += 6;
             else
                 ++metalId;
 
@@ -2178,6 +2185,43 @@ static String errorValidatingVariableAndEntryMatch(const AST::Variable& variable
         return "variableAccessMode != entryAccessMode"_s;
 
     return emptyString();
+}
+
+// https://gpuweb.github.io/gpuweb/#abstract-opdef-validating-gpuprogrammablestage
+std::optional<Error> RewriteGlobalVariables::errorValidatingTextureSamplerPairs(const CallGraph::EntryPoint& entryPoint, const PipelineLayout& layout) const
+{
+    const auto& findEntry = [&](const Global::Resource& resource) -> const BindGroupLayoutEntry* {
+        // A bind group's index into bindGroupLayouts is its @group number.
+        if (resource.group >= layout.bindGroupLayouts.size())
+            return nullptr;
+        for (const auto& entry : layout.bindGroupLayouts[resource.group].entries) {
+            if (entry.binding == resource.binding && entry.visibility.contains(m_stage))
+                return &entry;
+        }
+        return nullptr;
+    };
+
+    for (const auto& pair : entryPoint.textureSamplerPairs) {
+        const auto* samplerEntry = findEntry(pair.sampler);
+        if (!samplerEntry)
+            continue;
+        const auto* samplerBinding = std::get_if<SamplerBindingLayout>(&samplerEntry->bindingMember);
+        if (!samplerBinding || samplerBinding->type != SamplerBindingType::Filtering)
+            continue;
+
+        const auto* textureEntry = findEntry(pair.texture);
+        if (!textureEntry)
+            continue;
+        // A texture that is not bound as a plain texture, an external texture for instance, is
+        // filterable whatever the sampler.
+        const auto* textureBinding = std::get_if<TextureBindingLayout>(&textureEntry->bindingMember);
+        if (!textureBinding || textureBinding->sampleType == TextureSampleType::Float)
+            continue;
+
+        return Error(makeString("Shader is incompatible with layout pipeline: entry point '"_s, entryPoint.originalName, "' uses the filtering sampler at @group("_s, pair.sampler.group, ") @binding("_s, pair.sampler.binding, ") with the texture at @group("_s, pair.texture.group, ") @binding("_s, pair.texture.binding, "), whose sample type is "_s, nameForTextureSampleType(textureBinding->sampleType)), SourceSpan::empty());
+    }
+
+    return std::nullopt;
 }
 
 Result<Vector<unsigned>> RewriteGlobalVariables::insertStructs(PipelineLayout& layout, const UsedResources& usedResources)

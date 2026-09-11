@@ -269,7 +269,10 @@ Ref<ComputePassEncoder> CommandEncoder::beginComputePass(const WGPUComputePassDe
 
     if (!prepareTheEncoderState()) {
         GENERATE_INVALID_ENCODER_STATE_ERROR();
-        return ComputePassEncoder::createInvalid(*this, m_device, @"encoder state is invalid");
+        // https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-end
+        // A pass begun while the command encoder was already locked by another pass never took the
+        // encoder over. Ending it is a validation error the page can catch, not a no-op.
+        return ComputePassEncoder::createInvalidWithEncoderStateNotOpen(*this, m_device, @"encoder state is invalid");
     }
 
     if (NSString* error = errorValidatingComputePassDescriptor(descriptor))
@@ -539,7 +542,10 @@ Ref<RenderPassEncoder> CommandEncoder::beginRenderPass(const WGPURenderPassDescr
 
     if (!prepareTheEncoderState()) {
         GENERATE_INVALID_ENCODER_STATE_ERROR();
-        return RenderPassEncoder::createInvalid(*this, m_device, @"encoder state is not valid");
+        // https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-end
+        // A pass begun while the command encoder was already locked by another pass never took the
+        // encoder over. Ending it is a validation error the page can catch, not a no-op.
+        return RenderPassEncoder::createInvalidWithEncoderStateNotOpen(*this, m_device, @"encoder state is not valid");
     }
 
     if (NSString* error = errorValidatingRenderPassDescriptor(descriptor))
@@ -723,12 +729,9 @@ Ref<RenderPassEncoder> CommandEncoder::beginRenderPass(const WGPURenderPassDescr
                 return RenderPassEncoder::createInvalid(*this, m_device, @"depth stencil texture dimensions mismatch");
             if (textureView.arrayLayerCount() > 1 || textureView.mipLevelCount() > 1)
                 return RenderPassEncoder::createInvalid(*this, m_device, @"depth stencil texture has more than one array layer or mip level");
-
-            if (!Texture::isDepthStencilRenderableFormat(textureView.format(), m_device) || !isRenderableTextureView(textureView, attachment->depthLoadOp, attachment->depthStoreOp))
-                return RenderPassEncoder::createInvalid(*this, m_device, @"depth stencil texture is not renderable");
         }
 
-        if (!isAllowableTextureView(textureView, attachment->depthLoadOp, attachment->depthStoreOp))
+        if (!isRenderableDepthStencilTextureView(textureView, m_device, isDestroyed, hasDepthComponent, attachment->depthLoadOp, attachment->depthStoreOp, hasStencilComponent, attachment->stencilLoadOp, attachment->stencilStoreOp))
             return RenderPassEncoder::createInvalid(*this, m_device, @"depth stencil texture is not renderable");
 
         depthReadOnly = attachment->depthReadOnly;
@@ -1361,6 +1364,12 @@ void CommandEncoder::clearTextureIfNeeded(const WGPUImageCopyTexture& destinatio
 void CommandEncoder::clearTextureIfNeeded(Texture& texture, NSUInteger mipLevel, NSUInteger slice, const Device& device, id<MTLBlitCommandEncoder> blitCommandEncoder)
 {
     if (!blitCommandEncoder || texture.previouslyCleared(mipLevel, slice))
+        return;
+
+    // A transient texture is memoryless, so it cannot be the destination of a blit. Its contents
+    // never exist outside of the render pass which produces them, and every render pass using it
+    // has to clear it, so there is nothing to lazily initialize here.
+    if (texture.usage() & WGPUTextureUsage_Transient)
         return;
 
     texture.setPreviouslyCleared(mipLevel, slice);

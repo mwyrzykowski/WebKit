@@ -1839,6 +1839,7 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/WebGPU/GPUDeviceDescriptor.idl
     Modules/WebGPU/GPUDeviceLostInfo.idl
     Modules/WebGPU/GPUDeviceLostReason.idl
+    Modules/WebGPU/GPUError.idl
     Modules/WebGPU/GPUErrorFilter.idl
     Modules/WebGPU/GPUExtent3DDict.idl
     Modules/WebGPU/GPUExternalTexture.idl

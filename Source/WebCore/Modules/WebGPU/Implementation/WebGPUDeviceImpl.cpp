@@ -191,6 +191,8 @@ RefPtr<ExternalTexture> DeviceImpl::importExternalTexture(const ExternalTextureD
         .label = label.data(),
         .pixelBuffer = pixelBuffer ? pixelBuffer->get() : nullptr,
         .colorSpace = m_convertToBackingContext->convertToBacking(descriptor.colorSpace),
+        .visibleWidth = static_cast<uint32_t>(std::max(0, descriptor.visibleSize.width())),
+        .visibleHeight = static_cast<uint32_t>(std::max(0, descriptor.visibleSize.height())),
     };
     return ExternalTextureImpl::create(adoptWebGPU(wgpuDeviceImportExternalTexture(m_backing.get(), &backingDescriptor)), descriptor, m_convertToBackingContext);
 }

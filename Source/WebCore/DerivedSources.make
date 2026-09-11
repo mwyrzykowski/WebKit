@@ -111,6 +111,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/WebGPU/GPUDeviceLostInfo.idl \
     $(WebCore)/Modules/WebGPU/GPUDeviceLostReason.idl \
     $(WebCore)/Modules/WebGPU/GPUDeviceUncapturedError.idl \
+    $(WebCore)/Modules/WebGPU/GPUError.idl \
     $(WebCore)/Modules/WebGPU/GPUErrorFilter.idl \
     $(WebCore)/Modules/WebGPU/GPUExtent3DDict.idl \
     $(WebCore)/Modules/WebGPU/GPUExternalTexture.idl \
